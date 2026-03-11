@@ -12,10 +12,10 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 **Phase:** 3.1 of 4 (Chores)
 **Current Plan:** 2 of 2
 **Total Plans in Phase:** 2
-**Status:** In progress
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-03-11
 
-**Progress:** [████████░░] 79%
+**Progress:** [█████████░] 86%
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 03 P02 | 5min | 2 tasks | 5 files |
 | Phase 03 P03 | 4min | 2 tasks | 1 files |
 | Phase 03.1 P01 | 4min | 2 tasks | 5 files |
+| Phase 03.1 P02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 03.1]: No optimistic updates for chore completion/claim -- show loading, call RPC, refresh (cascading state changes)
 - [Phase 03.1]: pg_cron with DO-block exception handling for dispute auto-revert -- graceful fallback if unavailable
 - [Phase 03.1]: Chores due immediately on creation (next_due_at = now) so they appear in list right away
+- [Phase 03.1]: Client-side fallback for dispute auto-revert queries stale disputes on screen focus
+- [Phase 03.1]: Streaks calculated globally from all-time history, not filtered by dashboard period
+- [Phase 03.1]: Dashboard shows all household members even with zero completions for full visibility
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T20:33:57.065Z
-**Stopped at:** Completed 03.1-01-PLAN.md
+**Last session:** 2026-03-11T20:41:15.119Z
+**Stopped at:** Completed 03.1-02-PLAN.md
 **Resume file:** None

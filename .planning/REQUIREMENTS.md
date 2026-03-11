@@ -35,7 +35,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CHOR-01**: User can create and assign chores to household members
 - [x] **CHOR-02**: User can mark chores as completed
 - [x] **CHOR-03**: Chores automatically rotate among members with effort weighting
-- [ ] **CHOR-04**: User can view chore contribution history per member
+- [x] **CHOR-04**: User can view chore contribution history per member
 
 ### Engagement
 
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHOR-01 | Phase 3.1 | Complete |
 | CHOR-02 | Phase 3.1 | Complete |
 | CHOR-03 | Phase 3.1 | Complete |
-| CHOR-04 | Phase 3.1 | Pending |
+| CHOR-04 | Phase 3.1 | Complete |
 | PUSH-01 | Phase 4 | Pending |
 | PUSH-02 | Phase 4 | Pending |
 | PUSH-03 | Phase 4 | Pending |
