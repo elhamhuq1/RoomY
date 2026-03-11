@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { useSession } from "@/lib/auth-context";
 
 export default function TabsLayout() {
@@ -92,6 +92,22 @@ export default function TabsLayout() {
           ),
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Pressable
+                onPress={() =>
+                  Alert.alert(
+                    "Chore Actions Guide",
+                    "✅  Complete — Mark your chore as done. It rotates to the next person.\n\n" +
+                    "🤚  Claim — Volunteer to take over someone else's chore.\n\n" +
+                    "🔄  Swap — Request to trade a chore with another member. They can accept or decline.\n\n" +
+                    "🚩  Dispute — Flag a completion you think wasn't actually done. Auto-reverts after 24 hours.\n\n" +
+                    "📊  Dashboard — See everyone's completion stats and streaks.",
+                    [{ text: "Got it" }]
+                  )
+                }
+                style={{ marginRight: 8 }}
+              >
+                <Ionicons name="information-circle-outline" size={24} color="#9ca3af" />
+              </Pressable>
               <Pressable
                 onPress={() => router.push("/(app)/chores/swap-request" as never)}
                 style={{ marginRight: 8 }}
