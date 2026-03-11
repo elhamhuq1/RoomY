@@ -37,6 +37,34 @@ export interface HouseholdSettings {
   updated_by: string | null;
 }
 
+export interface Expense {
+  id: string;
+  household_id: string;
+  description: string;
+  amount: number;
+  paid_by: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExpenseSplit {
+  id: string;
+  expense_id: string;
+  user_id: string;
+  share_amount: number;
+}
+
+export interface Settlement {
+  id: string;
+  household_id: string;
+  paid_by: string;
+  paid_to: string;
+  amount: number;
+  created_by: string;
+  created_at: string;
+}
+
 // Supabase Database type for client generic
 export interface Database {
   public: {
@@ -81,6 +109,30 @@ export interface Database {
         };
         Update: Partial<Omit<HouseholdSettings, "household_id">>;
       };
+      expenses: {
+        Row: Expense;
+        Insert: Omit<Expense, "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Omit<Expense, "id">>;
+      };
+      expense_splits: {
+        Row: ExpenseSplit;
+        Insert: Omit<ExpenseSplit, "id"> & {
+          id?: string;
+        };
+        Update: Partial<Omit<ExpenseSplit, "id">>;
+      };
+      settlements: {
+        Row: Settlement;
+        Insert: Omit<Settlement, "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<Omit<Settlement, "id">>;
+      };
     };
     Functions: {
       generate_invite_code: {
@@ -94,6 +146,10 @@ export interface Database {
           household_name: string;
           member_count: number;
         };
+      };
+      get_household_balances: {
+        Args: { p_household_id: string };
+        Returns: { user_id: string; net_amount: number }[];
       };
     };
   };
