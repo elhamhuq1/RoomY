@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 3: Groceries
+**Current focus:** Phase 3.1: Chores
 
 ## Current Position
 
 **Phase:** 3.1 of 4 (Chores)
-**Current Plan:** Not started
-**Total Plans in Phase:** 0
-**Status:** Ready to execute
+**Current Plan:** 2 of 2
+**Total Plans in Phase:** 2
+**Status:** In progress
 **Last Activity:** 2026-03-11
 
-**Progress:** [████████░░] 75%
+**Progress:** [████████░░] 79%
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 03 P01 | 4min | 2 tasks | 6 files |
 | Phase 03 P02 | 5min | 2 tasks | 5 files |
 | Phase 03 P03 | 4min | 2 tasks | 1 files |
+| Phase 03.1 P01 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,10 @@ Recent decisions affecting current work:
 - [Phase 03]: useFocusEffect added to grocery list for reliable refetch after trip completion
 - [Phase 03]: Used swipeableMethods from renderRightActions callback instead of ref-based approach for cleaner swipeable control
 - [Phase 03]: Modal-internal KeyboardAvoidingView for keyboard safety (Modal renders in separate native hierarchy)
+- [Phase 03.1]: UUID array for rotation_order instead of junction table -- simpler for 2-4 member households
+- [Phase 03.1]: No optimistic updates for chore completion/claim -- show loading, call RPC, refresh (cascading state changes)
+- [Phase 03.1]: pg_cron with DO-block exception handling for dispute auto-revert -- graceful fallback if unavailable
+- [Phase 03.1]: Chores due immediately on creation (next_due_at = now) so they appear in list right away
 
 ### Pending Todos
 
@@ -96,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T20:01:20.966Z
-**Stopped at:** Completed 03-03-PLAN.md
+**Last session:** 2026-03-11T20:33:57.065Z
+**Stopped at:** Completed 03.1-01-PLAN.md
 **Resume file:** None
