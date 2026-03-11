@@ -10,13 +10,14 @@ import React, {
 } from "react";
 import { supabase } from "./supabase";
 import type { Session, User } from "@supabase/supabase-js";
-import type { Profile, Household } from "./types/database";
+import type { Profile, Household, HouseholdSettings } from "./types/database";
 
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   profile: Profile | null;
   household: Household | null;
+  householdSettings: HouseholdSettings | null;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -37,6 +38,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [household, setHousehold] = useState<Household | null>(null);
+  const [householdSettings, setHouseholdSettings] =
+    useState<HouseholdSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchProfileAndHousehold = useCallback(async (userId: string) => {
@@ -62,14 +65,30 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
       if (memberData?.households) {
         // households is returned as a joined object
-        setHousehold(memberData.households as unknown as Household);
+        const h = memberData.households as unknown as Household;
+        setHousehold(h);
+
+        // Fetch household settings for module toggles
+        const { data: settingsData } = await supabase
+          .from("household_settings")
+          .select("*")
+          .eq("household_id", h.id)
+          .single();
+
+        if (settingsData) {
+          setHouseholdSettings(settingsData as HouseholdSettings);
+        } else {
+          setHouseholdSettings(null);
+        }
       } else {
         setHousehold(null);
+        setHouseholdSettings(null);
       }
     } catch {
       // Profile or household not found -- user may not have completed onboarding
       setProfile(null);
       setHousehold(null);
+      setHouseholdSettings(null);
     }
   }, []);
 
@@ -106,6 +125,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       } else {
         setProfile(null);
         setHousehold(null);
+        setHouseholdSettings(null);
       }
     });
 
@@ -118,11 +138,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setUser(null);
     setProfile(null);
     setHousehold(null);
+    setHouseholdSettings(null);
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ session, user, profile, household, loading, signOut, refreshProfile }}
+      value={{ session, user, profile, household, householdSettings, loading, signOut, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>
