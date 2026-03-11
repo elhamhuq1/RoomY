@@ -274,8 +274,8 @@ export default function ExpensesScreen() {
   return (
     <View className="flex-1 bg-surface-50">
       <ScrollView
-        className="flex-1"
-        contentContainerClassName="px-4 pt-4 pb-24"
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 96 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
