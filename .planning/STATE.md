@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 **Phase:** 1 of 4 (Foundation)
-**Current Plan:** 2
+**Current Plan:** 3
 **Total Plans in Phase:** 4
 **Status:** Ready to execute
 **Last Activity:** 2026-03-11
 
-**Progress:** [███░░░░░░░] 25%
+**Progress:** [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -36,6 +36,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 *Updated after each plan completion*
 | Phase 01 P01 | 6min | 2 tasks | 24 files |
+| Phase 01 P02 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -50,6 +51,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Used Expo SDK 55 instead of 54 -- NativeWind v4 and all deps compatible
 - [Phase 01]: expo-sqlite/localStorage for Supabase sessions, detectSessionInUrl: false for RN
 - [Phase 01]: Added .npmrc with legacy-peer-deps=true for expo-router peer dep conflicts
+- [Phase 01]: Social auth via signInWithIdToken with native SDKs (not OAuth browser redirect)
+- [Phase 01]: Apple Sign-In button styled per Apple HIG (black bg); router.replace for auth cross-navigation
 
 ### Pending Todos
 
@@ -63,6 +66,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T04:51:20.839Z
-**Stopped at:** Completed 01-01-PLAN.md
+**Last session:** 2026-03-11T04:57:29.816Z
+**Stopped at:** Completed 01-02-PLAN.md
 **Resume file:** None
