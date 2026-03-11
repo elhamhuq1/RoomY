@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 **Phase:** 2 of 4 (Expense Splitting)
-**Current Plan:** 2
+**Current Plan:** 3
 **Total Plans in Phase:** 4
 **Status:** Ready to execute
 **Last Activity:** 2026-03-11
 
-**Progress:** [█████░░░░░] 50%
+**Progress:** [██████░░░░] 63%
 
 ## Performance Metrics
 
@@ -39,6 +39,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 01 P02 | 3min | 2 tasks | 6 files |
 | Phase 01 P03 | 3min | 2 tasks | 7 files |
 | Phase 02 P01 | 1min | 2 tasks | 2 files |
+| Phase 02 P03 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,9 @@ Recent decisions affecting current work:
 - [Phase 02]: All expense RLS policies use get_user_household_ids() to avoid infinite recursion
 - [Phase 02]: Balances computed via DB function (never stored as mutable columns)
 - [Phase 02]: Any household member can edit/delete any expense (per user decision)
+- [Phase 02]: HTTPS Venmo URL as primary deep link (not venmo:// scheme) for Expo Go compatibility
+- [Phase 02]: Manual mark-as-settled after Venmo return (no auto-detection per user decision)
+- [Phase 02]: Settle amount field allows exceeding balance with warning for pre-payment
 
 ### Pending Todos
 
@@ -73,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T07:25:54.070Z
-**Stopped at:** Completed 02-01-PLAN.md
+**Last session:** 2026-03-11T07:34:07.065Z
+**Stopped at:** Completed 02-03-PLAN.md
 **Resume file:** None

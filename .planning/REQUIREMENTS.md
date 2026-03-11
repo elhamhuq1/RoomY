@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **EXPN-03**: User can view balance dashboard showing who owes whom
 - [ ] **EXPN-04**: User can view scrollable expense history
 - [x] **EXPN-05**: User can settle up by recording a payment
-- [ ] **EXPN-06**: User can send a Venmo request with one tap from balance screen
+- [x] **EXPN-06**: User can send a Venmo request with one tap from balance screen
 
 ### Groceries
 
@@ -93,7 +93,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPN-03 | Phase 2 | Complete |
 | EXPN-04 | Phase 2 | Pending |
 | EXPN-05 | Phase 2 | Complete |
-| EXPN-06 | Phase 2 | Pending |
+| EXPN-06 | Phase 2 | Complete |
 | GROC-01 | Phase 3 | Pending |
 | GROC-02 | Phase 3 | Pending |
 | GROC-03 | Phase 3 | Pending |
