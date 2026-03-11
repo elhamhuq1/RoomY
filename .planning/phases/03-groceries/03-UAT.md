@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 03-groceries
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md]
 started: 2026-03-11T19:30:00Z
@@ -74,21 +74,39 @@ skipped: 0
   reason: "User reported: It passes but the keyboard is being a little weird and covers a bit of the modal. Also it should be clear to the user that they can click on an item for a modal to pop up."
   severity: minor
   test: 3
-  artifacts: []
-  missing: []
+  root_cause: "Modal renders in separate native view hierarchy, so outer KeyboardAvoidingView has no effect. No inner KAV inside Modal. Also no visual edit icon on item rows."
+  artifacts:
+    - path: "app/(app)/(tabs)/groceries.tsx"
+      issue: "Modal (line ~564) lacks inner KeyboardAvoidingView; renderItemRow (lines ~370-430) has no edit affordance icon"
+  missing:
+    - "Add KeyboardAvoidingView inside Modal wrapping content"
+    - "Add chevron-forward or pencil-outline icon to each item row"
+  debug_session: ".planning/debug/grocery-edit-modal-ux.md"
 
 - truth: "Both list sections (unchecked and checked) have clear section labels"
   status: failed
   reason: "User reported: it should be explicit with the uncompleted section is. Maybe saying like 'Shopping' or something better"
   severity: cosmetic
   test: 4
-  artifacts: []
-  missing: []
+  root_cause: "Unchecked items section (lines ~503-518) has no Text label header. Checked section has 'Completed' label but unchecked section goes straight into items."
+  artifacts:
+    - path: "app/(app)/(tabs)/groceries.tsx"
+      issue: "Unchecked items block lacks a section header Text element"
+  missing:
+    - "Add a 'To Buy' or 'Shopping' Text label before the unchecked items card, matching the Completed label style"
+  debug_session: ".planning/debug/grocery-section-label-missing.md"
 
 - truth: "Swipe-to-delete reveals a tappable delete button and doesn't auto-delete too quickly; feature is discoverable"
   status: failed
   reason: "User reported: swipe to delete works, but when I swipe i don't get the chance to click the delete button because the swiping deletes it pretty quick. So the user won't know that swipe to delete is a feature, so maybe making it more explicit with UI could be nice"
   severity: minor
   test: 5
-  artifacts: []
-  missing: []
+  root_cause: "onSwipeableOpen fires deleteItem automatically when swipe animation completes. RightSwipeAction is decorative only with no onPress. overshootRight not disabled, making snap-open aggressive."
+  artifacts:
+    - path: "app/(app)/(tabs)/groceries.tsx"
+      issue: "onSwipeableOpen triggers delete on swipe complete (lines ~372-377); RightSwipeAction has no onPress handler (lines ~66-72)"
+  missing:
+    - "Remove onSwipeableOpen as delete trigger; add onPress to RightSwipeAction Pressable"
+    - "Set overshootRight={false} and increase friction"
+    - "Add 'Delete' text label under trash icon in swipe action"
+  debug_session: ".planning/debug/grocery-swipe-delete.md"
