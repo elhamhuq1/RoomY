@@ -11,9 +11,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **AUTH-01**: User can sign up and sign in with email/password
 - [x] **AUTH-02**: User can create a profile with display name and Venmo username
-- [ ] **AUTH-03**: User can create a household and receive an invite code
-- [ ] **AUTH-04**: User can join a household by entering an invite code
-- [ ] **AUTH-05**: User completes onboarding quiz that configures enabled modules
+- [x] **AUTH-03**: User can create a household and receive an invite code
+- [x] **AUTH-04**: User can join a household by entering an invite code
+- [x] **AUTH-05**: User completes onboarding quiz that configures enabled modules
 
 ### Expenses & Balances
 
@@ -85,9 +85,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
 | EXPN-01 | Phase 2 | Pending |
 | EXPN-02 | Phase 2 | Pending |
 | EXPN-03 | Phase 2 | Pending |
