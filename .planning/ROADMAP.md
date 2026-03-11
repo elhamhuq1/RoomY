@@ -47,11 +47,13 @@ Plans:
   3. User can scroll through a history of all past expenses
   4. User can record a payment to settle a debt, and the balance dashboard updates accordingly
   5. User can tap "Request via Venmo" on the balance screen and be taken to Venmo with the amount and recipient pre-filled
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Database schema (expenses, splits, settlements tables), balance function, RLS policies, TypeScript types
+- [ ] 02-02-PLAN.md — Add expense form with member selection, expense history list, expense detail with edit/delete
+- [ ] 02-03-PLAN.md — Balance dashboard with net amounts, settle-up screen with Venmo deep link
+- [ ] 02-04-PLAN.md — User acceptance testing of complete expense splitting flow
 
 ### Phase 3: Groceries & Chores
 **Goal**: Users can coordinate grocery shopping with a shared real-time list and manage household chores with fair rotation
