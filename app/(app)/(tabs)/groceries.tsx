@@ -435,6 +435,14 @@ export default function GroceriesScreen() {
           {isChecked && item.quantity > 1 && (
             <Text className="ml-2 text-sm text-gray-400">x{item.quantity}</Text>
           )}
+
+          {/* Tap-to-edit affordance */}
+          <Ionicons
+            name="pencil-outline"
+            size={16}
+            color="#d1d5db"
+            style={{ marginLeft: 8 }}
+          />
         </Pressable>
       </ReanimatedSwipeable>
     );
@@ -583,86 +591,93 @@ export default function GroceriesScreen() {
         animationType="fade"
         onRequestClose={() => setEditingItem(null)}
       >
-        <Pressable
-          className="flex-1 items-center justify-center bg-black/40"
-          onPress={() => setEditingItem(null)}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
           <Pressable
-            className="mx-8 w-full max-w-sm rounded-2xl bg-white p-6"
-            onPress={() => {}}
+            className="flex-1 items-center justify-center bg-black/40"
+            onPress={() => setEditingItem(null)}
           >
-            <Text className="mb-4 text-lg font-bold text-gray-800">
-              Edit Item
-            </Text>
+            <Pressable
+              className="mx-8 w-full max-w-sm rounded-2xl bg-white p-6"
+              onPress={() => {}}
+            >
+              <Text className="mb-4 text-lg font-bold text-gray-800">
+                Edit Item
+              </Text>
 
-            {/* Name */}
-            <Text className="mb-1 text-sm font-medium text-gray-500">
-              Name
-            </Text>
-            <TextInput
-              className="mb-4 rounded-xl border border-gray-200 bg-surface-50 px-4 py-2.5 text-base text-gray-800"
-              value={editingItem?.name ?? ""}
-              onChangeText={(text) =>
-                setEditingItem((prev) =>
-                  prev ? { ...prev, name: text } : prev
-                )
-              }
-              autoFocus
-            />
-
-            {/* Quantity */}
-            <Text className="mb-2 text-sm font-medium text-gray-500">
-              Quantity
-            </Text>
-            <View className="mb-6 flex-row items-center">
-              <Pressable
-                className="h-10 w-10 items-center justify-center rounded-l-xl border border-gray-200 bg-surface-50 active:bg-surface-200"
-                onPress={() =>
+              {/* Name */}
+              <Text className="mb-1 text-sm font-medium text-gray-500">
+                Name
+              </Text>
+              <TextInput
+                className="mb-4 rounded-xl border border-gray-200 bg-surface-50 px-4 py-2.5 text-base text-gray-800"
+                value={editingItem?.name ?? ""}
+                onChangeText={(text) =>
                   setEditingItem((prev) =>
-                    prev
-                      ? { ...prev, quantity: Math.max(1, prev.quantity - 1) }
-                      : prev
+                    prev ? { ...prev, name: text } : prev
                   )
                 }
-              >
-                <Ionicons name="remove" size={20} color="#6b7280" />
-              </Pressable>
-              <View className="h-10 items-center justify-center border-y border-gray-200 bg-white px-6">
-                <Text className="text-lg font-semibold text-gray-800">
-                  {editingItem?.quantity ?? 1}
-                </Text>
+                autoFocus
+                returnKeyType="done"
+                onSubmitEditing={saveEdit}
+              />
+
+              {/* Quantity */}
+              <Text className="mb-2 text-sm font-medium text-gray-500">
+                Quantity
+              </Text>
+              <View className="mb-6 flex-row items-center">
+                <Pressable
+                  className="h-10 w-10 items-center justify-center rounded-l-xl border border-gray-200 bg-surface-50 active:bg-surface-200"
+                  onPress={() =>
+                    setEditingItem((prev) =>
+                      prev
+                        ? { ...prev, quantity: Math.max(1, prev.quantity - 1) }
+                        : prev
+                    )
+                  }
+                >
+                  <Ionicons name="remove" size={20} color="#6b7280" />
+                </Pressable>
+                <View className="h-10 items-center justify-center border-y border-gray-200 bg-white px-6">
+                  <Text className="text-lg font-semibold text-gray-800">
+                    {editingItem?.quantity ?? 1}
+                  </Text>
+                </View>
+                <Pressable
+                  className="h-10 w-10 items-center justify-center rounded-r-xl border border-gray-200 bg-surface-50 active:bg-surface-200"
+                  onPress={() =>
+                    setEditingItem((prev) =>
+                      prev ? { ...prev, quantity: prev.quantity + 1 } : prev
+                    )
+                  }
+                >
+                  <Ionicons name="add" size={20} color="#6b7280" />
+                </Pressable>
               </View>
-              <Pressable
-                className="h-10 w-10 items-center justify-center rounded-r-xl border border-gray-200 bg-surface-50 active:bg-surface-200"
-                onPress={() =>
-                  setEditingItem((prev) =>
-                    prev ? { ...prev, quantity: prev.quantity + 1 } : prev
-                  )
-                }
-              >
-                <Ionicons name="add" size={20} color="#6b7280" />
-              </Pressable>
-            </View>
 
-            {/* Buttons */}
-            <View className="flex-row gap-3">
-              <Pressable
-                className="flex-1 items-center rounded-xl border border-gray-200 py-3 active:bg-gray-50"
-                onPress={() => setEditingItem(null)}
-              >
-                <Text className="text-base font-medium text-gray-600">
-                  Cancel
-                </Text>
-              </Pressable>
-              <Pressable
-                className="flex-1 items-center rounded-xl bg-primary-500 py-3 active:bg-primary-600"
-                onPress={saveEdit}
-              >
-                <Text className="text-base font-bold text-white">Save</Text>
-              </Pressable>
-            </View>
+              {/* Buttons */}
+              <View className="flex-row gap-3">
+                <Pressable
+                  className="flex-1 items-center rounded-xl border border-gray-200 py-3 active:bg-gray-50"
+                  onPress={() => setEditingItem(null)}
+                >
+                  <Text className="text-base font-medium text-gray-600">
+                    Cancel
+                  </Text>
+                </Pressable>
+                <Pressable
+                  className="flex-1 items-center rounded-xl bg-primary-500 py-3 active:bg-primary-600"
+                  onPress={saveEdit}
+                >
+                  <Text className="text-base font-bold text-white">Save</Text>
+                </Pressable>
+              </View>
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </KeyboardAvoidingView>
   );
