@@ -91,7 +91,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Planned | - |
+| 1. Foundation | 1/4 | In Progress | - |
 | 2. Expense Splitting | 0/0 | Not started | - |
 | 3. Groceries & Chores | 0/0 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |

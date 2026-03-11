@@ -1,4 +1,4 @@
-# Requirements: SplitBase
+# Requirements: RoomY
 
 **Defined:** 2026-03-10
 **Core Value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication & Household
 
-- [ ] **AUTH-01**: User can sign up and sign in with email/password
-- [ ] **AUTH-02**: User can create a profile with display name and Venmo username
+- [x] **AUTH-01**: User can sign up and sign in with email/password
+- [x] **AUTH-02**: User can create a profile with display name and Venmo username
 - [ ] **AUTH-03**: User can create a household and receive an invite code
 - [ ] **AUTH-04**: User can join a household by entering an invite code
 - [ ] **AUTH-05**: User completes onboarding quiz that configures enabled modules
@@ -83,8 +83,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Pending |
