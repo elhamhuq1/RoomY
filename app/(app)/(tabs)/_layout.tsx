@@ -96,11 +96,11 @@ export default function TabsLayout() {
                 onPress={() =>
                   Alert.alert(
                     "Chore Actions Guide",
-                    "Green ✓ checkmark — Complete your chore. It rotates to the next person.\n\n" +
-                    "Blue hand icon — Claim someone else's chore and volunteer to do it.\n\n" +
-                    "Purple arrows icon — Request to swap a chore with another member. They can accept or decline.\n\n" +
-                    "Amber flag icon — Dispute a completion you think wasn't done. Auto-reverts after 24 hours.\n\n" +
-                    "Chart icon (header) — View everyone's completion stats and streaks.",
+                    "✅  Complete — Mark your chore as done. It rotates to the next person.\n\n" +
+                    "🤚  Claim — Volunteer to take over someone else's chore.\n\n" +
+                    "🔄  Swap — Request to trade a chore with another member. They can accept or decline.\n\n" +
+                    "🚩  Dispute — Flag a completion you think wasn't actually done. Auto-reverts after 24 hours.\n\n" +
+                    "📊  Dashboard — See everyone's completion stats and streaks.",
                     [{ text: "Got it" }]
                   )
                 }
