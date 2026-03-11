@@ -142,8 +142,8 @@ export default function SettleScreen() {
     const note = params.description && params.date
       ? `${params.description} - ${new Date(params.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
       : `RoomY: Settlement for ${household?.name ?? "household"}`;
-    const encodedNote = encodeURIComponent(note);
-    const url = `https://venmo.com/${username}?txn=charge&amount=${parsedAmount.toFixed(2)}&note=${encodedNote}`;
+    const safeNote = note.replace(/&/g, 'and').replace(/#/g, '');
+    const url = `https://venmo.com/${username}?txn=charge&amount=${parsedAmount.toFixed(2)}&note=${safeNote}`;
 
     Linking.openURL(url);
     setVenmoSent(true);
