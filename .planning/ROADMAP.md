@@ -54,7 +54,7 @@ Plans:
 - [ ] 02-02-PLAN.md — Add expense form with member selection, expense history list, expense detail with edit/delete
 - [ ] 02-03-PLAN.md — Balance dashboard with net amounts, settle-up screen with Venmo deep link
 - [ ] 02-04-PLAN.md — User acceptance testing of complete expense splitting flow
-- [ ] 02-05-PLAN.md — Gap closure: fix settlement balance inversion, $ alignment, keyboard dismiss, Venmo note format
+- [x] 02-05-PLAN.md — Gap closure: fix settlement balance inversion, $ alignment, keyboard dismiss, Venmo note format
 
 ### Phase 3: Groceries & Chores
 **Goal**: Users can coordinate grocery shopping with a shared real-time list and manage household chores with fair rotation
@@ -95,6 +95,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/4 | In Progress | - |
-| 2. Expense Splitting | 3/5 | In Progress | - |
+| 2. Expense Splitting | 4/5 | In Progress | - |
 | 3. Groceries & Chores | 0/0 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |

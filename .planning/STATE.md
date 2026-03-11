@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Phase:** 2 of 4 (Expense Splitting)
 **Current Plan:** 4
-**Total Plans in Phase:** 4
-**Status:** Ready to execute
+**Total Plans in Phase:** 5
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-03-11
 
-**Progress:** [████████░░] 75%
+**Progress:** [████████░░] 78%
 
 ## Performance Metrics
 
@@ -41,6 +41,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 02 P01 | 1min | 2 tasks | 2 files |
 | Phase 02 P03 | 4min | 2 tasks | 3 files |
 | Phase 02 P02 | 5min | 2 tasks | 4 files |
+| Phase 02 P05 | 20min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Settle amount field allows exceeding balance with warning for pre-payment
 - [Phase 02]: useFocusEffect for auto-refresh when returning from add/edit expense screens
 - [Phase 02]: Edit mode uses delete-then-insert for splits (simpler than tracking individual row updates)
+- [Phase 02]: Venmo note encoding: deferred remaining + sign issue; user accepted minor cosmetic gap
+- [Phase 02]: ScrollView uses inline style={{ flex: 1 }} instead of NativeWind className to avoid bounce-back regression
 
 ### Pending Todos
 
@@ -80,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T07:35:02.982Z
-**Stopped at:** Completed 02-02-PLAN.md
+**Last session:** 2026-03-11T15:15:55.601Z
+**Stopped at:** Completed 02-05-PLAN.md
 **Resume file:** None
