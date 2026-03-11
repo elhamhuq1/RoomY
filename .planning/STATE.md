@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Expense Splitting
 
 ## Current Position
 
-**Phase:** 1 of 4 (Foundation)
-**Current Plan:** 4
+**Phase:** 2 of 4 (Expense Splitting)
+**Current Plan:** 2
 **Total Plans in Phase:** 4
 **Status:** Ready to execute
 **Last Activity:** 2026-03-11
 
-**Progress:** [████████░░] 75%
+**Progress:** [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -38,6 +38,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 01 P01 | 6min | 2 tasks | 24 files |
 | Phase 01 P02 | 3min | 2 tasks | 6 files |
 | Phase 01 P03 | 3min | 2 tasks | 7 files |
+| Phase 02 P01 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -56,6 +57,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Apple Sign-In button styled per Apple HIG (black bg); router.replace for auth cross-navigation
 - [Phase 01]: Used React Native Share API (not expo-sharing) for invite code sharing -- simpler text-only API
 - [Phase 01]: refreshProfile triggers Stack.Protected guard redirect rather than manual router.replace to (app)
+- [Phase 02]: All expense RLS policies use get_user_household_ids() to avoid infinite recursion
+- [Phase 02]: Balances computed via DB function (never stored as mutable columns)
+- [Phase 02]: Any household member can edit/delete any expense (per user decision)
 
 ### Pending Todos
 
@@ -69,6 +73,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T07:18:24.131Z
-**Stopped at:** Phase 2 plans verified
-**Resume file:** .planning/phases/02-expense-splitting/02-01-PLAN.md
+**Last session:** 2026-03-11T07:25:54.070Z
+**Stopped at:** Completed 02-01-PLAN.md
+**Resume file:** None
