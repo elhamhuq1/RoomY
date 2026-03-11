@@ -65,6 +65,56 @@ export interface Settlement {
   created_at: string;
 }
 
+export interface GroceryList {
+  id: string;
+  household_id: string;
+  name: string;
+  status: "active" | "shopping" | "completed";
+  shopper_id: string | null;
+  total_amount: number | null;
+  expense_id: string | null;
+  created_by: string;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface GroceryItem {
+  id: string;
+  list_id: string;
+  name: string;
+  quantity: number;
+  unit: string | null;
+  notes: string | null;
+  is_checked: boolean;
+  checked_by: string | null;
+  added_by: string;
+  created_at: string;
+}
+
+export interface Chore {
+  id: string;
+  household_id: string;
+  name: string;
+  description: string | null;
+  effort_points: number;
+  recurrence: "daily" | "weekly" | "biweekly" | "monthly" | "once";
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChoreAssignment {
+  id: string;
+  chore_id: string;
+  assigned_to: string;
+  due_date: string;
+  status: "pending" | "completed" | "skipped";
+  completed_at: string | null;
+  completed_by: string | null;
+  created_at: string;
+}
+
 // Supabase Database type for client generic
 export interface Database {
   public: {
@@ -132,6 +182,47 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Omit<Settlement, "id">>;
+      };
+      grocery_lists: {
+        Row: GroceryList;
+        Insert: Omit<GroceryList, "id" | "created_at" | "status" | "name"> & {
+          id?: string;
+          name?: string;
+          status?: "active" | "shopping" | "completed";
+          created_at?: string;
+        };
+        Update: Partial<Omit<GroceryList, "id">>;
+      };
+      grocery_items: {
+        Row: GroceryItem;
+        Insert: Omit<GroceryItem, "id" | "created_at" | "quantity" | "is_checked"> & {
+          id?: string;
+          quantity?: number;
+          is_checked?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Omit<GroceryItem, "id">>;
+      };
+      chores: {
+        Row: Chore;
+        Insert: Omit<Chore, "id" | "created_at" | "updated_at" | "effort_points" | "recurrence" | "is_active"> & {
+          id?: string;
+          effort_points?: number;
+          recurrence?: "daily" | "weekly" | "biweekly" | "monthly" | "once";
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Omit<Chore, "id">>;
+      };
+      chore_assignments: {
+        Row: ChoreAssignment;
+        Insert: Omit<ChoreAssignment, "id" | "created_at" | "status"> & {
+          id?: string;
+          status?: "pending" | "completed" | "skipped";
+          created_at?: string;
+        };
+        Update: Partial<Omit<ChoreAssignment, "id">>;
       };
     };
     Functions: {
