@@ -19,7 +19,7 @@ import { Profile } from "@/lib/types/database";
 type Frequency = "daily" | "weekly" | "monthly" | "custom";
 
 export default function AddChoreScreen() {
-  const { household, session } = useSession();
+  const { householdId, session } = useSession();
   const { suggestedName } = useLocalSearchParams<{ suggestedName?: string }>();
   const router = useRouter();
 
@@ -33,7 +33,7 @@ export default function AddChoreScreen() {
   const [customDays, setCustomDays] = useState("3");
 
   useEffect(() => {
-    if (!household?.id) return;
+    if (!householdId) return;
 
     const fetchMembers = async () => {
       try {
@@ -41,7 +41,7 @@ export default function AddChoreScreen() {
         const { data: members, error: membersError } = await supabase
           .from("household_members")
           .select("user_id")
-          .eq("household_id", household.id);
+          .eq("household_id", householdId);
 
         if (membersError) throw membersError;
 
@@ -64,7 +64,7 @@ export default function AddChoreScreen() {
     };
 
     fetchMembers();
-  }, [household?.id]);
+  }, [householdId]);
 
   const toggleMember = (id: string) => {
     setSelectedMembers((prev) =>
@@ -97,7 +97,7 @@ export default function AddChoreScreen() {
 
       // 2. Insert chore (next_due_at is now so it's due immediately)
       const { error } = await supabase.from("chores").insert({
-        household_id: household!.id,
+        household_id: householdId,
         name: name.trim(),
         frequency,
         custom_interval_days: frequency === "custom" ? parseInt(customDays) : null,

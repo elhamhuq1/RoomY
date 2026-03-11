@@ -26,7 +26,7 @@ type ChoreWithAssignee = Chore & {
 };
 
 export default function ChoresScreen() {
-  const { session, household } = useSession();
+  const { session, householdId } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,7 +42,7 @@ export default function ChoresScreen() {
   const [selectedChoreId, setSelectedChoreId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    if (!household?.id || !session?.user?.id) return;
+    if (!householdId || !session?.user?.id) return;
 
     try {
       setLoading(true);
@@ -51,7 +51,7 @@ export default function ChoresScreen() {
       const { data: members, error: membersError } = await supabase
         .from("household_members")
         .select("user_id")
-        .eq("household_id", household.id);
+        .eq("household_id", householdId);
 
       if (membersError) throw membersError;
 
@@ -74,7 +74,7 @@ export default function ChoresScreen() {
       const { data: choresData, error: choresError } = await supabase
         .from("chores")
         .select("*")
-        .eq("household_id", household.id)
+        .eq("household_id", householdId)
         .eq("is_active", true)
         .order("next_due_at", { ascending: true });
 
@@ -159,7 +159,7 @@ export default function ChoresScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [household?.id, session?.user?.id]);
+  }, [householdId, session?.user?.id]);
 
   useFocusEffect(
     useCallback(() => {
