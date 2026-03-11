@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 02-expense-splitting
 source: [02-01-SUMMARY.md, 02-02-SUMMARY.md, 02-03-SUMMARY.md]
 started: 2026-03-11T08:00:00Z
@@ -76,41 +76,48 @@ result: pass
 
 total: 13
 passed: 9
-issues: 4
+issues: 3
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Keyboard can be dismissed so user can tap the Add Expense submit button"
-  status: failed
-  reason: "User reported: no way to make the keyboard go away so that I can press the add expense button"
-  severity: major
-  test: 3
-  artifacts: []
-  missing: []
-  debug_session: ""
 - truth: "Dollar sign and amount value are vertically aligned in the amount field"
   status: failed
   reason: "User reported: the $ is centered with the textbox but the value entered is a little lower than the $ sign"
   severity: cosmetic
   test: 3
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Font weight mismatch ($ has font-semibold, TextInput has no weight) and TextInput default internal vertical padding pushes text down"
+  artifacts:
+    - path: "app/(app)/expenses/add.tsx"
+      issue: "$ Text has font-semibold, TextInput missing paddingVertical: 0"
+  missing:
+    - "Remove font-semibold from $ or add to both, add style={{ paddingVertical: 0 }} to TextInput"
+  debug_session: ".planning/debug/expense-ui-issues.md"
 - truth: "Recording a settlement reduces the balance owed between two users"
   status: failed
   reason: "User reported: settling $38 for elham3 made the balance go to $78 — it added instead of subtracting"
   severity: major
   test: 10
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Signs swapped in get_household_balances() combined CTE: settlement rows use -amount where they should use +amount and vice versa"
+  artifacts:
+    - path: "supabase/migrations/00002_expenses.sql"
+      issue: "Lines 95 and 99 in combined CTE have inverted signs for settlement credits"
+  missing:
+    - "Swap -amount to amount on line 95, swap amount to -amount on line 99"
+  debug_session: ".planning/debug/settlement-adds-to-balance.md"
 - truth: "Venmo note shows expense description with date (e.g. 'Water Bill - 03/11/26')"
   status: failed
   reason: "User reported: Venmo note shows 'RoomY:+Sttement+for+Clowns' with URL encoding artifacts instead of expense description + date"
   severity: minor
   test: 11
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Venmo note hardcoded as 'RoomY: Settlement for {household}' in settle.tsx line 140. Settle screen has no access to expense description or date — not passed as route params"
+  artifacts:
+    - path: "app/(app)/expenses/settle.tsx"
+      issue: "Line 140 hardcoded generic note, no description/date params received"
+    - path: "app/(app)/(tabs)/expenses.tsx"
+      issue: "Navigation to settle screen doesn't pass description or date"
+  missing:
+    - "Pass description and date as route params to settle screen"
+    - "Format note as 'Description - MM/DD/YY'"
+  debug_session: ".planning/debug/expense-ui-issues.md"
