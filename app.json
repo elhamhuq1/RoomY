@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "RoomY",
+    "slug": "roomy",
+    "scheme": "com.roomy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fefdfb"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.roomy.app"
+    },
+    "android": {
+      "package": "com.roomy.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#fefdfb",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
+        }
+      ],
+      "expo-apple-authentication",
+      "expo-router",
+      "expo-sqlite",
+      "expo-sharing",
+      "expo-font"
+    ]
+  }
+}
