@@ -1,8 +1,8 @@
-# Roadmap: SplitBase
+# Roadmap: RoomY
 
 ## Overview
 
-SplitBase delivers a roommate household management app in four phases: first establish identity and household membership (the prerequisite for everything), then build the core expense splitting and Venmo settlement loop (the primary value), then layer on groceries and chores (the secondary modules), and finally wire up push notifications and a shared calendar (engagement and polish). Each phase delivers a complete, testable capability.
+RoomY delivers a roommate household management app in four phases: first establish identity and household membership (the prerequisite for everything), then build the core expense splitting and Venmo settlement loop (the primary value), then layer on groceries and chores (the secondary modules), and finally wire up push notifications and a shared calendar (engagement and polish). Each phase delivers a complete, testable capability.
 
 ## Phases
 
@@ -29,11 +29,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can create a household and share an invite code that another user enters to join
   4. User completes a short onboarding quiz and sees only the modules they enabled (expenses, groceries, chores)
   5. Household data is isolated -- users cannot see other households' data (RLS enforced)
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Project scaffolding, database schema, Supabase client, auth context, protected routes
+- [ ] 01-02-PLAN.md — Auth screens (welcome, sign-up, sign-in, forgot password, Google/Apple)
+- [ ] 01-03-PLAN.md — Onboarding wizard (profile, household create/join, module quiz)
+- [ ] 01-04-PLAN.md — Dashboard with dynamic tabs, empty states, settings screens
 
 ### Phase 2: Expense Splitting
 **Goal**: Users can log shared expenses, see who owes whom, and settle debts with one tap via Venmo
@@ -89,7 +91,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/0 | Not started | - |
+| 1. Foundation | 0/4 | Planned | - |
 | 2. Expense Splitting | 0/0 | Not started | - |
 | 3. Groceries & Chores | 0/0 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |
