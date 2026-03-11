@@ -1,0 +1,561 @@
+# Phase 3.1: Chores - Research
+
+**Researched:** 2026-03-11
+**Domain:** Household chore management with round-robin rotation, Supabase/Postgres backend, Expo React Native frontend
+**Confidence:** HIGH
+
+## Summary
+
+Phase 3.1 adds chore management to the RoomY app. The user's locked decisions simplify this significantly: all chores count equally (no effort weighting), rotation is round-robin (predictable A->B->C), and the feature set is minimal (name + frequency, no descriptions or subtasks). The core technical challenge is designing a database schema that tracks chore definitions, assignments, completions, disputes, and rotation order -- then building the UI screens.
+
+The project already has well-established patterns from Phases 1-3: Supabase RLS policies using `get_user_household_ids()`, TypeScript types in `lib/types/database.ts`, migrations in `supabase/migrations/`, NativeWind styling with Ionicons, ScrollView with inline `style={{ flex: 1 }}`, optimistic updates, and the two-query pattern for fetching members + profiles separately. The chores phase follows these same patterns exactly.
+
+**Primary recommendation:** Use a pure Postgres approach -- chore rotation is computed client-side or via a DB function at completion time (no cron jobs needed). Rotation order is deterministic from the `chore_assignments` history, so the "next assignee" can be derived without a scheduled job.
+
+<user_constraints>
+## User Constraints (from CONTEXT.md)
+
+### Locked Decisions
+- Fields: name + frequency only -- no effort weight, no room/area tags
+- All chores count equally for fairness (1 completion = 1 point regardless of chore type)
+- Frequency presets: daily, weekly, monthly
+- Custom frequency option: user can specify their own interval (e.g., every 3 days)
+- No description field, no subtasks -- keep it minimal
+- First assignment: random member, but anyone can volunteer/claim a chore
+- Rotation: round-robin (A -> B -> C -> A) -- predictable, everyone knows who's next
+- Swap: request-based -- tap to request swap, other person accepts or declines
+- Overdue handling: visual badge only ("X days overdue") -- no auto-reassignment, social pressure does the work
+- No "away" or vacation mode in this phase
+- Mark done: tap + confirmation dialog ("Mark complete?") to prevent accidental taps
+- Dispute system: any roommate can flag a completion as not actually done
+  - Flag sends a notification/badge to the assigned person
+  - If not resolved within 24 hours, the completion is reverted and impacts their streak
+- Dashboard shows: completion counts + current streak per member
+- Time periods: this week view + this month view (two separate views)
+- Grouping: my chores first at top, then other household members' chores below
+- Summary header at top: your pending count, overdue count, current streak
+- Overdue styling: red accent color + "X days overdue" badge -- stands out clearly
+- Empty state: friendly prompt message + common household chore suggestions (dishes, trash, vacuum, etc.) with icons, one-tap to add
+
+### Claude's Discretion
+- Exact icons for suggested chores
+- Swap request UI flow details
+- Dashboard chart style/visualization
+- Confirmation dialog wording
+- Streak calculation logic details
+
+### Deferred Ideas (OUT OF SCOPE)
+- Per-chore effort weighting (light/medium/heavy)
+- Room/area tags for grouping chores by location
+- Vacation/away mode to skip rotation
+- Auto-reassignment on overdue
+- Notifications (push) for chore reminders and dispute alerts
+</user_constraints>
+
+<phase_requirements>
+## Phase Requirements
+
+| ID | Description | Research Support |
+|----|-------------|-----------------|
+| CHOR-01 | User can create and assign chores to household members | Schema: `chores` table with name, frequency fields; `chore_assignments` for current assignment; UI: create chore screen with member picker; empty state with suggested chores |
+| CHOR-02 | User can mark chores as completed | Schema: `chore_completions` table; UI: tap + confirmation dialog; triggers rotation to next assignee; dispute mechanism with 24h auto-revert |
+| CHOR-03 | Chores automatically rotate among members with effort weighting | Schema: `chore_rotation_order` column on chores + DB function to advance rotation on completion; round-robin A->B->C (all chores equal, per user decision) |
+| CHOR-04 | User can view chore contribution history per member | Schema: query `chore_completions` grouped by user with date filters; UI: dashboard with completion counts + streaks, this-week and this-month views |
+</phase_requirements>
+
+## Standard Stack
+
+### Core (already installed -- no new dependencies)
+| Library | Version | Purpose | Why Standard |
+|---------|---------|---------|--------------|
+| `@supabase/supabase-js` | ^2.99.0 | Database queries, RLS, RPC functions | Already the project DB client |
+| `expo-router` | ~6.0.23 | Screen navigation for chore sub-routes | Already the project router |
+| `nativewind` | ^4.2.2 | Tailwind-style component styling | Already the project styling system |
+| `@expo/vector-icons` (Ionicons) | ^15.0.2 | Icons for chore UI, suggested chores | Already used project-wide |
+| `react-native-gesture-handler` | ~2.28.0 | Swipe gestures (if needed for swipe actions) | Already installed for groceries |
+| `react-native-reanimated` | ~4.1.1 | ReanimatedSwipeable component | Already installed for groceries |
+
+### Supporting
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| `react-native` Alert API | built-in | Confirmation dialog for mark-complete | Use native Alert.alert() for "Mark complete?" confirmation -- simpler than a custom modal and feels native |
+| `react-native` Modal | built-in | Create/edit chore form, swap request flow | Already used in groceries for edit modal |
+
+### Alternatives Considered
+| Instead of | Could Use | Tradeoff |
+|------------|-----------|----------|
+| Alert.alert for confirm | Custom Modal | Alert is native, familiar, zero-cost; Modal needed only if design requires custom look |
+| pg_cron for dispute auto-revert | Client-side check on load | pg_cron is cleaner but adds infra complexity; client check on each screen load + DB function is simpler for a small household app |
+| Bar chart library for dashboard | Simple View-based bars | No chart library needed -- completion counts for 2-4 people are trivially rendered with styled Views |
+
+**Installation:**
+```bash
+# No new packages needed -- all dependencies already installed
+```
+
+## Architecture Patterns
+
+### Recommended Project Structure
+```
+app/(app)/
+  (tabs)/
+    chores.tsx              # Main chore list (replace placeholder)
+  chores/
+    add.tsx                 # Create new chore screen
+    [id].tsx                # Chore detail / edit screen
+    dashboard.tsx           # Contribution dashboard screen
+    swap-request.tsx        # Swap request detail screen (optional -- could be modal)
+lib/
+  types/database.ts         # Add Chore, ChoreCompletion, ChoreSwapRequest types
+supabase/
+  migrations/
+    00004_chores.sql        # Chore tables, RLS, functions, indexes
+```
+
+### Pattern 1: Database Schema Design
+**What:** Five tables handle the full chore lifecycle
+**When to use:** All chore operations
+
+```sql
+-- CHORES: chore definition (what + how often)
+CREATE TABLE chores (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  household_id UUID REFERENCES households ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  frequency TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'custom')),
+  custom_interval_days INT,  -- only used when frequency = 'custom'
+  -- Rotation tracking
+  rotation_order UUID[] NOT NULL DEFAULT '{}',  -- ordered array of user_ids
+  current_assignee_index INT NOT NULL DEFAULT 0,
+  current_assignee UUID REFERENCES auth.users,
+  -- Timing
+  next_due_at TIMESTAMPTZ NOT NULL,
+  last_completed_at TIMESTAMPTZ,
+  created_by UUID REFERENCES auth.users NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  is_active BOOLEAN DEFAULT true
+);
+
+-- CHORE_COMPLETIONS: completion history (one row per "done" action)
+CREATE TABLE chore_completions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  chore_id UUID REFERENCES chores ON DELETE CASCADE NOT NULL,
+  completed_by UUID REFERENCES auth.users NOT NULL,
+  completed_at TIMESTAMPTZ DEFAULT now(),
+  is_disputed BOOLEAN DEFAULT false,
+  disputed_by UUID REFERENCES auth.users,
+  disputed_at TIMESTAMPTZ,
+  is_reverted BOOLEAN DEFAULT false,
+  reverted_at TIMESTAMPTZ
+);
+
+-- CHORE_SWAP_REQUESTS: swap negotiation
+CREATE TABLE chore_swap_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  chore_id UUID REFERENCES chores ON DELETE CASCADE NOT NULL,
+  requested_by UUID REFERENCES auth.users NOT NULL,
+  requested_to UUID REFERENCES auth.users NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  resolved_at TIMESTAMPTZ
+);
+```
+
+**Key design decisions:**
+- `rotation_order` is a UUID array on the chore itself -- deterministic, no extra table needed
+- `current_assignee_index` tracks position in the rotation array
+- `current_assignee` is denormalized for fast queries (always `rotation_order[current_assignee_index]`)
+- `next_due_at` is computed on creation and advanced on completion
+- Disputes are tracked inline on completions (no separate table needed)
+
+### Pattern 2: Round-Robin Rotation via DB Function
+**What:** When a chore is marked complete, a Postgres function advances the rotation and recomputes `next_due_at`
+**When to use:** Every completion event
+
+```sql
+-- Atomic: mark complete + rotate + set next due date
+CREATE OR REPLACE FUNCTION complete_chore(
+  p_chore_id UUID,
+  p_completed_by UUID
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_chore RECORD;
+  v_next_index INT;
+  v_next_assignee UUID;
+  v_next_due TIMESTAMPTZ;
+  v_completion_id UUID;
+BEGIN
+  SELECT * INTO v_chore FROM public.chores WHERE id = p_chore_id AND is_active = true;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Chore not found or inactive';
+  END IF;
+
+  -- Record completion
+  INSERT INTO public.chore_completions (chore_id, completed_by)
+  VALUES (p_chore_id, p_completed_by)
+  RETURNING id INTO v_completion_id;
+
+  -- Advance rotation (round-robin)
+  v_next_index := (v_chore.current_assignee_index + 1) % array_length(v_chore.rotation_order, 1);
+  v_next_assignee := v_chore.rotation_order[v_next_index + 1]; -- Postgres arrays are 1-indexed
+
+  -- Compute next due date
+  v_next_due := CASE v_chore.frequency
+    WHEN 'daily'   THEN now() + interval '1 day'
+    WHEN 'weekly'  THEN now() + interval '7 days'
+    WHEN 'monthly' THEN now() + interval '1 month'
+    WHEN 'custom'  THEN now() + (v_chore.custom_interval_days || ' days')::interval
+  END;
+
+  -- Update chore
+  UPDATE public.chores SET
+    current_assignee_index = v_next_index,
+    current_assignee = v_next_assignee,
+    next_due_at = v_next_due,
+    last_completed_at = now()
+  WHERE id = p_chore_id;
+
+  RETURN json_build_object(
+    'completion_id', v_completion_id,
+    'next_assignee', v_next_assignee,
+    'next_due_at', v_next_due
+  );
+END;
+$$;
+```
+
+### Pattern 3: Dispute Auto-Revert via pg_cron
+**What:** A cron job runs hourly, checking for disputed completions older than 24 hours that haven't been resolved, and auto-reverts them
+**When to use:** Background process, no user interaction
+
+```sql
+-- Enable pg_cron extension (run once in Supabase SQL editor)
+-- CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- Function to auto-revert stale disputes
+CREATE OR REPLACE FUNCTION auto_revert_stale_disputes()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  UPDATE public.chore_completions
+  SET is_reverted = true, reverted_at = now()
+  WHERE is_disputed = true
+    AND is_reverted = false
+    AND disputed_at < now() - interval '24 hours';
+END;
+$$;
+
+-- Schedule: runs every hour
+SELECT cron.schedule(
+  'revert-stale-disputes',
+  '0 * * * *',
+  'SELECT public.auto_revert_stale_disputes()'
+);
+```
+
+**Alternative (no cron):** Check on the client side every time the chores screen loads. Query for disputed completions > 24 hours old, call a revert RPC. This is simpler but means the revert only happens when someone opens the app.
+
+**Recommendation:** Use pg_cron. It is available on Supabase free tier (confirmed via community discussion), requires minimal setup (one SQL statement to schedule), and ensures disputes resolve even when nobody opens the app.
+
+### Pattern 4: Streak Calculation
+**What:** Compute consecutive completion streak per user per chore (or globally)
+**When to use:** Dashboard display, summary header
+
+**Streak logic (Claude's discretion area):**
+- A "streak" counts consecutive chore completions where the assigned person completed on time (before or on due date)
+- A streak breaks when: the chore goes overdue past the next due date, or a completion is reverted via dispute
+- Compute client-side from `chore_completions` ordered by `completed_at DESC` -- walk backwards until a gap or revert is found
+
+```typescript
+function calculateStreak(completions: ChoreCompletion[]): number {
+  let streak = 0;
+  for (const c of completions) {
+    if (c.is_reverted) break;
+    streak++;
+  }
+  return streak;
+}
+```
+
+A more sophisticated version can be a DB function if performance matters, but for 2-4 person households with modest completion history, client-side is fine.
+
+### Pattern 5: Fetching Members for Assignment (Existing Pattern)
+**What:** Two-query pattern to get household members + profiles
+**When to use:** Chore creation (member picker), dashboard (showing names)
+
+```typescript
+// Source: established project pattern from add.tsx, index.tsx
+const { data: membersData } = await supabase
+  .from("household_members")
+  .select("user_id, role")
+  .eq("household_id", household.id);
+
+if (membersData && membersData.length > 0) {
+  const userIds = membersData.map((m) => m.user_id);
+  const { data: profilesData } = await supabase
+    .from("profiles")
+    .select("*")
+    .in("id", userIds);
+  // Combine client-side
+}
+```
+
+### Anti-Patterns to Avoid
+- **Embedding rotation logic in the client:** The rotation + due date update MUST be atomic (use a SECURITY DEFINER function). If done client-side, two users could complete simultaneously and corrupt rotation state.
+- **Using a separate rotation_members junction table:** Overkill for 2-4 person households. A UUID array on the chore itself is simpler and sufficient.
+- **Using FlatList for chore list:** The project convention is ScrollView with `style={{ flex: 1 }}` for small lists. Household chore counts will be in the 5-20 range, well within ScrollView territory.
+- **Hand-rolling date math in JavaScript:** Use the DB function for `next_due_at` computation. JavaScript date arithmetic with months/timezones is error-prone.
+- **Storing streak as a mutable column:** Streaks should be computed from completion history (like balances are computed from expenses). Mutable streak counters go stale.
+
+## Don't Hand-Roll
+
+| Problem | Don't Build | Use Instead | Why |
+|---------|-------------|-------------|-----|
+| Round-robin rotation | Client-side index tracking | Postgres `complete_chore()` RPC | Must be atomic; concurrent completions would corrupt state |
+| Next due date computation | JS Date arithmetic | Postgres interval arithmetic in DB function | Timezone-safe, month boundary handling built-in |
+| Dispute auto-revert timer | setTimeout/setInterval on client | pg_cron scheduled function | Client timers don't run when app is closed; cron runs server-side |
+| Overdue detection | Complex client date comparison | SQL `WHERE next_due_at < now()` | Let the DB do the comparison with server time, display result client-side |
+| Confirmation dialog | Custom modal component | `Alert.alert()` from react-native | Native feel, accessible, handles platform differences automatically |
+
+**Key insight:** The chore system has more server-side logic than groceries (which was mostly CRUD). The rotation, due dates, and dispute resolution all need atomic DB operations. Keep the client thin -- it displays state and calls RPC functions.
+
+## Common Pitfalls
+
+### Pitfall 1: Postgres Array 1-Indexing
+**What goes wrong:** Rotation index uses 0-based indexing in JavaScript but Postgres arrays are 1-indexed
+**Why it happens:** Natural to write `rotation_order[current_assignee_index]` but in Postgres that needs `+1`
+**How to avoid:** Store `current_assignee_index` as 0-based (for modulo arithmetic), but access array as `rotation_order[index + 1]` in SQL
+**Warning signs:** First assignee is always NULL, or rotation skips a person
+
+### Pitfall 2: RLS Policy Infinite Recursion (Known Project Issue)
+**What goes wrong:** RLS policies that reference the same table or `household_members` directly cause infinite recursion
+**Why it happens:** Supabase PostgREST evaluates RLS policies on every query, including subqueries
+**How to avoid:** Always use `get_user_household_ids()` SECURITY DEFINER function (already established pattern)
+**Warning signs:** "infinite recursion" error from Supabase
+
+### Pitfall 3: Member Removal From Rotation
+**What goes wrong:** If a member leaves the household, their UUID remains in `rotation_order` arrays, causing assignment to a non-existent user
+**Why it happens:** No cascade from household_members deletion to chore rotation arrays
+**How to avoid:** When a member is removed, update all chores' `rotation_order` arrays to remove their UUID and adjust `current_assignee_index`. Can be a trigger or handled in the leave-household function.
+**Warning signs:** Chore assigned to "Unknown" user after someone leaves
+
+### Pitfall 4: Dispute Timing Edge Case
+**What goes wrong:** A completion is disputed at 23:59, the hourly cron runs at 00:00, and the auto-revert triggers at 01:00 -- only 1 hour instead of 24
+**Why it happens:** Cron checks `disputed_at < now() - interval '24 hours'`, so it naturally waits the full 24 hours
+**How to avoid:** The SQL `WHERE disputed_at < now() - interval '24 hours'` correctly handles this. No edge case.
+**Warning signs:** None if the WHERE clause is correct
+
+### Pitfall 5: Concurrent Completion Race Condition
+**What goes wrong:** Two users both try to complete the same chore simultaneously
+**Why it happens:** Both see the chore as "pending" and tap complete at the same time
+**How to avoid:** The `complete_chore()` DB function handles this atomically. The second call will still succeed (recording a second completion) but the rotation will advance correctly because Postgres serializes the updates.
+**Warning signs:** Double completions in the history
+
+### Pitfall 6: Optimistic Update Complexity
+**What goes wrong:** Optimistic UI for chore completion is complex because it changes assignee, due date, and completion history simultaneously
+**Why it happens:** Unlike grocery toggle (one boolean flip), completion triggers cascading state changes
+**How to avoid:** Don't optimistically update rotation state. Show a loading indicator on the completion button, call the RPC, then refresh the list. Completions are infrequent enough that a 200ms round-trip is acceptable.
+**Warning signs:** UI shows wrong assignee momentarily
+
+## Code Examples
+
+### Creating a Chore with Random First Assignment
+```typescript
+// Source: project pattern from add.tsx
+async function createChore(
+  name: string,
+  frequency: 'daily' | 'weekly' | 'monthly' | 'custom',
+  customIntervalDays: number | null,
+  householdId: string,
+  memberIds: string[],
+  createdBy: string
+) {
+  // Shuffle members for random initial rotation order
+  const shuffled = [...memberIds].sort(() => Math.random() - 0.5);
+  const firstAssignee = shuffled[0];
+
+  // Compute initial due date
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from('chores')
+    .insert({
+      household_id: householdId,
+      name,
+      frequency,
+      custom_interval_days: frequency === 'custom' ? customIntervalDays : null,
+      rotation_order: shuffled,
+      current_assignee_index: 0,
+      current_assignee: firstAssignee,
+      next_due_at: now, // Due immediately on creation
+      created_by: createdBy,
+    })
+    .select()
+    .single();
+
+  return { data, error };
+}
+```
+
+### Marking a Chore Complete
+```typescript
+// Source: project pattern (RPC call like complete_grocery_trip)
+import { Alert } from 'react-native';
+
+function handleComplete(choreId: string, userId: string) {
+  Alert.alert(
+    'Mark Complete?',
+    'This chore will be marked as done and rotate to the next person.',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Complete',
+        onPress: async () => {
+          const { data, error } = await supabase.rpc('complete_chore', {
+            p_chore_id: choreId,
+            p_completed_by: userId,
+          });
+          if (!error) {
+            fetchChores(); // Refresh the list
+          }
+        },
+      },
+    ]
+  );
+}
+```
+
+### Chore List Grouping (My Chores First)
+```typescript
+// Source: derived from project patterns
+const myChores = chores
+  .filter((c) => c.current_assignee === user?.id && c.is_active)
+  .sort((a, b) => new Date(a.next_due_at).getTime() - new Date(b.next_due_at).getTime());
+
+const othersChores = chores
+  .filter((c) => c.current_assignee !== user?.id && c.is_active)
+  .sort((a, b) => new Date(a.next_due_at).getTime() - new Date(b.next_due_at).getTime());
+```
+
+### Overdue Badge Calculation
+```typescript
+function getOverdueDays(nextDueAt: string): number | null {
+  const due = new Date(nextDueAt);
+  const now = new Date();
+  if (now <= due) return null;
+  return Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+// In JSX:
+// {overdueDays !== null && (
+//   <View className="rounded-full bg-red-100 px-2 py-0.5">
+//     <Text className="text-xs font-semibold text-red-600">
+//       {overdueDays}d overdue
+//     </Text>
+//   </View>
+// )}
+```
+
+### Dashboard Stats Query
+```typescript
+// Completions grouped by user for a date range
+async function fetchDashboardStats(
+  householdId: string,
+  startDate: string,
+  endDate: string
+) {
+  const { data } = await supabase
+    .from('chore_completions')
+    .select('completed_by, completed_at, is_reverted, chore_id, chores!inner(household_id)')
+    .eq('chores.household_id', householdId)
+    .eq('is_reverted', false)
+    .gte('completed_at', startDate)
+    .lte('completed_at', endDate);
+
+  // Group by user
+  const stats: Record<string, number> = {};
+  data?.forEach((c) => {
+    stats[c.completed_by] = (stats[c.completed_by] || 0) + 1;
+  });
+  return stats;
+}
+```
+
+### Suggested Chores (Empty State)
+```typescript
+// Claude's discretion: icons for common chores
+const SUGGESTED_CHORES = [
+  { name: 'Dishes', icon: 'restaurant-outline' as const, frequency: 'daily' as const },
+  { name: 'Take out trash', icon: 'trash-outline' as const, frequency: 'weekly' as const },
+  { name: 'Vacuum', icon: 'home-outline' as const, frequency: 'weekly' as const },
+  { name: 'Clean bathroom', icon: 'water-outline' as const, frequency: 'weekly' as const },
+  { name: 'Mop floors', icon: 'grid-outline' as const, frequency: 'weekly' as const },
+  { name: 'Wipe counters', icon: 'hand-left-outline' as const, frequency: 'daily' as const },
+  { name: 'Laundry', icon: 'shirt-outline' as const, frequency: 'weekly' as const },
+  { name: 'Buy groceries', icon: 'cart-outline' as const, frequency: 'weekly' as const },
+];
+```
+
+## State of the Art
+
+| Old Approach | Current Approach | When Changed | Impact |
+|--------------|------------------|--------------|--------|
+| Supabase Edge Function cron | pg_cron native in Postgres | Supabase Cron module (2024) | No Edge Function needed for scheduled DB operations; simpler, zero network latency |
+| ReanimatedSwipeable from 'react-native-gesture-handler/Swipeable' | ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable' | react-native-gesture-handler 2.x | Old Swipeable is deprecated; project already uses the correct import |
+| expo-router v5 (SDK 53) | expo-router v6 (SDK 54) | SDK 54 | Project already on correct version |
+
+**Deprecated/outdated:**
+- Supabase Edge Functions for simple cron: Not needed when pg_cron + a Postgres function can do the job entirely in-database with zero network latency
+- Old Swipeable import: Project already uses ReanimatedSwipeable (correct)
+
+## Open Questions
+
+1. **pg_cron setup on Supabase hosted**
+   - What we know: pg_cron is available on the free tier (confirmed via community). The `cron.schedule()` function is used to register jobs.
+   - What's unclear: Whether pg_cron is pre-enabled or needs `CREATE EXTENSION pg_cron` first on the hosted Supabase instance. Most sources suggest it's pre-enabled.
+   - Recommendation: Try `SELECT cron.schedule(...)` directly. If it fails, run `CREATE EXTENSION IF NOT EXISTS pg_cron` in the SQL editor first. This is a one-time setup step.
+
+2. **Dispute notification without push**
+   - What we know: Push notifications are deferred to Phase 4. Disputes need to alert the assigned person.
+   - What's unclear: How the assigned person knows they've been disputed if they don't open the app within 24 hours.
+   - Recommendation: Show a dispute badge/count in the chore list header and on the chore item itself. The 24-hour auto-revert via cron handles the case where they don't respond. This is acceptable for Phase 3.1 -- push notifications in Phase 4 will improve this.
+
+3. **Volunteer/claim flow**
+   - What we know: Anyone can volunteer/claim a chore even if assigned to someone else.
+   - What's unclear: Does claiming immediately reassign, or does the current assignee need to approve?
+   - Recommendation: Immediate claim -- tap "I'll do it" button, chore is reassigned to the volunteer, and when they complete it the rotation advances as normal. This is simpler and matches the "flexibility is important" user statement.
+
+## Sources
+
+### Primary (HIGH confidence)
+- Project codebase: `supabase/migrations/00001_foundation.sql`, `00002_expenses.sql`, `00003_groceries.sql` -- established schema patterns
+- Project codebase: `lib/types/database.ts`, `lib/auth-context.tsx`, `lib/supabase.ts` -- established client patterns
+- Project codebase: `app/(app)/(tabs)/groceries.tsx`, `app/(app)/expenses/add.tsx` -- established UI patterns
+- Supabase Cron docs: https://supabase.com/docs/guides/cron -- cron scheduling syntax
+- Supabase Cron quickstart: https://supabase.com/docs/guides/cron/quickstart -- `cron.schedule()` usage
+
+### Secondary (MEDIUM confidence)
+- GitHub Discussion #37405: https://github.com/orgs/supabase/discussions/37405 -- pg_cron free tier availability confirmed by community
+- Supabase pg_cron extension docs: https://supabase.com/docs/guides/database/extensions/pg_cron -- extension reference
+
+### Tertiary (LOW confidence)
+- None -- all findings verified against project code or official docs
+
+## Metadata
+
+**Confidence breakdown:**
+- Standard stack: HIGH -- no new dependencies, all patterns established in prior phases
+- Architecture: HIGH -- schema design follows proven project patterns (expenses, groceries); round-robin is well-understood algorithm
+- Pitfalls: HIGH -- most are known project issues (RLS recursion, profiles embed) with established solutions
+- pg_cron availability: MEDIUM -- community-confirmed but not explicitly stated in official pricing docs
+
+**Research date:** 2026-03-11
+**Valid until:** 2026-04-11 (stable -- no fast-moving dependencies)
