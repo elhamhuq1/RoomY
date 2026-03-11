@@ -6,13 +6,19 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
-import type { Chore, ChoreCompletion, Profile } from "@/lib/types/database";
+import type {
+  Chore,
+  ChoreCompletion,
+  ChoreSwapRequest,
+  Profile,
+} from "@/lib/types/database";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -108,9 +114,15 @@ export default function ChoresScreen() {
   const [chores, setChores] = useState<Chore[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [completions, setCompletions] = useState<ChoreCompletion[]>([]);
+  const [disputedChoreIds, setDisputedChoreIds] = useState<Set<string>>(new Set());
+  const [disputedByMeChoreIds, setDisputedByMeChoreIds] = useState<Set<string>>(new Set());
+  const [pendingSwapCount, setPendingSwapCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const [disputingId, setDisputingId] = useState<string | null>(null);
+  const [swapModalChoreId, setSwapModalChoreId] = useState<string | null>(null);
+  const [swapSubmitting, setSwapSubmitting] = useState(false);
 
   // -------------------------------------------------------------------------
   // Data fetching
@@ -164,6 +176,59 @@ export default function ChoresScreen() {
     if (completionsData) {
       setCompletions(completionsData as ChoreCompletion[]);
     }
+
+    // Fetch disputed completions (active, non-reverted) for badge display
+    if (choresData && choresData.length > 0) {
+      const choreIds = (choresData as Chore[]).map((c) => c.id);
+      const { data: disputedData } = await supabase
+        .from("chore_completions")
+        .select("*")
+        .in("chore_id", choreIds)
+        .eq("is_disputed", true)
+        .eq("is_reverted", false);
+
+      if (disputedData) {
+        const disputedSet = new Set<string>();
+        const disputedByMeSet = new Set<string>();
+        (disputedData as ChoreCompletion[]).forEach((d) => {
+          disputedSet.add(d.chore_id);
+          if (d.completed_by === user.id) {
+            disputedByMeSet.add(d.chore_id);
+          }
+        });
+        setDisputedChoreIds(disputedSet);
+        setDisputedByMeChoreIds(disputedByMeSet);
+      }
+    }
+
+    // Client-side dispute revert check (fallback if pg_cron unavailable)
+    const twentyFourHoursAgo = new Date(
+      Date.now() - 24 * 60 * 60 * 1000
+    ).toISOString();
+    const { data: staleDisputes } = await supabase
+      .from("chore_completions")
+      .select("id")
+      .eq("is_disputed", true)
+      .eq("is_reverted", false)
+      .lt("disputed_at", twentyFourHoursAgo);
+
+    if (staleDisputes && staleDisputes.length > 0) {
+      // Revert stale disputes
+      const staleIds = staleDisputes.map((d) => d.id);
+      await supabase
+        .from("chore_completions")
+        .update({ is_reverted: true, reverted_at: new Date().toISOString() })
+        .in("id", staleIds);
+    }
+
+    // Fetch pending swap request count for current user
+    const { count: swapCount } = await supabase
+      .from("chore_swap_requests")
+      .select("*", { count: "exact", head: true })
+      .eq("requested_to", user.id)
+      .eq("status", "pending");
+
+    setPendingSwapCount(swapCount ?? 0);
 
     setLoading(false);
   }, [household?.id, user?.id]);
@@ -223,6 +288,82 @@ export default function ChoresScreen() {
     [user?.id, fetchData]
   );
 
+  const handleDispute = useCallback(
+    async (choreId: string) => {
+      if (!user?.id) return;
+
+      // Fetch the most recent non-reverted completion for this chore
+      const { data: recentCompletions } = await supabase
+        .from("chore_completions")
+        .select("*")
+        .eq("chore_id", choreId)
+        .eq("is_reverted", false)
+        .order("completed_at", { ascending: false })
+        .limit(1);
+
+      if (!recentCompletions || recentCompletions.length === 0) {
+        Alert.alert("No completion", "No recent completion found to dispute.");
+        return;
+      }
+
+      const completion = recentCompletions[0] as ChoreCompletion;
+
+      if (completion.is_disputed) {
+        Alert.alert("Already disputed", "This completion is already under dispute.");
+        return;
+      }
+
+      Alert.alert(
+        "Dispute Completion?",
+        "Flag the last completion as not actually done. If unresolved within 24 hours, it will be automatically reverted.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Dispute",
+            style: "destructive",
+            onPress: async () => {
+              setDisputingId(choreId);
+              const { error } = await supabase.rpc("dispute_completion", {
+                p_completion_id: completion.id,
+                p_disputed_by: user.id,
+              });
+              setDisputingId(null);
+              if (error) {
+                Alert.alert("Error", "Failed to dispute completion.");
+              } else {
+                fetchData();
+              }
+            },
+          },
+        ]
+      );
+    },
+    [user?.id, fetchData]
+  );
+
+  const handleSwapRequest = useCallback(
+    async (targetUserId: string) => {
+      if (!user?.id || !swapModalChoreId) return;
+
+      setSwapSubmitting(true);
+      const { error } = await supabase.from("chore_swap_requests").insert({
+        chore_id: swapModalChoreId,
+        requested_by: user.id,
+        requested_to: targetUserId,
+      });
+      setSwapSubmitting(false);
+
+      if (error) {
+        Alert.alert("Error", "Failed to create swap request.");
+      } else {
+        Alert.alert("Swap Requested", "Your swap request has been sent.");
+        setSwapModalChoreId(null);
+        fetchData();
+      }
+    },
+    [user?.id, swapModalChoreId, fetchData]
+  );
+
   // -------------------------------------------------------------------------
   // Derived data
   // -------------------------------------------------------------------------
@@ -249,6 +390,11 @@ export default function ChoresScreen() {
 
   const isEmpty = chores.length === 0 && !loading;
 
+  // Other household members for swap modal
+  const otherMembers = Object.values(profiles).filter(
+    (p) => p.id !== user?.id
+  );
+
   // -------------------------------------------------------------------------
   // Render helpers
   // -------------------------------------------------------------------------
@@ -262,6 +408,16 @@ export default function ChoresScreen() {
     const isMyChore = chore.current_assignee === user?.id;
     const isCompleting = completingId === chore.id;
     const isClaiming = claimingId === chore.id;
+    const isDisputing = disputingId === chore.id;
+    const isDisputed = disputedChoreIds.has(chore.id);
+    const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
+    const hasLastCompletion = chore.last_completed_at !== null;
+
+    // Show dispute button if: has recent completion AND last completion was NOT by current user
+    // We determine this by checking if the chore has any completion at all
+    // and the current assignee has rotated (meaning someone else completed it)
+    const showDisputeButton =
+      hasLastCompletion && !isDisputed && !isMyChore;
 
     return (
       <View
@@ -286,9 +442,18 @@ export default function ChoresScreen() {
 
         {/* Chore info */}
         <View className="flex-1">
-          <Text className="text-base font-semibold text-gray-800" numberOfLines={1}>
-            {chore.name}
-          </Text>
+          <View className="flex-row items-center gap-2">
+            <Text className="text-base font-semibold text-gray-800" numberOfLines={1}>
+              {chore.name}
+            </Text>
+            {isDisputed && (
+              <View className="rounded-full bg-amber-100 px-2 py-0.5">
+                <Text className="text-xs font-semibold text-amber-600">
+                  Disputed
+                </Text>
+              </View>
+            )}
+          </View>
           <View className="mt-0.5 flex-row items-center gap-2">
             <View className="rounded-full bg-primary-100 px-2 py-0.5">
               <Text className="text-xs font-medium text-primary-700">
@@ -311,10 +476,40 @@ export default function ChoresScreen() {
               </View>
             )}
           </View>
+          {isDisputedByMe && (
+            <Text className="mt-1 text-xs text-amber-600">
+              Your completion was disputed
+            </Text>
+          )}
         </View>
 
         {/* Action buttons */}
-        <View className="flex-row items-center gap-2">
+        <View className="flex-row items-center gap-1.5">
+          {/* Swap button -- only on my chores */}
+          {isMyChore && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-purple-50 active:bg-purple-100"
+              onPress={() => setSwapModalChoreId(chore.id)}
+            >
+              <Ionicons name="swap-horizontal-outline" size={18} color="#9333ea" />
+            </Pressable>
+          )}
+
+          {/* Dispute button -- on chores with recent completions (not by current user) */}
+          {showDisputeButton && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-amber-50 active:bg-amber-100"
+              onPress={() => handleDispute(chore.id)}
+              disabled={isDisputing}
+            >
+              {isDisputing ? (
+                <ActivityIndicator size="small" color="#d97706" />
+              ) : (
+                <Ionicons name="flag-outline" size={18} color="#d97706" />
+              )}
+            </Pressable>
+          )}
+
           {/* Claim button -- only on others' chores */}
           {!isMyChore && (
             <Pressable
@@ -467,6 +662,20 @@ export default function ChoresScreen() {
           </View>
         </View>
 
+        {/* Swap requests banner */}
+        {pendingSwapCount > 0 && (
+          <Pressable
+            className="mx-4 mt-2 flex-row items-center rounded-xl bg-purple-50 px-4 py-3"
+            onPress={() => router.push("/(app)/chores/swap-request" as never)}
+          >
+            <Ionicons name="swap-horizontal" size={20} color="#9333ea" />
+            <Text className="ml-2 flex-1 text-sm font-medium text-purple-700">
+              {pendingSwapCount} pending swap request{pendingSwapCount !== 1 ? "s" : ""}
+            </Text>
+            <Ionicons name="chevron-forward" size={16} color="#9333ea" />
+          </Pressable>
+        )}
+
         {/* My Chores section */}
         {myChores.length > 0 && (
           <View className="mt-4">
@@ -522,6 +731,65 @@ export default function ChoresScreen() {
       >
         <Ionicons name="add" size={28} color="#fff" />
       </Pressable>
+
+      {/* Swap member picker modal */}
+      <Modal
+        visible={swapModalChoreId !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSwapModalChoreId(null)}
+      >
+        <Pressable
+          className="flex-1 justify-end bg-black/40"
+          onPress={() => setSwapModalChoreId(null)}
+        >
+          <Pressable
+            className="rounded-t-3xl bg-white pb-8 pt-4"
+            onPress={() => {}}
+          >
+            <View className="mb-4 items-center">
+              <View className="h-1 w-10 rounded-full bg-gray-300" />
+            </View>
+            <Text className="mb-4 px-6 text-lg font-bold text-gray-800">
+              Request Swap With
+            </Text>
+            {otherMembers.length === 0 ? (
+              <Text className="px-6 py-4 text-center text-gray-500">
+                No other members in household
+              </Text>
+            ) : (
+              otherMembers.map((member) => (
+                <Pressable
+                  key={member.id}
+                  className="flex-row items-center px-6 py-3.5 active:bg-gray-50"
+                  onPress={() => handleSwapRequest(member.id)}
+                  disabled={swapSubmitting}
+                >
+                  <View
+                    className="mr-3 h-10 w-10 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor:
+                        AVATAR_COLORS[member.id.charCodeAt(0) % AVATAR_COLORS.length],
+                    }}
+                  >
+                    <Text className="text-sm font-bold text-white">
+                      {getInitials(member.display_name)}
+                    </Text>
+                  </View>
+                  <Text className="flex-1 text-base text-gray-800">
+                    {member.display_name}
+                  </Text>
+                  {swapSubmitting ? (
+                    <ActivityIndicator size="small" color="#9333ea" />
+                  ) : (
+                    <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
+                  )}
+                </Pressable>
+              ))
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }

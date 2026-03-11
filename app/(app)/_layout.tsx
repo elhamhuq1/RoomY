@@ -94,6 +94,36 @@ export default function AppLayout() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="chores/add"
+        options={{
+          headerShown: true,
+          title: "Add Chore",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="chores/swap-request"
+        options={{
+          headerShown: true,
+          title: "Swap Requests",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="chores/dashboard"
+        options={{
+          headerShown: true,
+          title: "Chore Dashboard",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }

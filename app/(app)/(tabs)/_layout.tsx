@@ -93,6 +93,12 @@ export default function TabsLayout() {
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Pressable
+                onPress={() => router.push("/(app)/chores/swap-request" as never)}
+                style={{ marginRight: 8 }}
+              >
+                <Ionicons name="swap-horizontal-outline" size={24} color="#9ca3af" />
+              </Pressable>
+              <Pressable
                 onPress={() => router.push("/(app)/chores/dashboard" as never)}
                 style={{ marginRight: 8 }}
               >
