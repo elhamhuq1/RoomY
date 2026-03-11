@@ -64,11 +64,12 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can add items to a shared grocery list and see other members' additions appear in real-time
   2. User can check off grocery items and, when shopping is done, convert the trip total into a split expense with one tap
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
 - [ ] 03-01-PLAN.md — Database schema (grocery_items, grocery_trips tables, RLS, realtime), TypeScript types, real-time grocery list screen
 - [ ] 03-02-PLAN.md — Complete Trip expense conversion flow, trip history archive, end-to-end verification
+- [ ] 03-03-PLAN.md — Gap closure: fix edit modal keyboard, swipe-to-delete UX, section labels, tap-to-edit affordance
 
 ### Phase 3.1: Chores — INSERTED
 **Goal**: Users can manage household chores with assignment, completion tracking, and fair automatic rotation
@@ -108,6 +109,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/4 | In Progress | - |
 | 2. Expense Splitting | 4/5 | In Progress | - |
-| 3. Groceries | 1/2 | In Progress | - |
+| 3. Groceries | 2/3 | In Progress | - |
 | 3.1. Chores | 0/2 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |
