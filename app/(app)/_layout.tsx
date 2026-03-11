@@ -74,6 +74,26 @@ export default function AppLayout() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="groceries/complete-trip"
+        options={{
+          headerShown: true,
+          title: "Complete Trip",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="groceries/trip-history"
+        options={{
+          headerShown: true,
+          title: "Trip History",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }

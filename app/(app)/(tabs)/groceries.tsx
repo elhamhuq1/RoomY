@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
@@ -165,6 +166,16 @@ export default function GroceriesScreen() {
       supabase.removeChannel(channel);
     };
   }, [household?.id]);
+
+  // -------------------------------------------------------------------------
+  // Refetch on screen focus (in case realtime events were missed)
+  // -------------------------------------------------------------------------
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchItems();
+    }, [fetchItems])
+  );
 
   // -------------------------------------------------------------------------
   // Add item (optimistic)

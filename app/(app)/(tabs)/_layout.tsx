@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSession } from "@/lib/auth-context";
 
 export default function TabsLayout() {
@@ -63,6 +63,22 @@ export default function TabsLayout() {
           href: groceriesEnabled ? "/(app)/(tabs)/groceries" : null,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart" size={size} color={color} />
+          ),
+          headerRight: () => (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Pressable
+                onPress={() => router.push("/(app)/groceries/trip-history" as never)}
+                style={{ marginRight: 8 }}
+              >
+                <Ionicons name="time-outline" size={24} color="#9ca3af" />
+              </Pressable>
+              <Pressable
+                onPress={() => router.push("/(app)/settings" as never)}
+                style={{ marginRight: 16 }}
+              >
+                <Ionicons name="settings-outline" size={24} color="#9ca3af" />
+              </Pressable>
+            </View>
           ),
         }}
       />
