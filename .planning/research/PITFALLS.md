@@ -277,5 +277,5 @@ How roadmap phases should address these pitfalls.
 - [System Design of Splitwise Backend - GeeksforGeeks](https://www.geeksforgeeks.org/system-design/system-design-of-backend-for-expense-sharing-apps-like-splitwise/) -- Concurrent balance updates must be thread-safe
 
 ---
-*Pitfalls research for: SplitBase -- Roommate household management app*
+*Pitfalls research for: RoomY -- Roommate household management app*
 *Researched: 2026-03-10*

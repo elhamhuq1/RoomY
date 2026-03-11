@@ -74,7 +74,7 @@
 
 ```bash
 # Create new Expo project with SDK 55 default template
-npx create-expo-app@latest SplitBase --template default@sdk-55
+npx create-expo-app@latest RoomY --template default@sdk-55
 
 # Core dependencies
 npx expo install @supabase/supabase-js @tanstack/react-query zustand
@@ -228,5 +228,5 @@ Expo SDK 55 requires Node.js `^20.19.4`, `^22.13.0`, `^24.3.0`, or `^25.0.0`. Us
 - [Zod Release Notes v4](https://zod.dev/v4) -- v4 stable, performance improvements (HIGH confidence)
 
 ---
-*Stack research for: SplitBase -- Roommate household management app*
+*Stack research for: RoomY -- Roommate household management app*
 *Researched: 2026-03-10*

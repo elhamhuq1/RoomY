@@ -15,13 +15,7 @@ type SettingsRow = {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { profile, household, householdSettings, signOut } = useSession();
-
-  const enabledModuleCount = [
-    true, // expenses always enabled
-    householdSettings?.groceries_enabled,
-    householdSettings?.chores_enabled,
-  ].filter(Boolean).length;
+  const { profile, household, signOut } = useSession();
 
   function handleSignOut() {
     Alert.alert(
@@ -56,13 +50,6 @@ export default function SettingsScreen() {
       subtitle: profile?.display_name ?? "Set up your profile",
       icon: "person-outline",
       route: "/(app)/settings/profile",
-    },
-    {
-      key: "modules",
-      title: "Modules",
-      subtitle: `${enabledModuleCount} module${enabledModuleCount !== 1 ? "s" : ""} enabled`,
-      icon: "grid-outline",
-      route: "/(app)/settings/modules",
     },
     {
       key: "members",

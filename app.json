@@ -38,7 +38,6 @@
       "expo-apple-authentication",
       "expo-router",
       "expo-sqlite",
-      "expo-sharing",
       "expo-font"
     ]
   }

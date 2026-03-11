@@ -3,22 +3,28 @@
 // Sources: RESEARCH.md Patterns 6 & 7, Supabase Auth docs
 
 import { Platform } from "react-native";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { supabase } from "./supabase";
-
-// Configure Google Sign-In with web client ID
-GoogleSignin.configure({
-  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-});
 
 /**
  * Sign in with Google using native SDK.
  * Uses signInWithIdToken (not signInWithOAuth) for native experience.
  * Per RESEARCH.md Pattern 6.
+ *
+ * GoogleSignin is imported lazily because the native module is not available
+ * in Expo Go — only in development builds. A top-level import would crash
+ * the entire app at startup.
  */
 export async function signInWithGoogle() {
   try {
+    const { GoogleSignin } = await import(
+      "@react-native-google-signin/google-signin"
+    );
+
+    GoogleSignin.configure({
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    });
+
     await GoogleSignin.hasPlayServices();
     const response = await GoogleSignin.signIn();
 

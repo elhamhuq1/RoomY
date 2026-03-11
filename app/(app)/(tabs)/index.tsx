@@ -58,13 +58,30 @@ export default function DashboardScreen() {
 
   const fetchMembers = useCallback(async () => {
     if (!household?.id) return;
-    const { data } = await supabase
+
+    const { data: membersData } = await supabase
       .from("household_members")
-      .select("user_id, role, profiles(*)")
+      .select("user_id, role")
       .eq("household_id", household.id);
 
-    if (data) {
-      setMembers(data as unknown as MemberWithProfile[]);
+    if (membersData && membersData.length > 0) {
+      const userIds = membersData.map((m) => m.user_id);
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", userIds);
+
+      const combined = membersData.map((member) => ({
+        ...member,
+        profiles: (profilesData?.find((p) => p.id === member.user_id) as Profile) ?? {
+          id: member.user_id,
+          display_name: "Unknown",
+        },
+      })) as MemberWithProfile[];
+
+      setMembers(combined);
+    } else {
+      setMembers([]);
     }
     setLoading(false);
   }, [household?.id]);

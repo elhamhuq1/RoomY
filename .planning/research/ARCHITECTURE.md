@@ -415,7 +415,7 @@ Root _layout.tsx checks session via supabase.auth.getSession()
 
 1. **Expense lifecycle:** User creates expense --> splits computed (equal, percentage, or custom) --> splits stored in `expense_splits` table --> balances recomputed --> settlement screen reflects new debts.
 2. **Chore rotation:** Chores assigned on creation --> rotation schedule computed (weekly/biweekly) --> cron or Edge Function advances assignments --> push notification sent to assigned user --> user marks complete --> next rotation occurs.
-3. **Settle up via Venmo:** User views balance --> taps "Settle Up" --> app constructs Venmo deep link with amount and note --> Venmo app opens --> user confirms in Venmo --> user returns and marks as settled in SplitBase --> balance updated.
+3. **Settle up via Venmo:** User views balance --> taps "Settle Up" --> app constructs Venmo deep link with amount and note --> Venmo app opens --> user confirms in Venmo --> user returns and marks as settled in RoomY --> balance updated.
 
 ## Database Schema (Core Tables)
 
@@ -600,5 +600,5 @@ Phase 4: Polish (depends on Phases 2+3)
 - [Obytes Expo Starter Project Structure](https://starter.obytes.com/getting-started/project-structure/) - MEDIUM confidence (well-maintained open-source starter)
 
 ---
-*Architecture research for: SplitBase (roommate household management app)*
+*Architecture research for: RoomY (roommate household management app)*
 *Researched: 2026-03-10*

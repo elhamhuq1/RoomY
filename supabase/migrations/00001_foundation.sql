@@ -209,6 +209,19 @@ ALTER TABLE households ENABLE ROW LEVEL SECURITY;
 ALTER TABLE household_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE household_settings ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to avoid infinite recursion in RLS policies.
+-- Policies on household_members cannot reference household_members in a subquery
+-- (it triggers the same policy again). This SECURITY DEFINER function bypasses RLS.
+CREATE OR REPLACE FUNCTION public.get_user_household_ids()
+RETURNS SETOF UUID
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+STABLE
+AS $$
+  SELECT household_id FROM public.household_members WHERE user_id = auth.uid();
+$$;
+
 -- PROFILES: users can read/update their own; household members can read each other
 CREATE POLICY "Users can view own profile"
   ON profiles FOR SELECT
@@ -222,22 +235,24 @@ CREATE POLICY "Household members can view each others profiles"
   ON profiles FOR SELECT
   USING (
     id IN (
-      SELECT hm2.user_id FROM household_members hm1
-      JOIN household_members hm2 ON hm1.household_id = hm2.household_id
-      WHERE hm1.user_id = auth.uid()
+      SELECT hm.user_id FROM public.household_members hm
+      WHERE hm.household_id IN (SELECT public.get_user_household_ids())
     )
   );
 
 -- HOUSEHOLDS: only members can view; authenticated users can create
 CREATE POLICY "Members can view their household"
   ON households FOR SELECT
-  USING (
-    id IN (SELECT household_id FROM household_members WHERE user_id = auth.uid())
-  );
+  USING (id IN (SELECT public.get_user_household_ids()));
 
 CREATE POLICY "Authenticated users can create households"
   ON households FOR INSERT
   WITH CHECK (auth.uid() = created_by);
+
+-- Creator can view their own household (needed for INSERT...RETURNING before member row exists)
+CREATE POLICY "Creator can view own household"
+  ON households FOR SELECT
+  USING (created_by = auth.uid());
 
 -- Allow household creator to update (e.g., regenerate invite code)
 CREATE POLICY "Creator can update household"
@@ -247,27 +262,21 @@ CREATE POLICY "Creator can update household"
 -- HOUSEHOLD_MEMBERS: members can view co-members; creator can insert first member
 CREATE POLICY "Members can view household members"
   ON household_members FOR SELECT
-  USING (
-    household_id IN (SELECT household_id FROM household_members WHERE user_id = auth.uid())
-  );
+  USING (household_id IN (SELECT public.get_user_household_ids()));
 
 -- Allow the household creator to insert themselves as the first member
 CREATE POLICY "Creator can add themselves as first member"
   ON household_members FOR INSERT
   WITH CHECK (
     user_id = auth.uid()
-    AND household_id IN (SELECT id FROM households WHERE created_by = auth.uid())
+    AND household_id IN (SELECT id FROM public.households WHERE created_by = auth.uid())
   );
 
 -- HOUSEHOLD_SETTINGS: members can view and update
 CREATE POLICY "Members can view household settings"
   ON household_settings FOR SELECT
-  USING (
-    household_id IN (SELECT household_id FROM household_members WHERE user_id = auth.uid())
-  );
+  USING (household_id IN (SELECT public.get_user_household_ids()));
 
 CREATE POLICY "Members can update household settings"
   ON household_settings FOR UPDATE
-  USING (
-    household_id IN (SELECT household_id FROM household_members WHERE user_id = auth.uid())
-  );
+  USING (household_id IN (SELECT public.get_user_household_ids()));

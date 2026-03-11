@@ -33,13 +33,27 @@ export default function MemberWelcomeScreen() {
       if (!params.household_id) return;
 
       try {
-        const { data } = await supabase
+        const { data: membersData } = await supabase
           .from("household_members")
-          .select("user_id, role, profiles(*)")
+          .select("user_id, role")
           .eq("household_id", params.household_id);
 
-        if (data) {
-          setMembers(data as unknown as MemberWithProfile[]);
+        if (membersData && membersData.length > 0) {
+          const userIds = membersData.map((m) => m.user_id);
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("*")
+            .in("id", userIds);
+
+          const combined = membersData.map((member) => ({
+            ...member,
+            profiles: profilesData?.find((p) => p.id === member.user_id) ?? {
+              id: member.user_id,
+              display_name: "Unknown",
+            },
+          })) as unknown as MemberWithProfile[];
+
+          setMembers(combined);
         }
       } catch {
         // Silently fail -- we still show the welcome with params data

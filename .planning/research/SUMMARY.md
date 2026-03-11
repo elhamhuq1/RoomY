@@ -1,13 +1,13 @@
 # Project Research Summary
 
-**Project:** SplitBase — Roommate Household Management App
+**Project:** RoomY — Roommate Household Management App
 **Domain:** Mobile app for expense splitting, shared grocery lists, chore tracking, and household coordination
 **Researched:** 2026-03-10
 **Confidence:** HIGH (stack, architecture), MEDIUM-HIGH (features, pitfalls)
 
 ## Executive Summary
 
-SplitBase is a React Native mobile app targeting the well-understood "household management" category — but it carves out a clear niche: modular, opt-in features personalized through an onboarding quiz, with Venmo deep-link settlement as a first-class citizen. The dominant competitor (Splitwise) is losing users through aggressive monetization; all-in-one competitors (Flatastic, OurHome) overwhelm users with undifferentiated feature sets. The recommended approach is Expo SDK 55 + Supabase, a stack with official integration guides, relational data modeling that perfectly fits the expense/balance domain, and free tiers sufficient for personal use. Two developers on Linux and macOS can collaborate effectively with EAS Build handling cross-platform iOS/Android builds.
+RoomY is a React Native mobile app targeting the well-understood "household management" category — but it carves out a clear niche: modular, opt-in features personalized through an onboarding quiz, with Venmo deep-link settlement as a first-class citizen. The dominant competitor (Splitwise) is losing users through aggressive monetization; all-in-one competitors (Flatastic, OurHome) overwhelm users with undifferentiated feature sets. The recommended approach is Expo SDK 55 + Supabase, a stack with official integration guides, relational data modeling that perfectly fits the expense/balance domain, and free tiers sufficient for personal use. Two developers on Linux and macOS can collaborate effectively with EAS Build handling cross-platform iOS/Android builds.
 
 The architectural pattern is a layered feature-module system: thin Expo Router route files import from self-contained feature modules (expenses, groceries, chores, household), which expose custom hooks wrapping TanStack Query and Supabase. Zustand handles ephemeral UI state. Supabase Realtime provides live sync for collaborative tables (grocery lists, chore boards) without additional infrastructure. The data model must treat expense records as an immutable ledger — balances are always derived, never stored as mutable fields — and Row Level Security must be enabled on every table from day one. These are not refactorable decisions; getting them wrong means a rewrite.
 
@@ -46,7 +46,7 @@ The feature research analyzed 10+ competitors with MEDIUM-HIGH confidence. Split
 - Settle up with Venmo deep link — one-tap request from balance screen, free, no competitor does it well
 - Expense history — scrollable, filterable log
 - Push notifications for new expenses — apps without push lose 77% of users in 3 days
-- Onboarding quiz (3-4 questions) — SplitBase's most unique UX concept; no competitor does this
+- Onboarding quiz (3-4 questions) — RoomY's most unique UX concept; no competitor does this
 
 **Should have (competitive) — v1.x:**
 - Recurring expenses — users manually re-enter rent twice before expecting automation
