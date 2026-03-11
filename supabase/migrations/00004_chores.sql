@@ -260,16 +260,16 @@ BEGIN
     resolved_at = now()
   WHERE id = p_request_id;
 
-  -- If accepted, reassign the chore to the requester
+  -- If accepted, reassign the chore to the accepter (requested_to)
   IF p_status = 'accepted' THEN
-    v_position := (SELECT array_position(rotation_order, v_request.requested_by)
+    v_position := (SELECT array_position(rotation_order, v_request.requested_to)
                    FROM public.chores WHERE id = v_request.chore_id);
     IF v_position IS NULL THEN
-      RAISE EXCEPTION 'Requester is not in the rotation order';
+      RAISE EXCEPTION 'Accepter is not in the rotation order';
     END IF;
 
     UPDATE public.chores SET
-      current_assignee = v_request.requested_by,
+      current_assignee = v_request.requested_to,
       current_assignee_index = v_position - 1
     WHERE id = v_request.chore_id;
   END IF;
