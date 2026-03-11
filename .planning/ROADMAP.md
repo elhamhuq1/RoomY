@@ -76,13 +76,13 @@ Plans:
 **Requirements**: CHOR-01, CHOR-02, CHOR-03, CHOR-04
 **Success Criteria** (what must be TRUE):
   1. User can create chores, assign them to household members, and mark them complete
-  2. Chores automatically rotate among members using effort weighting so that workload is distributed fairly over time
+  2. Chores automatically rotate among members using round-robin so that workload is distributed fairly over time
   3. User can view a chore contribution dashboard showing each member's effort history
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03.1-01: TBD
-- [ ] 03.1-02: TBD
+- [ ] 03.1-01-PLAN.md — Database schema (chores, completions, swap_requests tables, RLS, RPC functions, pg_cron), TypeScript types, main chore list with create/complete/claim
+- [ ] 03.1-02-PLAN.md — Swap requests, dispute system with 24h auto-revert, contribution dashboard with week/month views
 
 ### Phase 4: Engagement
 **Goal**: Users stay informed about household activity through push notifications and can see upcoming obligations on a shared calendar
@@ -109,5 +109,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
 | 1. Foundation | 1/4 | In Progress | - |
 | 2. Expense Splitting | 4/5 | In Progress | - |
 | 3. Groceries | 1/2 | In Progress | - |
-| 3.1. Chores | 0/0 | Not started | - |
+| 3.1. Chores | 0/2 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |
