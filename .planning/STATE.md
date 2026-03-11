@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 **Phase:** 2 of 4 (Expense Splitting)
-**Current Plan:** 3
+**Current Plan:** 4
 **Total Plans in Phase:** 4
 **Status:** Ready to execute
 **Last Activity:** 2026-03-11
 
-**Progress:** [██████░░░░] 63%
+**Progress:** [████████░░] 75%
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 01 P03 | 3min | 2 tasks | 7 files |
 | Phase 02 P01 | 1min | 2 tasks | 2 files |
 | Phase 02 P03 | 4min | 2 tasks | 3 files |
+| Phase 02 P02 | 5min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,8 @@ Recent decisions affecting current work:
 - [Phase 02]: HTTPS Venmo URL as primary deep link (not venmo:// scheme) for Expo Go compatibility
 - [Phase 02]: Manual mark-as-settled after Venmo return (no auto-detection per user decision)
 - [Phase 02]: Settle amount field allows exceeding balance with warning for pre-payment
+- [Phase 02]: useFocusEffect for auto-refresh when returning from add/edit expense screens
+- [Phase 02]: Edit mode uses delete-then-insert for splits (simpler than tracking individual row updates)
 
 ### Pending Todos
 
@@ -77,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T07:34:07.065Z
-**Stopped at:** Completed 02-03-PLAN.md
+**Last session:** 2026-03-11T07:35:02.982Z
+**Stopped at:** Completed 02-02-PLAN.md
 **Resume file:** None

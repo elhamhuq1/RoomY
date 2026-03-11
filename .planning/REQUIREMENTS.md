@@ -20,7 +20,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **EXPN-01**: User can add an expense with description, amount, and who paid
 - [x] **EXPN-02**: Expense is automatically split equally among household members
 - [x] **EXPN-03**: User can view balance dashboard showing who owes whom
-- [ ] **EXPN-04**: User can view scrollable expense history
+- [x] **EXPN-04**: User can view scrollable expense history
 - [x] **EXPN-05**: User can settle up by recording a payment
 - [x] **EXPN-06**: User can send a Venmo request with one tap from balance screen
 
@@ -91,7 +91,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPN-01 | Phase 2 | Complete |
 | EXPN-02 | Phase 2 | Complete |
 | EXPN-03 | Phase 2 | Complete |
-| EXPN-04 | Phase 2 | Pending |
+| EXPN-04 | Phase 2 | Complete |
 | EXPN-05 | Phase 2 | Complete |
 | EXPN-06 | Phase 2 | Complete |
 | GROC-01 | Phase 3 | Pending |
