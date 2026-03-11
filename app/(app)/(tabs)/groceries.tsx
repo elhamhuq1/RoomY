@@ -63,11 +63,15 @@ function QuantityStepper({
 // Swipe Delete Action
 // ---------------------------------------------------------------------------
 
-function RightSwipeAction() {
+function RightSwipeAction({ onDelete }: { onDelete: () => void }) {
   return (
-    <View className="items-center justify-center bg-red-500 px-6">
+    <Pressable
+      className="w-20 items-center justify-center bg-red-500"
+      onPress={onDelete}
+    >
       <Ionicons name="trash" size={22} color="#fff" />
-    </View>
+      <Text className="mt-1 text-xs font-medium text-white">Delete</Text>
+    </Pressable>
   );
 }
 
@@ -371,8 +375,15 @@ export default function GroceriesScreen() {
     return (
       <ReanimatedSwipeable
         key={item.id}
-        renderRightActions={RightSwipeAction}
-        onSwipeableOpen={() => deleteItem(item.id)}
+        renderRightActions={(_progress, _translation, swipeableMethods) => (
+          <RightSwipeAction
+            onDelete={() => {
+              swipeableMethods.close();
+              deleteItem(item.id);
+            }}
+          />
+        )}
+        overshootRight={false}
         rightThreshold={80}
       >
         <Pressable
@@ -501,19 +512,24 @@ export default function GroceriesScreen() {
         >
           {/* Unchecked items */}
           {uncheckedItems.length > 0 && (
-            <View className="mt-3 mx-4 overflow-hidden rounded-xl">
-              {uncheckedItems.map((item, index) => (
-                <View
-                  key={item.id}
-                  className={
-                    index < uncheckedItems.length - 1
-                      ? "border-b border-gray-100"
-                      : ""
-                  }
-                >
-                  {renderItemRow(item, false)}
-                </View>
-              ))}
+            <View className="mt-3">
+              <Text className="mb-2 px-4 text-sm font-medium uppercase tracking-wide text-gray-400">
+                To Buy
+              </Text>
+              <View className="mx-4 overflow-hidden rounded-xl">
+                {uncheckedItems.map((item, index) => (
+                  <View
+                    key={item.id}
+                    className={
+                      index < uncheckedItems.length - 1
+                        ? "border-b border-gray-100"
+                        : ""
+                    }
+                  >
+                    {renderItemRow(item, false)}
+                  </View>
+                ))}
+              </View>
             </View>
           )}
 
