@@ -524,18 +524,20 @@ export default function ChoresScreen() {
             </Pressable>
           )}
 
-          {/* Complete button */}
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-green-50 active:bg-green-100"
-            onPress={() => handleComplete(chore.id)}
-            disabled={isCompleting}
-          >
-            {isCompleting ? (
-              <ActivityIndicator size="small" color="#22c55e" />
-            ) : (
-              <Ionicons name="checkmark" size={20} color="#22c55e" />
-            )}
-          </Pressable>
+          {/* Complete button — only on your own chores */}
+          {isMyChore && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-green-50 active:bg-green-100"
+              onPress={() => handleComplete(chore.id)}
+              disabled={isCompleting}
+            >
+              {isCompleting ? (
+                <ActivityIndicator size="small" color="#22c55e" />
+              ) : (
+                <Ionicons name="checkmark" size={20} color="#22c55e" />
+              )}
+            </Pressable>
+          )}
         </View>
       </View>
     );
