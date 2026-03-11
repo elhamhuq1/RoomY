@@ -1,7 +1,7 @@
 # Requirements: SplitBase
 
 **Defined:** 2026-03-10
-**Core Value:** Roommates can see exactly who owes what and settle up with one tap — no awkward conversations, no mental math, no forgotten debts.
+**Core Value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
 
 ## v1 Requirements
 
@@ -68,12 +68,12 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| Built-in payment processing (Stripe) | Not a business, no merchant account — Venmo deep links cover the need |
-| Receipt scanning / OCR | Mediocre accuracy, API cost — manual entry takes 10 seconds for small households |
+| Built-in payment processing (Stripe) | Not a business, no merchant account -- Venmo deep links cover the need |
+| Receipt scanning / OCR | Mediocre accuracy, API cost -- manual entry takes 10 seconds for small households |
 | In-app chat / messaging | Roommates already have iMessage/WhatsApp group chats |
-| Gamification / points system | Patronizing for adults — transparent contribution history is more effective |
+| Gamification / points system | Patronizing for adults -- transparent contribution history is more effective |
 | Social features beyond household | This is a household tool, not a social network |
-| Multi-currency support | USD only — target users are in the same US household |
+| Multi-currency support | USD only -- target users are in the same US household |
 | AI-powered suggestions | Decision space too small for AI to add value in 2-4 person households |
 | Income-based splitting | Requires sensitive financial disclosure, creates social friction |
 
@@ -83,35 +83,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTH-05 | — | Pending |
-| EXPN-01 | — | Pending |
-| EXPN-02 | — | Pending |
-| EXPN-03 | — | Pending |
-| EXPN-04 | — | Pending |
-| EXPN-05 | — | Pending |
-| EXPN-06 | — | Pending |
-| GROC-01 | — | Pending |
-| GROC-02 | — | Pending |
-| GROC-03 | — | Pending |
-| CHOR-01 | — | Pending |
-| CHOR-02 | — | Pending |
-| CHOR-03 | — | Pending |
-| CHOR-04 | — | Pending |
-| PUSH-01 | — | Pending |
-| PUSH-02 | — | Pending |
-| PUSH-03 | — | Pending |
-| CALC-01 | — | Pending |
-| CALC-02 | — | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| EXPN-01 | Phase 2 | Pending |
+| EXPN-02 | Phase 2 | Pending |
+| EXPN-03 | Phase 2 | Pending |
+| EXPN-04 | Phase 2 | Pending |
+| EXPN-05 | Phase 2 | Pending |
+| EXPN-06 | Phase 2 | Pending |
+| GROC-01 | Phase 3 | Pending |
+| GROC-02 | Phase 3 | Pending |
+| GROC-03 | Phase 3 | Pending |
+| CHOR-01 | Phase 3 | Pending |
+| CHOR-02 | Phase 3 | Pending |
+| CHOR-03 | Phase 3 | Pending |
+| CHOR-04 | Phase 3 | Pending |
+| PUSH-01 | Phase 4 | Pending |
+| PUSH-02 | Phase 4 | Pending |
+| PUSH-03 | Phase 4 | Pending |
+| CALC-01 | Phase 4 | Pending |
+| CALC-02 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23 ⚠️
+- Mapped to phases: 23
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-10*
-*Last updated: 2026-03-10 after initial definition*
+*Last updated: 2026-03-10 after roadmap creation*
