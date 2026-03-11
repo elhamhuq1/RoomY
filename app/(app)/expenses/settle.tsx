@@ -139,11 +139,11 @@ export default function SettleScreen() {
     if (!otherProfile?.venmo_username) return;
 
     const username = otherProfile.venmo_username.replace(/^@/, "");
-    const note = params.description && params.date
-      ? `${params.description} - ${new Date(params.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
+    const desc = params.description?.replace(/\+/g, ' ') ?? '';
+    const note = desc && params.date
+      ? `${desc} - ${new Date(params.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
       : `RoomY: Settlement for ${household?.name ?? "household"}`;
-    const safeNote = note.replace(/&/g, 'and').replace(/#/g, '');
-    const url = `https://venmo.com/${username}?txn=charge&amount=${parsedAmount.toFixed(2)}&note=${safeNote}`;
+    const url = `https://venmo.com/${username}?txn=charge&amount=${parsedAmount.toFixed(2)}&note=${encodeURIComponent(note)}`;
 
     Linking.openURL(url);
     setVenmoSent(true);

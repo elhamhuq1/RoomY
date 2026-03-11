@@ -259,8 +259,7 @@ export default function ExpensesScreen() {
     const note = description && date
       ? `${description} - ${new Date(date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
       : `RoomY: Balance settlement for ${household?.name ?? "household"}`;
-    const safeNote = note.replace(/&/g, 'and').replace(/#/g, '');
-    const url = `https://venmo.com/${username}?txn=charge&amount=${Math.abs(amount).toFixed(2)}&note=${safeNote}`;
+    const url = `https://venmo.com/${username}?txn=charge&amount=${Math.abs(amount).toFixed(2)}&note=${encodeURIComponent(note)}`;
     Linking.openURL(url);
   }
 
