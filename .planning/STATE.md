@@ -69,6 +69,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T05:10:19.335Z
-**Stopped at:** Checkpoint at 01-04 Task 3 (human-verify)
-**Resume file:** None
+**Last session:** 2026-03-11T07:03:18.892Z
+**Stopped at:** Phase 2 context gathered
+**Resume file:** .planning/phases/02-expense-splitting/02-CONTEXT.md
