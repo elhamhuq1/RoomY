@@ -50,6 +50,8 @@ export default function SettleScreen() {
     userId: string;
     amount: string;
     direction: string;
+    description?: string;
+    date?: string;
   }>();
 
   const [otherProfile, setOtherProfile] = useState<Profile | null>(null);
@@ -137,7 +139,9 @@ export default function SettleScreen() {
     if (!otherProfile?.venmo_username) return;
 
     const username = otherProfile.venmo_username.replace(/^@/, "");
-    const note = `RoomY: Settlement for ${household?.name ?? "household"}`;
+    const note = params.description && params.date
+      ? `${params.description} - ${new Date(params.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
+      : `RoomY: Settlement for ${household?.name ?? "household"}`;
     const encodedNote = encodeURIComponent(note);
     const url = `https://venmo.com/${username}?txn=charge&amount=${parsedAmount.toFixed(2)}&note=${encodedNote}`;
 

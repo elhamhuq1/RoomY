@@ -238,9 +238,27 @@ export default function ExpensesScreen() {
   const youOwe = balances.filter((b) => b.net_amount < 0);
   const allSettled = balances.length === 0;
 
-  function handleVenmoRequest(venmoUsername: string, amount: number) {
+  function getRecentExpenseForUser(userId: string): { description: string; date: string } | null {
+    for (const group of groupedHistory) {
+      for (const item of group.items) {
+        if (item.type === 'expense') {
+          if (item.data.paid_by === userId || item.data.paid_by === user?.id) {
+            return {
+              description: item.data.description,
+              date: item.data.created_at,
+            };
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  function handleVenmoRequest(venmoUsername: string, amount: number, description?: string, date?: string) {
     const username = venmoUsername.replace(/^@/, "");
-    const note = `RoomY: Balance settlement for ${household?.name ?? "household"}`;
+    const note = description && date
+      ? `${description} - ${new Date(date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
+      : `RoomY: Balance settlement for ${household?.name ?? "household"}`;
     const encodedNote = encodeURIComponent(note);
     const url = `https://venmo.com/${username}?txn=charge&amount=${Math.abs(amount).toFixed(2)}&note=${encodedNote}`;
     Linking.openURL(url);
@@ -288,7 +306,9 @@ export default function ExpensesScreen() {
                   <Text className="mb-2 text-sm font-semibold text-green-600">
                     Owed to you
                   </Text>
-                  {owedToYou.map((entry, index) => (
+                  {owedToYou.map((entry, index) => {
+                    const recentExpense = getRecentExpenseForUser(entry.user_id);
+                    return (
                     <View
                       key={entry.user_id}
                       className="mb-2 flex-row items-center rounded-xl bg-surface-50 p-3"
@@ -322,7 +342,9 @@ export default function ExpensesScreen() {
                             onPress={() =>
                               handleVenmoRequest(
                                 entry.profile!.venmo_username!,
-                                entry.net_amount
+                                entry.net_amount,
+                                recentExpense?.description,
+                                recentExpense?.date
                               )
                             }
                           >
@@ -335,7 +357,7 @@ export default function ExpensesScreen() {
                           className="rounded-lg bg-primary-500 px-3 py-2 active:bg-primary-600"
                           onPress={() =>
                             router.push(
-                              `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=owed_to_you` as never
+                              `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=owed_to_you${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
                             )
                           }
                         >
@@ -345,7 +367,8 @@ export default function ExpensesScreen() {
                         </Pressable>
                       </View>
                     </View>
-                  ))}
+                    );
+                  })}
                 </View>
               )}
 
@@ -355,7 +378,9 @@ export default function ExpensesScreen() {
                   <Text className="mb-2 text-sm font-semibold text-red-500">
                     You owe
                   </Text>
-                  {youOwe.map((entry, index) => (
+                  {youOwe.map((entry, index) => {
+                    const recentExpense = getRecentExpenseForUser(entry.user_id);
+                    return (
                     <View
                       key={entry.user_id}
                       className="mb-2 flex-row items-center rounded-xl bg-surface-50 p-3"
@@ -387,7 +412,7 @@ export default function ExpensesScreen() {
                         className="rounded-lg bg-primary-500 px-3 py-2 active:bg-primary-600"
                         onPress={() =>
                           router.push(
-                            `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=you_owe` as never
+                            `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=you_owe${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
                           )
                         }
                       >
@@ -396,7 +421,8 @@ export default function ExpensesScreen() {
                         </Text>
                       </Pressable>
                     </View>
-                  ))}
+                    );
+                  })}
                 </View>
               )}
             </View>
