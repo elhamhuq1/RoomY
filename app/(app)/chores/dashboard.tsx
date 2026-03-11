@@ -24,7 +24,7 @@ type MemberStats = {
 };
 
 export default function ChoreDashboardScreen() {
-  const { householdId } = useSession();
+  const { household } = useSession();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [period, setPeriod] = useState<TimePeriod>("week");
@@ -32,7 +32,7 @@ export default function ChoreDashboardScreen() {
   const [totalCompletions, setTotalCompletions] = useState(0);
 
   const fetchData = useCallback(async () => {
-    if (!householdId) return;
+    if (!household?.id) return;
 
     try {
       setLoading(true);
@@ -41,7 +41,7 @@ export default function ChoreDashboardScreen() {
       const { data: members, error: membersError } = await supabase
         .from("household_members")
         .select("user_id")
-        .eq("household_id", householdId);
+        .eq("household_id", household.id);
 
       if (membersError) throw membersError;
 
@@ -60,7 +60,7 @@ export default function ChoreDashboardScreen() {
           *,
           chore:chores!inner(household_id)
         `)
-        .eq("chore.household_id", householdId)
+        .eq("chore.household_id", household.id)
         .eq("is_reverted", false)
         .order("completed_at", { ascending: false });
 
@@ -109,7 +109,7 @@ export default function ChoreDashboardScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [householdId, period]);
+  }, [household?.id, period]);
 
   useFocusEffect(
     useCallback(() => {

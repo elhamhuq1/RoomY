@@ -21,14 +21,14 @@ type SwapWithDetails = ChoreSwapRequest & {
 };
 
 export default function SwapRequestsScreen() {
-  const { session, householdId } = useSession();
+  const { session, household } = useSession();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [incoming, setIncoming] = useState<SwapWithDetails[]>([]);
   const [outgoing, setOutgoing] = useState<SwapWithDetails[]>([]);
 
   const fetchData = useCallback(async () => {
-    if (!householdId || !session?.user?.id) return;
+    if (!household?.id || !session?.user?.id) return;
 
     try {
       setLoading(true);
@@ -40,7 +40,7 @@ export default function SwapRequestsScreen() {
           *,
           chore:chores(*)
         `)
-        .eq("chore.household_id", householdId);
+        .eq("chore.household_id", household.id);
 
       if (requestsError) throw requestsError;
 
@@ -74,7 +74,7 @@ export default function SwapRequestsScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [householdId, session?.user?.id]);
+  }, [household?.id, session?.user?.id]);
 
   useFocusEffect(
     useCallback(() => {
