@@ -5,6 +5,36 @@ export default function AppLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
+        name="expenses/add"
+        options={{
+          headerShown: true,
+          title: "Add Expense",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="expenses/[id]"
+        options={{
+          headerShown: true,
+          title: "Expense",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="expenses/settle"
+        options={{
+          headerShown: true,
+          title: "Settle Up",
+          headerTintColor: "#f9a825",
+          headerStyle: { backgroundColor: "#fefdfb" },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="settings/index"
         options={{
           headerShown: true,
