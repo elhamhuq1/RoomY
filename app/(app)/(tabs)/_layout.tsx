@@ -90,22 +90,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkbox" size={size} color={color} />
           ),
-          headerRight: () => (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Pressable
-                onPress={() => router.push("/(app)/chores/dashboard" as never)}
-                style={{ marginRight: 8 }}
-              >
-                <Ionicons name="stats-chart-outline" size={24} color="#9ca3af" />
-              </Pressable>
-              <Pressable
-                onPress={() => router.push("/(app)/settings" as never)}
-                style={{ marginRight: 16 }}
-              >
-                <Ionicons name="settings-outline" size={24} color="#9ca3af" />
-              </Pressable>
-            </View>
-          ),
         }}
       />
     </Tabs>

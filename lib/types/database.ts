@@ -87,44 +87,6 @@ export interface GroceryTrip {
   completed_at: string;
 }
 
-export interface Chore {
-  id: string;
-  household_id: string;
-  name: string;
-  frequency: "daily" | "weekly" | "monthly" | "custom";
-  custom_interval_days: number | null;
-  rotation_order: string[];
-  current_assignee_index: number;
-  current_assignee: string | null;
-  next_due_at: string;
-  last_completed_at: string | null;
-  created_by: string;
-  created_at: string;
-  is_active: boolean;
-}
-
-export interface ChoreCompletion {
-  id: string;
-  chore_id: string;
-  completed_by: string;
-  completed_at: string;
-  is_disputed: boolean;
-  disputed_by: string | null;
-  disputed_at: string | null;
-  is_reverted: boolean;
-  reverted_at: string | null;
-}
-
-export interface ChoreSwapRequest {
-  id: string;
-  chore_id: string;
-  requested_by: string;
-  requested_to: string;
-  status: "pending" | "accepted" | "declined";
-  created_at: string;
-  resolved_at: string | null;
-}
-
 // Supabase Database type for client generic
 export interface Database {
   public: {
@@ -214,46 +176,6 @@ export interface Database {
         };
         Update: Partial<Omit<GroceryTrip, "id">>;
       };
-      chores: {
-        Row: Chore;
-        Insert: Omit<
-          Chore,
-          "id" | "created_at" | "current_assignee_index" | "is_active" | "last_completed_at"
-        > & {
-          id?: string;
-          created_at?: string;
-          current_assignee_index?: number;
-          is_active?: boolean;
-          last_completed_at?: string | null;
-        };
-        Update: Partial<Omit<Chore, "id">>;
-      };
-      chore_completions: {
-        Row: ChoreCompletion;
-        Insert: Omit<
-          ChoreCompletion,
-          "id" | "completed_at" | "is_disputed" | "disputed_by" | "disputed_at" | "is_reverted" | "reverted_at"
-        > & {
-          id?: string;
-          completed_at?: string;
-          is_disputed?: boolean;
-          disputed_by?: string | null;
-          disputed_at?: string | null;
-          is_reverted?: boolean;
-          reverted_at?: string | null;
-        };
-        Update: Partial<Omit<ChoreCompletion, "id">>;
-      };
-      chore_swap_requests: {
-        Row: ChoreSwapRequest;
-        Insert: Omit<ChoreSwapRequest, "id" | "created_at" | "resolved_at" | "status"> & {
-          id?: string;
-          created_at?: string;
-          resolved_at?: string | null;
-          status?: "pending" | "accepted" | "declined";
-        };
-        Update: Partial<Omit<ChoreSwapRequest, "id">>;
-      };
     };
     Functions: {
       generate_invite_code: {
@@ -282,27 +204,6 @@ export interface Database {
         };
         Returns: { trip_id: string; expense_id: string };
       };
-      complete_chore: {
-        Args: { p_chore_id: string; p_completed_by: string };
-        Returns: {
-          completion_id: string;
-          next_assignee: string;
-          next_due_at: string;
-        };
-      };
-      claim_chore: {
-        Args: { p_chore_id: string; p_claimed_by: string };
-        Returns: void;
-      };
-      dispute_completion: {
-        Args: { p_completion_id: string; p_disputed_by: string };
-        Returns: void;
-      };
-      resolve_swap_request: {
-        Args: { p_request_id: string; p_status: string };
-        Returns: void;
-      };
     };
   };
 }
-
