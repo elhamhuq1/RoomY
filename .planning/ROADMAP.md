@@ -2,7 +2,7 @@
 
 ## Overview
 
-RoomY delivers a roommate household management app in four phases: first establish identity and household membership (the prerequisite for everything), then build the core expense splitting and Venmo settlement loop (the primary value), then layer on groceries and chores (the secondary modules), and finally wire up push notifications and a shared calendar (engagement and polish). Each phase delivers a complete, testable capability.
+RoomY delivers a roommate household management app in five phases: first establish identity and household membership (the prerequisite for everything), then build the core expense splitting and Venmo settlement loop (the primary value), then add groceries and chores as separate parallel phases (enabling two developers to work simultaneously), and finally wire up push notifications and a shared calendar (engagement and polish). Each phase delivers a complete, testable capability.
 
 ## Phases
 
@@ -14,7 +14,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation** - Auth, household creation/joining, onboarding quiz, and secure data model
 - [ ] **Phase 2: Expense Splitting** - Add expenses, view balances, settle up via Venmo deep link
-- [ ] **Phase 3: Groceries & Chores** - Shared grocery list with cost splitting, chore assignment with rotation
+- [ ] **Phase 3: Groceries** - Shared grocery list with real-time sync and one-tap cost splitting
+- [ ] **Phase 3.1: Chores** - Chore assignment, completion tracking, fair rotation with effort weighting
 - [ ] **Phase 4: Engagement** - Push notifications across all modules and shared household calendar
 
 ## Phase Details
@@ -56,25 +57,36 @@ Plans:
 - [ ] 02-04-PLAN.md — User acceptance testing of complete expense splitting flow
 - [x] 02-05-PLAN.md — Gap closure: fix settlement balance inversion, $ alignment, keyboard dismiss, Venmo note format
 
-### Phase 3: Groceries & Chores
-**Goal**: Users can coordinate grocery shopping with a shared real-time list and manage household chores with fair rotation
+### Phase 3: Groceries
+**Goal**: Users can coordinate grocery shopping with a shared real-time list and convert shopping trips into split expenses
 **Depends on**: Phase 1, Phase 2 (grocery cost splitting creates expenses)
-**Requirements**: GROC-01, GROC-02, GROC-03, CHOR-01, CHOR-02, CHOR-03, CHOR-04
+**Requirements**: GROC-01, GROC-02, GROC-03
 **Success Criteria** (what must be TRUE):
   1. User can add items to a shared grocery list and see other members' additions appear in real-time
   2. User can check off grocery items and, when shopping is done, convert the trip total into a split expense with one tap
-  3. User can create chores, assign them to household members, and mark them complete
-  4. Chores automatically rotate among members using effort weighting so that workload is distributed fairly over time
-  5. User can view a chore contribution dashboard showing each member's effort history
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Database schema (grocery_items, grocery_trips tables, RLS, realtime), TypeScript types, real-time grocery list screen
+- [ ] 03-02-PLAN.md — Complete Trip expense conversion flow, trip history archive, end-to-end verification
+
+### Phase 3.1: Chores — INSERTED
+**Goal**: Users can manage household chores with assignment, completion tracking, and fair automatic rotation
+**Depends on**: Phase 1 (household membership)
+**Requirements**: CHOR-01, CHOR-02, CHOR-03, CHOR-04
+**Success Criteria** (what must be TRUE):
+  1. User can create chores, assign them to household members, and mark them complete
+  2. Chores automatically rotate among members using effort weighting so that workload is distributed fairly over time
+  3. User can view a chore contribution dashboard showing each member's effort history
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03.1-01: TBD
+- [ ] 03.1-02: TBD
 
 ### Phase 4: Engagement
 **Goal**: Users stay informed about household activity through push notifications and can see upcoming obligations on a shared calendar
-**Depends on**: Phase 2, Phase 3
+**Depends on**: Phase 2, Phase 3, Phase 3.1
 **Requirements**: PUSH-01, PUSH-02, PUSH-03, CALC-01, CALC-02
 **Success Criteria** (what must be TRUE):
   1. User receives a push notification when a new expense is added by another household member
@@ -90,11 +102,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
+Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/4 | In Progress | - |
 | 2. Expense Splitting | 4/5 | In Progress | - |
-| 3. Groceries & Chores | 0/0 | Not started | - |
+| 3. Groceries | 0/2 | Planned | - |
+| 3.1. Chores | 0/0 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |
