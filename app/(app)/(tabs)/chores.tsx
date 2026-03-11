@@ -31,7 +31,6 @@ const SUGGESTED_CHORES = [
   { name: "Clean bathroom", icon: "water-outline" as const, frequency: "weekly" as const },
   { name: "Mop floors", icon: "grid-outline" as const, frequency: "weekly" as const },
   { name: "Wipe counters", icon: "hand-left-outline" as const, frequency: "daily" as const },
-  { name: "Laundry", icon: "shirt-outline" as const, frequency: "weekly" as const },
 ];
 
 const AVATAR_COLORS = [
