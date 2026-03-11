@@ -108,6 +108,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/4 | In Progress | - |
 | 2. Expense Splitting | 4/5 | In Progress | - |
-| 3. Groceries | 0/2 | Planned | - |
+| 3. Groceries | 1/2 | In Progress | - |
 | 3.1. Chores | 0/0 | Not started | - |
 | 4. Engagement | 0/0 | Not started | - |
