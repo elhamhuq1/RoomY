@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -185,6 +186,7 @@ export default function AddExpenseScreen() {
   }
 
   async function handleSubmit() {
+    Keyboard.dismiss();
     if (!canSubmit || !household?.id || !user?.id) return;
 
     setSubmitting(true);
@@ -248,6 +250,7 @@ export default function AddExpenseScreen() {
         className="flex-1"
         contentContainerClassName="px-6 py-6 pb-12"
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
         {/* Description */}
@@ -287,9 +290,10 @@ export default function AddExpenseScreen() {
         {/* Amount */}
         <Text className="mb-2 text-sm font-medium text-gray-500">Amount</Text>
         <View className="mb-6 flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3">
-          <Text className="mr-1 text-lg font-semibold text-gray-400">$</Text>
+          <Text className="mr-1 text-lg text-gray-400">$</Text>
           <TextInput
             className="flex-1 text-lg text-gray-800"
+            style={{ paddingVertical: 0 }}
             placeholder="0.00"
             placeholderTextColor="#9ca3af"
             keyboardType="decimal-pad"

@@ -91,12 +91,12 @@ AS $$
     SELECT creditor AS other_user, -amount
     FROM expense_debts WHERE debtor = auth.uid()
     UNION ALL
-    -- I settled (paid them), reduces what I owe (positive for them)
-    SELECT creditor AS other_user, -amount
+    -- I settled (paid them), reduces what I owe
+    SELECT creditor AS other_user, amount
     FROM settlement_credits WHERE debtor = auth.uid()
     UNION ALL
-    -- They settled (paid me), reduces what they owe
-    SELECT debtor AS other_user, amount
+    -- They settled (paid me), reduces what they owe me
+    SELECT debtor AS other_user, -amount
     FROM settlement_credits WHERE creditor = auth.uid()
   )
   SELECT other_user AS user_id, SUM(amount) AS net_amount
