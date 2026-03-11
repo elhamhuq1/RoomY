@@ -65,6 +65,28 @@ export interface Settlement {
   created_at: string;
 }
 
+export interface GroceryItem {
+  id: string;
+  household_id: string;
+  name: string;
+  quantity: number;
+  is_checked: boolean;
+  trip_id: string | null;
+  archived_at: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+export interface GroceryTrip {
+  id: string;
+  household_id: string;
+  total_amount: number;
+  expense_id: string | null;
+  paid_by: string;
+  created_by: string;
+  completed_at: string;
+}
+
 // Supabase Database type for client generic
 export interface Database {
   public: {
@@ -133,6 +155,27 @@ export interface Database {
         };
         Update: Partial<Omit<Settlement, "id">>;
       };
+      grocery_items: {
+        Row: GroceryItem;
+        Insert: Omit<GroceryItem, "id" | "created_at" | "is_checked" | "trip_id" | "archived_at"> & {
+          id?: string;
+          created_at?: string;
+          is_checked?: boolean;
+          quantity?: number;
+          trip_id?: string | null;
+          archived_at?: string | null;
+        };
+        Update: Partial<Omit<GroceryItem, "id">>;
+      };
+      grocery_trips: {
+        Row: GroceryTrip;
+        Insert: Omit<GroceryTrip, "id" | "completed_at" | "expense_id"> & {
+          id?: string;
+          completed_at?: string;
+          expense_id?: string | null;
+        };
+        Update: Partial<Omit<GroceryTrip, "id">>;
+      };
     };
     Functions: {
       generate_invite_code: {
@@ -150,6 +193,16 @@ export interface Database {
       get_household_balances: {
         Args: { p_household_id: string };
         Returns: { user_id: string; net_amount: number }[];
+      };
+      complete_grocery_trip: {
+        Args: {
+          p_household_id: string;
+          p_total_amount: number;
+          p_paid_by: string;
+          p_split_user_ids: string[];
+          p_created_by: string;
+        };
+        Returns: { trip_id: string; expense_id: string };
       };
     };
   };
