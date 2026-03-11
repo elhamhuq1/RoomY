@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 2: Expense Splitting
+**Current focus:** Phase 3: Groceries
 
 ## Current Position
 
-**Phase:** 2 of 4 (Expense Splitting)
-**Current Plan:** Not started
-**Total Plans in Phase:** 5
-**Status:** Milestone complete
+**Phase:** 3 of 4 (Groceries)
+**Current Plan:** 2 of 2
+**Total Plans in Phase:** 2
+**Status:** In progress
 **Last Activity:** 2026-03-11
 
-**Progress:** [████████░░] 78%
+**Progress:** [███████░░░] 73%
 
 ## Performance Metrics
 
@@ -42,6 +42,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 02 P03 | 4min | 2 tasks | 3 files |
 | Phase 02 P02 | 5min | 2 tasks | 4 files |
 | Phase 02 P05 | 20min | 3 tasks | 4 files |
+| Phase 03 P01 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,11 @@ Recent decisions affecting current work:
 - [Phase 02]: Edit mode uses delete-then-insert for splits (simpler than tracking individual row updates)
 - [Phase 02]: Venmo note encoding: deferred remaining + sign issue; user accepted minor cosmetic gap
 - [Phase 02]: ScrollView uses inline style={{ flex: 1 }} instead of NativeWind className to avoid bounce-back regression
+- [Phase 03]: ReanimatedSwipeable for swipe-to-delete (not deprecated Swipeable)
+- [Phase 03]: ScrollView with inline style for grocery list (not FlatList -- small lists)
+- [Phase 03]: Edit modal for name + quantity changes; quantity stepper visible on each row
+- [Phase 03]: Realtime INSERT dedup by ID prevents double-add from optimistic + realtime
+- [Phase 03]: GestureHandlerRootView added to root layout for gesture handler support
 
 ### Pending Todos
 
@@ -83,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T18:30:12.032Z
-**Stopped at:** Phase 3 context gathered
-**Resume file:** .planning/phases/03-groceries/03-CONTEXT.md
+**Last session:** 2026-03-11T19:07:01.318Z
+**Stopped at:** Phase 3.1 context gathered
+**Resume file:** .planning/phases/03.1-chores/03.1-CONTEXT.md
