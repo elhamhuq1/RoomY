@@ -15,7 +15,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 **Status:** In progress
 **Last Activity:** 2026-03-11
 
-**Progress:** [███████░░░] 73%
+**Progress:** [████████░░] 75%
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 02 P02 | 5min | 2 tasks | 4 files |
 | Phase 02 P05 | 20min | 3 tasks | 4 files |
 | Phase 03 P01 | 4min | 2 tasks | 6 files |
+| Phase 03 P02 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Edit modal for name + quantity changes; quantity stepper visible on each row
 - [Phase 03]: Realtime INSERT dedup by ID prevents double-add from optimistic + realtime
 - [Phase 03]: GestureHandlerRootView added to root layout for gesture handler support
+- [Phase 03]: Duplicated AVATAR_COLORS/getInitials from expenses/add.tsx rather than extracting shared module
+- [Phase 03]: Expandable trip cards in history (tap to toggle items) rather than always-visible lists
+- [Phase 03]: useFocusEffect added to grocery list for reliable refetch after trip completion
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-11T19:07:01.318Z
-**Stopped at:** Phase 3.1 context gathered
-**Resume file:** .planning/phases/03.1-chores/03.1-CONTEXT.md
+**Last session:** 2026-03-11T19:17:22.194Z
+**Stopped at:** 03-02 Task 3 checkpoint: human-verify grocery workflow
+**Resume file:** None

@@ -28,7 +28,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **GROC-01**: User can add items to a shared grocery list
 - [x] **GROC-02**: User can check off items from the grocery list in real-time
-- [ ] **GROC-03**: When shopping is complete, user can auto-create a split expense from the total
+- [x] **GROC-03**: When shopping is complete, user can auto-create a split expense from the total
 
 ### Chores
 
@@ -96,7 +96,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXPN-06 | Phase 2 | Complete |
 | GROC-01 | Phase 3 | Complete |
 | GROC-02 | Phase 3 | Complete |
-| GROC-03 | Phase 3 | Pending |
+| GROC-03 | Phase 3 | Complete |
 | CHOR-01 | Phase 3.1 | Pending |
 | CHOR-02 | Phase 3.1 | Pending |
 | CHOR-03 | Phase 3.1 | Pending |
