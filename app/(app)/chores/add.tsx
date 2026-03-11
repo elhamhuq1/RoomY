@@ -160,7 +160,14 @@ export default function AddChoreScreen() {
       .sort(() => Math.random() - 0.5);
 
     const firstAssignee = shuffled[0];
-    const now = new Date().toISOString();
+
+    // Compute first due date based on frequency (not "now" — avoids instant overdue)
+    const now = new Date();
+    const dueDate = new Date(now);
+    if (frequency === "daily") dueDate.setDate(dueDate.getDate() + 1);
+    else if (frequency === "weekly") dueDate.setDate(dueDate.getDate() + 7);
+    else if (frequency === "monthly") dueDate.setMonth(dueDate.getMonth() + 1);
+    else if (frequency === "custom") dueDate.setDate(dueDate.getDate() + (parseInt(customDays, 10) || 3));
 
     setSubmitting(true);
     const { error } = await supabase
@@ -173,7 +180,7 @@ export default function AddChoreScreen() {
         rotation_order: shuffled,
         current_assignee_index: 0,
         current_assignee: firstAssignee,
-        next_due_at: now, // Due immediately on creation
+        next_due_at: dueDate.toISOString(),
         created_by: user.id,
       })
       .select()
