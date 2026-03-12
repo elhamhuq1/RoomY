@@ -14,7 +14,8 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 
 **Target features:**
 - Design token system (colors, typography, spacing, shadows)
-- Shared component library (Avatar, Badge, Card, Icon containers)
+- Shared component library (Avatar, Badge, Card, Icon containers, buttons, toggles)
+- Onboarding flow rebuild (welcome carousel, sign up, display name, setup choice, household name, invite code, module selection)
 - Home screen rebuild (week-strip calendar, balance summary, attention feed)
 - Expenses screen rebuild (balance cards, differentiated history rows)
 - Groceries screen rebuild (to-get/done sections, member attribution)
@@ -22,8 +23,9 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - Tab bar and navigation polish
 
 **Design references:**
-- `docs/DESIGN_SPEC.md` — full specification
-- `docs/reference-mockup.jsx` — visual target
+- `docs/roomy-gsd-ui-redesign/gsd-ui-redesign/DESIGN_SPEC.md` — full specification
+- `docs/roomy-gsd-ui-redesign/gsd-ui-redesign/reference-mockup.jsx` — visual target (main screens)
+- `docs/roomy-gsd-ui-redesign/gsd-ui-redesign/onboarding-mockup.jsx` — visual target (onboarding flow)
 
 ## Requirements
 
@@ -44,7 +46,8 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 
 - [ ] Intentional color system replacing default orange-everything palette
 - [ ] Typography hierarchy with clear visual weight
-- [ ] Shared component library (Avatar, Badge, Card)
+- [ ] Shared component library (Avatar, Badge, Card, buttons, toggles)
+- [ ] Onboarding flow with gradient hero carousel, avatar preview, step progress bar, toggle cards
 - [ ] Home screen with calendar, balance summary, attention feed
 - [ ] Expenses screen with visual expense/settlement differentiation
 - [ ] Groceries screen with to-get/done sections and member attribution
