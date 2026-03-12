@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Groceries** - Shared grocery list with real-time sync and one-tap cost splitting
 - [ ] **Phase 3.1: Chores** - Chore assignment, completion tracking, fair rotation with effort weighting
 - [ ] **Phase 4: Engagement** - Push notifications across all modules and shared household calendar
+- [ ] **Phase 5: Audit Gap Closure** - Verify Phase 1 auth requirements and fix calendar chore deep link
 
 ## Phase Details
 
@@ -102,10 +103,21 @@ Plans:
 - [ ] 04-03-PLAN.md — Client-side push registration, notification handler, preferences settings screen
 - [ ] 04-04-PLAN.md — Gap closure: bound event list scroll height, fix push token crash in Expo Go
 
+### Phase 5: Audit Gap Closure
+**Goal**: Close all gaps identified by v1.0 milestone audit — verify Phase 1 requirements and fix calendar chore navigation
+**Depends on**: Phase 4
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, CALC-02
+**Gap Closure:** Closes gaps from audit
+**Success Criteria** (what must be TRUE):
+  1. Phase 1 has a VERIFICATION.md confirming AUTH-01 through AUTH-05 are satisfied
+  2. Tapping a chore event in the calendar navigates to the chores tab (deep link path fixed)
+  3. All 23 v1 requirements are fully satisfied (no unverified or partial)
+**Plans**: 0 plans (pending `/gsd:plan-phase 5`)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
+Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -114,3 +126,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
 | 3. Groceries | 2/3 | In Progress | - |
 | 3.1. Chores | 0/2 | Not started | - |
 | 4. Engagement | 0/4 | Not started | - |
+| 5. Audit Gap Closure | 0/0 | Not started | - |

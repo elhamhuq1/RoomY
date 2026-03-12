@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication & Household
 
-- [x] **AUTH-01**: User can sign up and sign in with email/password
-- [x] **AUTH-02**: User can create a profile with display name and Venmo username
-- [x] **AUTH-03**: User can create a household and receive an invite code
-- [x] **AUTH-04**: User can join a household by entering an invite code
-- [x] **AUTH-05**: User completes onboarding quiz that configures enabled modules
+- [ ] **AUTH-01**: User can sign up and sign in with email/password
+- [ ] **AUTH-02**: User can create a profile with display name and Venmo username
+- [ ] **AUTH-03**: User can create a household and receive an invite code
+- [ ] **AUTH-04**: User can join a household by entering an invite code
+- [ ] **AUTH-05**: User completes onboarding quiz that configures enabled modules
 
 ### Expenses & Balances
 
@@ -43,7 +43,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PUSH-02**: User receives push notifications for chore reminders
 - [x] **PUSH-03**: User receives push notifications for grocery list updates
 - [x] **CALC-01**: User can view a shared household calendar
-- [x] **CALC-02**: Recurring expense due dates and chore schedules appear on calendar
+- [ ] **CALC-02**: Recurring expense due dates and chore schedules appear on calendar
 
 ## v2 Requirements
 
@@ -83,11 +83,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Complete |
-| AUTH-04 | Phase 1 | Complete |
-| AUTH-05 | Phase 1 | Complete |
+| AUTH-01 | Phase 5 | Pending |
+| AUTH-02 | Phase 5 | Pending |
+| AUTH-03 | Phase 5 | Pending |
+| AUTH-04 | Phase 5 | Pending |
+| AUTH-05 | Phase 5 | Pending |
 | EXPN-01 | Phase 2 | Complete |
 | EXPN-02 | Phase 2 | Complete |
 | EXPN-03 | Phase 2 | Complete |
@@ -105,12 +105,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PUSH-02 | Phase 4 | Complete |
 | PUSH-03 | Phase 4 | Complete |
 | CALC-01 | Phase 4 | Complete |
-| CALC-02 | Phase 4 | Complete |
+| CALC-02 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
 - Mapped to phases: 23
 - Unmapped: 0
+- Satisfied: 17
+- Pending (gap closure): 6 (AUTH-01–05, CALC-02 → Phase 5)
 
 ---
 *Requirements defined: 2026-03-10*
