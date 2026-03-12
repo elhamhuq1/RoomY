@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 7 of 10 (Home Screen) -- COMPLETE
-Plan: 3 of 3 in current phase
+Plan: 4 of 4 in current phase (gap closure plan added and completed)
 Status: Phase Complete
-Last activity: 2026-03-12 -- Completed 07-03 Home screen assembly with all 6 sections
+Last activity: 2026-03-12 -- Completed 07-04 Gap closure (4 UAT bug fixes)
 
-Progress: [####################] 100% (v1.1 Phase 7: 3/3 plans)
+Progress: [####################] 100% (v1.1 Phase 7: 4/4 plans)
 
 ## Performance Metrics
 
@@ -33,20 +33,21 @@ Progress: [####################] 100% (v1.1 Phase 7: 3/3 plans)
 | 04 Engagement | 4 | 13min | 3.3min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 2min, 2min, 2min, 20min
-- Trend: UAT plan took longer (human-in-loop verification + 3 bug fixes)
+- Last 5 plans: 2min, 2min, 2min, 20min, 4min
+- Trend: Gap closure plan fast (4min, all code changes pre-diagnosed)
 
 **By Phase (v1.1):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 06 Design System | 4 | 31min | 7.8min |
-| 07 Home Screen | 3 | 13min | 4.3min |
+| 07 Home Screen | 4 | 17min | 4.3min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
 | Phase 07 P02 | 4min | 1 task | 2 files |
 | Phase 07 P03 | 5min | 2 tasks | 3 files |
+| Phase 07 P04 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,10 @@ Recent decisions affecting current work:
 - [07-03]: Unsettled balances shown from current user's perspective by inverting other members' net_amount
 - [07-03]: Solo creator state simplified to GreetingHeader + MembersCard only (no empty data sections)
 - [07-03]: Centralized data fetching pattern: parent screen fetches all data in Promise.all, passes to presentational children
+- [07-04]: Balance buttons hidden when settled (user override of original "visible but muted" CONTEXT.md decision)
+- [07-04]: myNetAmount via .reduce() summing all RPC pairwise rows (not .find() for own user_id which was always undefined)
+- [07-04]: weekChores uses projectChoreDates for recurring frequency projection instead of filtering single next_due_at
+- [07-04]: fetchAllData scoped to selectedDate month so pull-to-refresh preserves calendar context
 
 ### Pending Todos
 
@@ -95,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 07-03-PLAN.md -- Phase 7 complete
+Stopped at: Completed 07-04-PLAN.md -- Phase 7 gap closure complete, all 4 UAT bugs fixed
 Resume file: None
