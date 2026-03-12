@@ -1,184 +1,286 @@
-import { colors } from "@/lib/theme/colors";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from 'react';
 import {
   View,
-  Text,
-  Pressable,
-  Share,
   ScrollView,
   ActivityIndicator,
   RefreshControl,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
-import { Calendar, DateData } from "react-native-calendars";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { useSession } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
-import type { Profile, Expense, Chore } from "@/lib/types/database";
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import {
-  buildMarkedDates,
-  getEventsForDate,
-  type CalendarEvent,
-} from "@/lib/calendar-utils";
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  parseISO,
+  isSameDay,
+  isBefore,
+  isWithinInterval,
+} from 'date-fns';
+import { useSession } from '@/lib/auth-context';
+import { supabase } from '@/lib/supabase';
+import { colors } from '@/lib/theme/colors';
+import type { Profile, Expense, Chore } from '@/lib/types/database';
 
-import * as Clipboard from "expo-clipboard";
-
-// Colors for member initials avatars
-const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { GreetingHeader } from '@/components/home/GreetingHeader';
+import { MembersCard } from '@/components/home/MembersCard';
+import { BalanceSummaryCard } from '@/components/home/BalanceSummaryCard';
+import CalendarSection from '@/components/home/CalendarSection';
+import { AttentionFeed } from '@/components/home/AttentionFeed';
+import { WeeklyTimeline } from '@/components/home/WeeklyTimeline';
 
 type MemberWithProfile = {
   user_id: string;
-  role: "creator" | "member";
-  profiles: Profile;
+  role: 'creator' | 'member';
+  display_name: string;
+};
+
+type BalanceRow = {
+  user_id: string;
+  net_amount: number;
+};
+
+type DisputeRow = {
+  id: string;
+  chore_id: string;
+  chores: { name: string };
 };
 
 export default function DashboardScreen() {
   const router = useRouter();
-  const { household, householdSettings, user } = useSession();
-  const [members, setMembers] = useState<MemberWithProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const { household, user, profile } = useSession();
 
-  // Calendar state
-  const [selectedDate, setSelectedDate] = useState(
-    format(new Date(), "yyyy-MM-dd")
-  );
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [members, setMembers] = useState<MemberWithProfile[]>([]);
+  const [balances, setBalances] = useState<BalanceRow[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [chores, setChores] = useState<Chore[]>([]);
+  const [disputes, setDisputes] = useState<DisputeRow[]>([]);
 
-  const inviteCode = household?.invite_code ?? "";
-  const formattedCode = inviteCode
-    ? inviteCode.slice(0, 4) + " " + inviteCode.slice(4)
-    : "";
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(
+    format(new Date(), 'yyyy-MM-dd')
+  );
 
-  const fetchMembers = useCallback(async () => {
+  const inviteCode = household?.invite_code ?? '';
+
+  // ---------- Data fetching ----------
+
+  const fetchAllData = useCallback(async () => {
     if (!household?.id) return;
 
-    const { data: membersData } = await supabase
-      .from("household_members")
-      .select("user_id, role")
-      .eq("household_id", household.id);
+    const monthStart = startOfMonth(new Date()).toISOString();
+    const monthEnd = endOfMonth(new Date()).toISOString();
 
-    if (membersData && membersData.length > 0) {
-      const userIds = membersData.map((m) => m.user_id);
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("*")
-        .in("id", userIds);
+    const [membersRes, balancesRes, expensesRes, choresRes, disputesRes] =
+      await Promise.all([
+        // Members: two-query pattern (household_members + profiles, combine client-side)
+        (async () => {
+          const { data: membersData } = await supabase
+            .from('household_members')
+            .select('user_id, role')
+            .eq('household_id', household.id);
 
-      const combined = membersData.map((member) => ({
-        ...member,
-        profiles: (profilesData?.find((p) => p.id === member.user_id) as Profile) ?? {
-          id: member.user_id,
-          display_name: "Unknown",
-        },
-      })) as MemberWithProfile[];
+          if (!membersData || membersData.length === 0) return [];
 
-      setMembers(combined);
-    } else {
-      setMembers([]);
-    }
+          const userIds = membersData.map((m) => m.user_id);
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('*')
+            .in('id', userIds);
+
+          return membersData.map((member) => {
+            const p = profilesData?.find(
+              (pr) => pr.id === member.user_id
+            ) as Profile | undefined;
+            return {
+              user_id: member.user_id,
+              role: member.role as 'creator' | 'member',
+              display_name: p?.display_name ?? 'Unknown',
+            };
+          });
+        })(),
+
+        // Balances
+        supabase
+          .rpc('get_household_balances', { p_household_id: household.id })
+          .then((r) => r.data ?? []),
+
+        // Expenses (current month)
+        supabase
+          .from('expenses')
+          .select('*')
+          .eq('household_id', household.id)
+          .gte('created_at', monthStart)
+          .lte('created_at', monthEnd)
+          .then((r) => (r.data ?? []) as Expense[]),
+
+        // Chores (active)
+        supabase
+          .from('chores')
+          .select('*')
+          .eq('household_id', household.id)
+          .eq('is_active', true)
+          .then((r) => (r.data ?? []) as Chore[]),
+
+        // Pending disputes
+        supabase
+          .from('chore_completions')
+          .select('id, chore_id, chores!inner(name)')
+          .eq('is_disputed', true)
+          .eq('is_reverted', false)
+          .then((r) => (r.data ?? []) as unknown as DisputeRow[]),
+      ]);
+
+    setMembers(membersRes);
+    setBalances(balancesRes as BalanceRow[]);
+    setExpenses(expensesRes);
+    setChores(choresRes);
+    setDisputes(disputesRes);
     setLoading(false);
   }, [household?.id]);
 
-  useEffect(() => {
-    fetchMembers();
-  }, [fetchMembers]);
-
-  // Fetch calendar data (expenses + chores for visible month)
-  const fetchCalendarData = useCallback(async () => {
-    if (!household?.id) return;
-
-    const monthStart = startOfMonth(currentMonth).toISOString();
-    const monthEnd = endOfMonth(currentMonth).toISOString();
-
-    const [expensesRes, choresRes] = await Promise.all([
-      supabase
-        .from("expenses")
-        .select("*")
-        .eq("household_id", household.id)
-        .gte("created_at", monthStart)
-        .lte("created_at", monthEnd),
-      supabase
-        .from("chores")
-        .select("*")
-        .eq("household_id", household.id)
-        .eq("is_active", true),
-    ]);
-
-    if (expensesRes.data) setExpenses(expensesRes.data as Expense[]);
-    if (choresRes.data) setChores(choresRes.data as Chore[]);
-  }, [household?.id, currentMonth]);
-
-  // Refetch calendar data when month changes
-  useEffect(() => {
-    fetchCalendarData();
-  }, [fetchCalendarData]);
-
-  // Refresh calendar data on screen focus
+  // Refresh on screen focus
   useFocusEffect(
     useCallback(() => {
-      fetchCalendarData();
-    }, [fetchCalendarData])
-  );
-
-  // Compute marked dates for calendar
-  const markedDates = useMemo(() => {
-    const marks = buildMarkedDates(expenses, chores, currentMonth);
-    // Add selected date highlight
-    if (!marks[selectedDate]) {
-      marks[selectedDate] = { dots: [] };
-    }
-    marks[selectedDate] = {
-      ...marks[selectedDate],
-      selected: true,
-      selectedColor: colors.brand.DEFAULT,
-    };
-    return marks;
-  }, [expenses, chores, currentMonth, selectedDate]);
-
-  // Compute events for selected date
-  const selectedDateEvents = useMemo(
-    () => getEventsForDate(selectedDate, expenses, chores),
-    [selectedDate, expenses, chores]
+      fetchAllData();
+    }, [fetchAllData])
   );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([fetchMembers(), fetchCalendarData()]);
+    await fetchAllData();
     setRefreshing(false);
-  }, [fetchMembers, fetchCalendarData]);
+  }, [fetchAllData]);
 
-  async function handleShare() {
-    if (!inviteCode) return;
-    try {
-      await Share.share({
-        message: `Join my household on RoomY! Use code: ${inviteCode}`,
+  // ---------- Derived data ----------
+
+  const firstName = profile?.display_name?.split(' ')[0] ?? '';
+
+  const membersList = useMemo(
+    () =>
+      members.map((m) => ({
+        user_id: m.user_id,
+        display_name: m.display_name,
+      })),
+    [members]
+  );
+
+  const myNetAmount = useMemo(() => {
+    const myBalance = balances.find((b) => b.user_id === user?.id);
+    return Number(myBalance?.net_amount ?? 0);
+  }, [balances, user?.id]);
+
+  // Unsettled balances: members with non-zero balance relative to current user
+  const unsettledBalances = useMemo(() => {
+    return balances
+      .filter((b) => b.user_id !== user?.id && Number(b.net_amount) !== 0)
+      .map((b) => {
+        const member = members.find((m) => m.user_id === b.user_id);
+        // From current user's perspective: if another member has negative net_amount,
+        // they owe the household (and potentially the current user).
+        // Simplified: show the amount and let the card describe it.
+        const amount = Number(b.net_amount);
+        return {
+          userId: b.user_id,
+          displayName: member?.display_name ?? 'Unknown',
+          // Negative net_amount = they owe; Positive = they are owed
+          // From current user's perspective, invert: if they owe, it's positive for us
+          amount: -amount,
+        };
+      })
+      .filter((b) => b.amount !== 0);
+  }, [balances, members, user?.id]);
+
+  // Overdue chores
+  const overdueChores = useMemo(() => {
+    const now = new Date().toISOString();
+    return chores
+      .filter((c) => c.next_due_at < now)
+      .map((c) => {
+        const assignee = members.find((m) => m.user_id === c.current_assignee);
+        return {
+          id: c.id,
+          name: c.name,
+          assigneeName: assignee?.display_name ?? 'Unassigned',
+        };
       });
-    } catch {
-      // User cancelled or share failed
-    }
-  }
+  }, [chores, members]);
 
-  async function handleCopyCode() {
-    if (!inviteCode) return;
-    await Clipboard.setStringAsync(inviteCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  // Pending disputes
+  const pendingDisputes = useMemo(
+    () =>
+      disputes.map((d) => ({
+        id: d.id,
+        choreName: d.chores?.name ?? 'Unknown chore',
+      })),
+    [disputes]
+  );
+
+  // Chores due today
+  const choresDueToday = useMemo(() => {
+    const today = new Date();
+    return chores
+      .filter((c) => {
+        const dueDate = parseISO(c.next_due_at);
+        return isSameDay(dueDate, today) && !isBefore(dueDate, today);
+      })
+      .map((c) => {
+        const assignee = members.find((m) => m.user_id === c.current_assignee);
+        return {
+          id: c.id,
+          name: c.name,
+          assigneeName: assignee?.display_name ?? 'Unassigned',
+        };
+      });
+  }, [chores, members]);
+
+  // Week chores for timeline
+  const weekChores = useMemo(() => {
+    const now = new Date();
+    const wStart = startOfWeek(now, { weekStartsOn: 0 });
+    const wEnd = endOfWeek(now, { weekStartsOn: 0 });
+
+    return chores
+      .filter((c) => {
+        const dueDate = parseISO(c.next_due_at);
+        return isWithinInterval(dueDate, { start: wStart, end: wEnd });
+      })
+      .map((c) => {
+        const assignee = members.find((m) => m.user_id === c.current_assignee);
+        return {
+          id: c.id,
+          name: c.name,
+          assigneeId: c.current_assignee ?? '',
+          assigneeName: assignee?.display_name ?? 'Unassigned',
+          dueDate: c.next_due_at,
+          isCompleted: c.last_completed_at
+            ? isSameDay(parseISO(c.last_completed_at), parseISO(c.next_due_at))
+            : false,
+        };
+      });
+  }, [chores, members]);
+
+  // Determine if date filter is active (not today)
+  const todayString = format(new Date(), 'yyyy-MM-dd');
+  const isDateFiltered = selectedDate !== todayString;
+
+  // ---------- Navigation handlers ----------
+
+  const handleSettleUp = useCallback(() => {
+    router.push('/(app)/expenses/settle' as never);
+  }, [router]);
+
+  const handleRequest = useCallback(() => {
+    router.push('/(app)/expenses/add' as never);
+  }, [router]);
+
+  const handleBalanceCardPress = useCallback(() => {
+    router.push('/(app)/(tabs)/expenses' as never);
+  }, [router]);
+
+  // ---------- Loading state ----------
 
   if (loading) {
     return (
@@ -190,286 +292,74 @@ export default function DashboardScreen() {
 
   const isSoloCreator = members.length <= 1;
 
-  // Solo creator empty state
+  // ---------- Solo creator state ----------
+
   if (isSoloCreator) {
     return (
       <ScrollView
         className="flex-1 bg-neutral-bg"
-        contentContainerClassName="flex-grow justify-center px-8 py-12"
+        contentContainerClassName="pb-12"
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Friendly icon */}
-        <View className="mb-6 items-center">
-          <View className="mb-6 h-28 w-28 items-center justify-center rounded-full bg-brand-light">
-            <Ionicons name="people" size={56} color={colors.brand.DEFAULT} />
-          </View>
-          <Text className="text-3xl font-bold text-gray-800">
-            Your household is ready!
-          </Text>
-          <Text className="mt-3 text-center text-base leading-6 text-gray-500">
-            Share this invite code with your roommates so they can join{" "}
-            <Text className="font-semibold text-gray-700">
-              {household?.name}
-            </Text>
-          </Text>
-        </View>
-
-        {/* Invite code display */}
-        <View className="mb-6 items-center rounded-2xl bg-white p-8 shadow-sm">
-          <Text className="mb-2 text-sm font-medium text-gray-400">
-            INVITE CODE
-          </Text>
-          <Text
-            className="text-4xl font-bold tracking-widest text-brand-dark"
-            style={{ fontVariant: ["tabular-nums"] }}
-          >
-            {formattedCode}
-          </Text>
-          <Text className="mt-3 text-xs text-gray-400">
-            Code expires in 7 days. You can regenerate it in Settings.
-          </Text>
-        </View>
-
-        {/* Share button */}
-        <Pressable
-          className="mb-3 flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
-          onPress={handleShare}
-        >
-          <Ionicons
-            name="share-outline"
-            size={22}
-            color="#fff"
-            style={{ marginRight: 8 }}
-          />
-          <Text className="text-lg font-bold text-white">
-            Share with Roommates
-          </Text>
-        </Pressable>
-
-        {/* Copy code button */}
-        <Pressable
-          className="flex-row items-center justify-center rounded-2xl border-2 border-brand py-4 active:bg-brand-light"
-          onPress={handleCopyCode}
-        >
-          <Ionicons
-            name={copied ? "checkmark" : "copy-outline"}
-            size={20}
-            color={colors.brand.DEFAULT}
-            style={{ marginRight: 8 }}
-          />
-          <Text className="text-lg font-bold text-brand-dark">
-            {copied ? "Copied!" : "Copy Code"}
-          </Text>
-        </Pressable>
+        <GreetingHeader userName={firstName} />
+        <MembersCard
+          members={membersList}
+          householdName={household?.name ?? ''}
+          inviteCode={inviteCode}
+        />
       </ScrollView>
     );
   }
 
-  // Normal state (2+ members)
-  const groceriesEnabled = householdSettings?.groceries_enabled ?? false;
-  const choresEnabled = householdSettings?.chores_enabled ?? false;
-
-  type ModuleCardConfig = {
-    key: string;
-    title: string;
-    icon: keyof typeof Ionicons.glyphMap;
-    status: string;
-    route: string;
-    enabled: boolean;
-  };
-
-  const moduleCards: ModuleCardConfig[] = [
-    {
-      key: "expenses",
-      title: "Expenses",
-      icon: "wallet",
-      status: "No expenses yet",
-      route: "/(app)/(tabs)/expenses",
-      enabled: true,
-    },
-    ...(groceriesEnabled
-      ? [
-          {
-            key: "groceries",
-            title: "Groceries",
-            icon: "cart" as keyof typeof Ionicons.glyphMap,
-            status: "No items yet",
-            route: "/(app)/(tabs)/groceries",
-            enabled: true,
-          },
-        ]
-      : []),
-    ...(choresEnabled
-      ? [
-          {
-            key: "chores",
-            title: "Chores",
-            icon: "checkbox" as keyof typeof Ionicons.glyphMap,
-            status: "No chores yet",
-            route: "/(app)/(tabs)/chores",
-            enabled: true,
-          },
-        ]
-      : []),
-  ];
+  // ---------- Full dashboard ----------
 
   return (
     <ScrollView
       className="flex-1 bg-neutral-bg"
-      contentContainerClassName="px-6 pt-6 pb-12"
+      contentContainerClassName="pb-12"
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      {/* Header */}
-      <Text className="text-2xl font-bold text-gray-800">
-        {household?.name}
-      </Text>
+      <GreetingHeader userName={firstName} />
 
-      {/* Member avatars row */}
-      <View className="mt-4 flex-row items-center">
-        {members.map((member, index) => (
-          <View
-            key={member.user_id}
-            className="mr-3 items-center"
-          >
-            <View
-              className="h-12 w-12 items-center justify-center rounded-full"
-              style={{
-                backgroundColor:
-                  AVATAR_COLORS[index % AVATAR_COLORS.length],
-              }}
-            >
-              <Text className="text-sm font-bold text-white">
-                {getInitials(
-                  member.profiles?.display_name ?? "?"
-                )}
-              </Text>
-            </View>
-            <Text
-              className="mt-1 text-xs text-gray-500"
-              numberOfLines={1}
-            >
-              {member.profiles?.display_name?.split(" ")[0] ?? "?"}
-            </Text>
-          </View>
-        ))}
+      <MembersCard
+        members={membersList}
+        householdName={household?.name ?? ''}
+        inviteCode={inviteCode}
+      />
+
+      <BalanceSummaryCard
+        netAmount={myNetAmount}
+        onSettleUp={handleSettleUp}
+        onRequest={handleRequest}
+        onCardPress={handleBalanceCardPress}
+      />
+
+      <View className="mt-4 px-5">
+        <CalendarSection
+          expenses={expenses}
+          chores={chores}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+        />
       </View>
 
-      {/* Calendar */}
-      <View className="mt-6">
-        <Text className="mb-3 text-lg font-semibold text-gray-700">
-          Calendar
-        </Text>
-        <View className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          <Calendar
-            markingType="multi-dot"
-            markedDates={markedDates}
-            onDayPress={(day: DateData) => setSelectedDate(day.dateString)}
-            onMonthChange={(month: DateData) => {
-              setCurrentMonth(new Date(month.year, month.month - 1, 1));
-            }}
-            enableSwipeMonths={true}
-            theme={{
-              calendarBackground: "#ffffff",
-              todayTextColor: colors.brand.DEFAULT,
-              selectedDayBackgroundColor: colors.brand.DEFAULT,
-              selectedDayTextColor: "#ffffff",
-              arrowColor: colors.brand.DEFAULT,
-              dotStyle: { marginTop: 2 },
-              textDayFontSize: 14,
-              textMonthFontSize: 16,
-              textDayHeaderFontSize: 13,
-            }}
-          />
-        </View>
+      <AttentionFeed
+        unsettledBalances={unsettledBalances}
+        overdueChores={overdueChores}
+        pendingDisputes={pendingDisputes}
+        choresDueToday={choresDueToday}
+      />
 
-        {/* Day detail list */}
-        <View className="mt-3 overflow-hidden rounded-2xl bg-white shadow-sm">
-          {selectedDateEvents.length > 0 ? (
-            <ScrollView
-              style={{ maxHeight: 280 }}
-              nestedScrollEnabled={true}
-              showsVerticalScrollIndicator={true}
-            >
-              {selectedDateEvents.map((event) => (
-                <Pressable
-                  key={`${event.type}-${event.id}`}
-                  className="flex-row items-center border-b border-neutral-border px-4 py-3 active:bg-neutral-bg"
-                  onPress={() => router.push(event.deepLink as never)}
-                >
-                  <Ionicons
-                    name={event.icon as keyof typeof Ionicons.glyphMap}
-                    size={22}
-                    color={event.color}
-                    style={{ marginRight: 12 }}
-                  />
-                  <View className="flex-1">
-                    <Text className="text-base font-medium text-gray-800">
-                      {event.title}
-                    </Text>
-                    <Text className="text-sm text-gray-400">
-                      {event.detail}
-                    </Text>
-                  </View>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={16}
-                    color="#d1d5db"
-                  />
-                </Pressable>
-              ))}
-            </ScrollView>
-          ) : (
-            <View className="items-center py-6">
-              <Text className="text-sm text-gray-400">
-                No events on this day
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Color legend */}
-        <View className="mt-3 flex-row items-center justify-center gap-6">
-          <View className="flex-row items-center">
-            <View className="mr-2 h-3 w-3 rounded-full bg-[#3b82f6]" />
-            <Text className="text-xs text-gray-500">Expenses</Text>
-          </View>
-          <View className="flex-row items-center">
-            <View className="mr-2 h-3 w-3 rounded-full bg-[#22c55e]" />
-            <Text className="text-xs text-gray-500">Chores</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Module cards */}
-      <Text className="mb-3 mt-6 text-lg font-semibold text-gray-700">
-        Modules
-      </Text>
-      <View className="gap-3">
-        {moduleCards.map((card) => (
-          <Pressable
-            key={card.key}
-            className="flex-row items-center rounded-2xl bg-white p-4 shadow-sm active:bg-neutral-surface"
-            onPress={() => router.push(card.route as never)}
-          >
-            <View className="mr-4 h-12 w-12 items-center justify-center rounded-xl bg-brand-light">
-              <Ionicons name={card.icon} size={24} color={colors.brand.DEFAULT} />
-            </View>
-            <View className="flex-1">
-              <Text className="text-base font-semibold text-gray-800">
-                {card.title}
-              </Text>
-              <Text className="text-sm text-gray-400">{card.status}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
-          </Pressable>
-        ))}
-      </View>
+      <WeeklyTimeline
+        chores={weekChores}
+        selectedDate={isDateFiltered ? selectedDate : null}
+      />
     </ScrollView>
   );
 }
