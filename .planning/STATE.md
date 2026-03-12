@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 Phase: 8 of 10 (Expenses Screen)
 Plan: 2 of 2 in current phase -- PHASE COMPLETE
 Status: Phase Complete
-Last activity: 2026-03-12 -- Completed 08-02 Per-member breakdown and visual verification
+Last activity: 2026-03-12 - Completed quick task 1: Add RoomY logo as app icon and splash screen
 
 Progress: [####################] 100% (v1.1 Phase 8: 2/2 plans)
 
@@ -96,6 +96,12 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Add RoomY logo as app icon and splash screen | 2026-03-12 | 8a6885d | [1-add-roomy-logo-as-app-icon-and-splash-sc](./quick/1-add-roomy-logo-as-app-icon-and-splash-sc/) |
 
 ### Blockers/Concerns
 
