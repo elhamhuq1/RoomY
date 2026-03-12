@@ -12,10 +12,10 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 **Phase:** 4 of 4 (Engagement)
 **Current Plan:** 3 of 3
 **Total Plans in Phase:** 3
-**Status:** Phase complete — ready for verification
+**Status:** In progress
 **Last Activity:** 2026-03-12
 
-**Progress:** [████████░░] 76%
+**Progress:** [████████░░] 82%
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 03.1 P01 | 4min | 2 tasks | 5 files |
 | Phase 03.1 P02 | 4min | 2 tasks | 5 files |
 | Phase 04 P02 | 3min | 2 tasks | 4 files |
+| Phase 04 P01 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,9 @@ Recent decisions affecting current work:
 - [Phase 04]: No grocery notifications per user decision (PUSH-03 not implemented)
 - [Phase 04]: Edge Functions use service role key to bypass RLS for cross-user notification queries
 - [Phase 04]: UTC-based chore reminder timing for v1 (cron at 1 PM UTC ~ 8 AM EST); timezone handling deferred
+- [Phase 04]: Used react-native-calendars multi-dot marking for color-coded expense/chore indicators on Home tab calendar
+- [Phase 04]: Chore date projection walks forward+backward from next_due_at to cover any visible month range
+- [Phase 04]: Calendar data fetched via useFocusEffect + useEffect on month change; pull-to-refresh fetches members and calendar in parallel
 
 ### Pending Todos
 
@@ -110,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-12T01:47:20.632Z
-**Stopped at:** Completed 04-02-PLAN.md
+**Last session:** 2026-03-12T01:48:22.867Z
+**Stopped at:** Completed 04-01-PLAN.md
 **Resume file:** None
