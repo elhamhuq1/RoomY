@@ -57,12 +57,12 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 ### Shared Components
 
-- [ ] **COMP-01**: Avatar component renders gradient circles with member-unique colors, supports 6 sizes, and shows colored shadow
-- [ ] **COMP-02**: Card component provides consistent container styling (white bg, border, radius, shadow, padding) across all screens
-- [ ] **COMP-03**: Badge component renders pill-shaped status indicators with semantic color variants
-- [ ] **COMP-04**: Button component provides primary (filled) and outline variants with consistent sizing
-- [ ] **COMP-05**: Icon container component renders 40x40 rounded squares with semantic background colors
-- [ ] **COMP-06**: Toggle switch component animates between on/off states with brand coloring and locked state support
+- [x] **COMP-01**: Avatar component renders gradient circles with member-unique colors, supports 6 sizes, and shows colored shadow
+- [x] **COMP-02**: Card component provides consistent container styling (white bg, border, radius, shadow, padding) across all screens
+- [x] **COMP-03**: Badge component renders pill-shaped status indicators with semantic color variants
+- [x] **COMP-04**: Button component provides primary (filled) and outline variants with consistent sizing
+- [x] **COMP-05**: Icon container component renders 40x40 rounded squares with semantic background colors
+- [x] **COMP-06**: Toggle switch component animates between on/off states with brand coloring and locked state support
 
 ### Onboarding
 
@@ -161,12 +161,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSYS-01 | Phase 6 | Complete |
 | DSYS-02 | Phase 6 | Complete |
 | DSYS-03 | Phase 6 | Complete |
-| COMP-01 | Phase 6 | Pending |
-| COMP-02 | Phase 6 | Pending |
-| COMP-03 | Phase 6 | Pending |
-| COMP-04 | Phase 6 | Pending |
-| COMP-05 | Phase 6 | Pending |
-| COMP-06 | Phase 6 | Pending |
+| COMP-01 | Phase 6 | Complete |
+| COMP-02 | Phase 6 | Complete |
+| COMP-03 | Phase 6 | Complete |
+| COMP-04 | Phase 6 | Complete |
+| COMP-05 | Phase 6 | Complete |
+| COMP-06 | Phase 6 | Complete |
 | NAVG-01 | Phase 6 | Complete |
 | NAVG-02 | Phase 6 | Complete |
 | HOME-01 | Phase 7 | Pending |
