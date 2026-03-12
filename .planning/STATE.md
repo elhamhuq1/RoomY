@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 **Phase:** 4 of 4 (Engagement)
-**Current Plan:** 3 of 3
-**Total Plans in Phase:** 3
-**Status:** In progress
+**Current Plan:** 4 of 4
+**Total Plans in Phase:** 4
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-03-12
 
-**Progress:** [████████░░] 82%
+**Progress:** [████████░░] 83%
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 03.1 P02 | 4min | 2 tasks | 5 files |
 | Phase 04 P02 | 3min | 2 tasks | 4 files |
 | Phase 04 P01 | 4min | 2 tasks | 3 files |
+| Phase 04 P04 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Used react-native-calendars multi-dot marking for color-coded expense/chore indicators on Home tab calendar
 - [Phase 04]: Chore date projection walks forward+backward from next_due_at to cover any visible month range
 - [Phase 04]: Calendar data fetched via useFocusEffect + useEffect on month change; pull-to-refresh fetches members and calendar in parallel
+- [Phase 04]: 280px maxHeight for event list (~5 items at 56px each)
+- [Phase 04]: try/catch around getExpoPushTokenAsync as safety net beyond projectId guard
 
 ### Pending Todos
 
@@ -114,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-12T01:48:22.867Z
-**Stopped at:** Completed 04-01-PLAN.md
+**Last session:** 2026-03-12T02:15:36.491Z
+**Stopped at:** Completed 04-04-PLAN.md
 **Resume file:** None
