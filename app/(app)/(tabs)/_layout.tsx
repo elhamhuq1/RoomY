@@ -17,15 +17,19 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.brand.DEFAULT,
         tabBarInactiveTintColor: colors.neutral.tertiary,
         tabBarStyle: {
-          backgroundColor: colors.neutral.bg,
+          backgroundColor: colors.white,
           borderTopColor: colors.neutral.border,
           borderTopWidth: 1,
-          paddingBottom: 4,
-          paddingTop: 4,
-          height: 56,
+          height: 84,
+          paddingTop: 8,
+          paddingBottom: 28,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor: colors.neutral.bg,
+          backgroundColor: colors.white,
         },
         headerShadowVisible: false,
         headerTintColor: colors.neutral.text,
@@ -43,8 +47,8 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
           ),
         }}
       />
@@ -52,8 +56,8 @@ export default function TabsLayout() {
         name="expenses"
         options={{
           title: "Expenses",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="wallet" size={size} color={color} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'wallet' : 'wallet-outline'} size={size} color={color} />
           ),
         }}
       />
@@ -62,8 +66,8 @@ export default function TabsLayout() {
         options={{
           title: "Groceries",
           href: groceriesEnabled ? "/(app)/(tabs)/groceries" : null,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cart" size={size} color={color} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'cart' : 'cart-outline'} size={size} color={color} />
           ),
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -88,8 +92,8 @@ export default function TabsLayout() {
         options={{
           title: "Chores",
           href: choresEnabled ? "/(app)/(tabs)/chores" : null,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="checkbox" size={size} color={color} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'checkbox' : 'checkbox-outline'} size={size} color={color} />
           ),
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
