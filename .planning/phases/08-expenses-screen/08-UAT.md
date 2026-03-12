@@ -39,6 +39,7 @@ result: pass
 ### 7. Inline Expense Expansion
 expected: Tap an expense row — it expands inline to show a read-only split breakdown (per-member amounts). Tap again — it collapses back.
 result: pass
+noted: "Not clear to the user that rows are expandable. Should add a small arrow/chevron indicator."
 
 ### 8. Pull-to-Refresh
 expected: Pull down on the expenses screen — data reloads (balance section and history refresh).
@@ -47,6 +48,7 @@ result: pass
 ### 9. Per-Member Breakdown Navigation
 expected: Tap a member row in the balance section (not the action button) — navigates to a per-member breakdown screen showing all expenses and settlements between you and that member, with the same date grouping and visual styling.
 result: pass
+noted: "Per-member navigation should move out of balance section. Better as a dedicated 'Expenses by roommate' section listing ALL roommates — balance section hides zero-balance members, making them unreachable."
 
 ### 10. Per-Member Screen Back Navigation
 expected: From the per-member breakdown screen, navigate back — the expenses tab should be intact with all data still displayed.
@@ -62,4 +64,4 @@ skipped: 0
 
 ## Gaps
 
-[none]
+[none — 2 UX improvements noted on tests 7 and 9 for future iteration]
