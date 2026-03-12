@@ -439,13 +439,6 @@ export default function DashboardScreen() {
               </Text>
             </View>
           )}
-          {selectedDateEvents.length > 5 && (
-            <View className="items-center border-t border-surface-100 py-1.5">
-              <Text className="text-xs text-gray-400">
-                Scroll for more ({selectedDateEvents.length} events)
-              </Text>
-            </View>
-          )}
         </View>
 
         {/* Color legend */}
