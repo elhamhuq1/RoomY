@@ -86,9 +86,9 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 ### Expenses UI
 
-- [ ] **XPUI-01**: Expenses screen shows balance cards with member rows, owe amounts, and remind/settle actions
-- [ ] **XPUI-02**: Expense history visually differentiates expenses (amber icon, bold amount) from settlements (green icon, dimmed text)
-- [ ] **XPUI-03**: Expense history uses overline-styled date group headers (TODAY, YESTERDAY, EARLIER)
+- [x] **XPUI-01**: Expenses screen shows balance cards with member rows, owe amounts, and remind/settle actions
+- [x] **XPUI-02**: Expense history visually differentiates expenses (amber icon, bold amount) from settlements (green icon, dimmed text)
+- [x] **XPUI-03**: Expense history uses overline-styled date group headers (TODAY, YESTERDAY, EARLIER)
 
 ### Groceries UI
 
@@ -175,9 +175,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HOME-04 | Phase 7 | Complete |
 | HOME-05 | Phase 7 | Complete |
 | HOME-06 | Phase 7 | Complete |
-| XPUI-01 | Phase 8 | Pending |
-| XPUI-02 | Phase 8 | Pending |
-| XPUI-03 | Phase 8 | Pending |
+| XPUI-01 | Phase 8 | Complete |
+| XPUI-02 | Phase 8 | Complete |
+| XPUI-03 | Phase 8 | Complete |
 | GRUI-01 | Phase 9 | Pending |
 | GRUI-02 | Phase 9 | Pending |
 | GRUI-03 | Phase 9 | Pending |

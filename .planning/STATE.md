@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 7 - Home Screen
+**Current focus:** Phase 8 - Expenses Screen
 
 ## Current Position
 
-Phase: 7 of 10 (Home Screen) -- COMPLETE
-Plan: 4 of 4 in current phase (gap closure plan added and completed)
-Status: Phase Complete
-Last activity: 2026-03-12 -- Completed 07-04 Gap closure (4 UAT bug fixes)
+Phase: 8 of 10 (Expenses Screen)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-03-12 -- Completed 08-01 Expenses screen components and parent rewrite
 
-Progress: [####################] 100% (v1.1 Phase 7: 4/4 plans)
+Progress: [##########..........] 50% (v1.1 Phase 8: 1/2 plans)
 
 ## Performance Metrics
 
@@ -42,12 +42,14 @@ Progress: [####################] 100% (v1.1 Phase 7: 4/4 plans)
 |-------|-------|-------|----------|
 | 06 Design System | 4 | 31min | 7.8min |
 | 07 Home Screen | 4 | 17min | 4.3min |
+| 08 Expenses Screen | 1/2 | 3min | 3.0min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
 | Phase 07 P02 | 4min | 1 task | 2 files |
 | Phase 07 P03 | 5min | 2 tasks | 3 files |
 | Phase 07 P04 | 4min | 2 tasks | 5 files |
+| Phase 08 P01 | 3min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -84,6 +86,8 @@ Recent decisions affecting current work:
 - [07-04]: myNetAmount via .reduce() summing all RPC pairwise rows (not .find() for own user_id which was always undefined)
 - [07-04]: weekChores uses projectChoreDates for recurring frequency projection instead of filtering single next_due_at
 - [07-04]: fetchAllData scoped to selectedDate month so pull-to-refresh preserves calendar context
+- [08-01]: Separated touch zones (left Pressable for row, right Button for action) to avoid RN event bubbling
+- [08-01]: Card p-0 override for HistorySection cards since items manage their own px-4 padding
 
 ### Pending Todos
 
@@ -100,5 +104,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 07-04-PLAN.md -- Phase 7 gap closure complete, all 4 UAT bugs fixed
+Stopped at: Completed 08-01-PLAN.md -- Expenses screen components and parent rewrite
 Resume file: None
