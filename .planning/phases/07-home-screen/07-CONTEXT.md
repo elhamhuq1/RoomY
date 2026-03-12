@@ -39,7 +39,7 @@ The daily landing screen gives users an at-a-glance view of their household, fin
 - Both "Settle up" and "Request" buttons always visible regardless of owe direction
 - Tapping card body navigates to expenses tab for full breakdown
 - Buttons navigate to their respective action flows (settle-up flow, request/reminder flow)
-- Zero balance state: "All settled up" with checkmark; buttons still visible but muted
+- Zero balance state: "All settled up" with checkmark; buttons hidden when settled (user override: originally "visible but muted", changed during UAT to "hidden completely")
 
 ### Claude's Discretion
 - Loading skeleton design for each section

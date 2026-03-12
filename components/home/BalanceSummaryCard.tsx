@@ -69,24 +69,23 @@ export function BalanceSummaryCard({
           </Text>
         </View>
 
-        {/* Action buttons */}
-        <View
-          className="mt-4 flex-row gap-3"
-          style={isSettled ? { opacity: 0.7 } : undefined}
-        >
-          <Button
-            title="Settle Up"
-            variant="primary"
-            onPress={onSettleUp}
-            className="flex-1"
-          />
-          <Button
-            title="Request"
-            variant="outline"
-            onPress={onRequest}
-            className="flex-1"
-          />
-        </View>
+        {/* Action buttons - hidden when settled */}
+        {!isSettled && (
+          <View className="mt-4 flex-row gap-3">
+            <Button
+              title="Settle Up"
+              variant="primary"
+              onPress={onSettleUp}
+              className="flex-1"
+            />
+            <Button
+              title="Request"
+              variant="outline"
+              onPress={onRequest}
+              className="flex-1"
+            />
+          </View>
+        )}
       </LinearGradient>
     </Pressable>
   );

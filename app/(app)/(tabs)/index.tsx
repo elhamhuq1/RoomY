@@ -71,8 +71,8 @@ export default function DashboardScreen() {
   const fetchAllData = useCallback(async () => {
     if (!household?.id) return;
 
-    const monthStart = startOfMonth(new Date()).toISOString();
-    const monthEnd = endOfMonth(new Date()).toISOString();
+    const monthStart = startOfMonth(parseISO(selectedDate)).toISOString();
+    const monthEnd = endOfMonth(parseISO(selectedDate)).toISOString();
 
     const [membersRes, balancesRes, expensesRes, choresRes, disputesRes] =
       await Promise.all([
@@ -140,7 +140,7 @@ export default function DashboardScreen() {
     setChores(choresRes);
     setDisputes(disputesRes);
     setLoading(false);
-  }, [household?.id]);
+  }, [household?.id, selectedDate]);
 
   // Refresh on screen focus
   useFocusEffect(
@@ -169,9 +169,10 @@ export default function DashboardScreen() {
   );
 
   const myNetAmount = useMemo(() => {
-    const myBalance = balances.find((b) => b.user_id === user?.id);
-    return Number(myBalance?.net_amount ?? 0);
-  }, [balances, user?.id]);
+    // Each balance row = pairwise net between current user and one other member.
+    // Positive = they owe us, negative = we owe them. Sum = overall net position.
+    return balances.reduce((sum, b) => sum + Number(b.net_amount), 0);
+  }, [balances]);
 
   // Unsettled balances: members with non-zero balance relative to current user
   const unsettledBalances = useMemo(() => {
