@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: resolved
 phase: 07-home-screen
 source: [07-01-SUMMARY.md, 07-02-SUMMARY.md, 07-03-SUMMARY.md]
 started: 2026-03-12T18:00:00Z
@@ -60,7 +60,7 @@ skipped: 0
 ## Gaps
 
 - truth: "Weekly Timeline shows upcoming chores/events grouped by day with task name, assignee avatar, completion indicator, and connecting line"
-  status: failed
+  status: resolved
   reason: "User reported: did not pass, I don't see any of what you described even though I have chores and expenses for the current week"
   severity: major
   test: 7
@@ -76,7 +76,7 @@ skipped: 0
   debug_session: ".planning/debug/weekly-timeline-empty.md"
 
 - truth: "Balance Summary Card hides Settle Up/Request buttons when all settled up"
-  status: failed
+  status: resolved
   reason: "User reported: buttons show when all settled up, tapping Settle Up causes forever loading screen because nothing to settle"
   severity: minor
   test: 3
@@ -91,7 +91,7 @@ skipped: 0
   debug_session: ".planning/debug/balance-buttons-when-settled.md"
 
 - truth: "Pull-to-refresh preserves selected calendar date context"
-  status: failed
+  status: resolved
   reason: "User reported: selecting a different week then refreshing resets back to current week instead of preserving selection"
   severity: minor
   test: 8
@@ -105,7 +105,7 @@ skipped: 0
   debug_session: ".planning/debug/pull-refresh-resets-date.md"
 
 - truth: "Balance Summary Card shows correct net balance when other users add expenses"
-  status: failed
+  status: resolved
   reason: "User reported: another user added an expense for me to pay but the balance card still shows All settled up"
   severity: major
   test: 3
