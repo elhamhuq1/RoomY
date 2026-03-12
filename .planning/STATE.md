@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 3.1: Chores
+**Current focus:** Phase 4: Engagement
 
 ## Current Position
 
-**Phase:** 3.1 of 4 (Chores)
-**Current Plan:** Not started
-**Total Plans in Phase:** 2
-**Status:** Milestone complete
-**Last Activity:** 2026-03-11
+**Phase:** 4 of 4 (Engagement)
+**Current Plan:** 3 of 3
+**Total Plans in Phase:** 3
+**Status:** Phase complete — ready for verification
+**Last Activity:** 2026-03-12
 
-**Progress:** [█████████░] 86%
+**Progress:** [████████░░] 76%
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 | Phase 03 P03 | 4min | 2 tasks | 1 files |
 | Phase 03.1 P01 | 4min | 2 tasks | 5 files |
 | Phase 03.1 P02 | 4min | 2 tasks | 5 files |
+| Phase 04 P02 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,10 @@ Recent decisions affecting current work:
 - [Phase 03.1]: Client-side fallback for dispute auto-revert queries stale disputes on screen focus
 - [Phase 03.1]: Streaks calculated globally from all-time history, not filtered by dashboard period
 - [Phase 03.1]: Dashboard shows all household members even with zero completions for full visibility
+- [Phase 04]: Individual push notifications for v1 -- grouping deferred to v2 (low frequency in small households)
+- [Phase 04]: No grocery notifications per user decision (PUSH-03 not implemented)
+- [Phase 04]: Edge Functions use service role key to bypass RLS for cross-user notification queries
+- [Phase 04]: UTC-based chore reminder timing for v1 (cron at 1 PM UTC ~ 8 AM EST); timezone handling deferred
 
 ### Pending Todos
 
@@ -105,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-**Last session:** 2026-03-12T01:23:58.129Z
-**Stopped at:** Phase 4 context gathered
-**Resume file:** .planning/phases/04-engagement/04-CONTEXT.md
+**Last session:** 2026-03-12T01:47:20.632Z
+**Stopped at:** Completed 04-02-PLAN.md
+**Resume file:** None

@@ -39,9 +39,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Engagement
 
-- [ ] **PUSH-01**: User receives push notifications for new expenses
-- [ ] **PUSH-02**: User receives push notifications for chore reminders
-- [ ] **PUSH-03**: User receives push notifications for grocery list updates
+- [x] **PUSH-01**: User receives push notifications for new expenses
+- [x] **PUSH-02**: User receives push notifications for chore reminders
+- [x] **PUSH-03**: User receives push notifications for grocery list updates
 - [ ] **CALC-01**: User can view a shared household calendar
 - [ ] **CALC-02**: Recurring expense due dates and chore schedules appear on calendar
 
@@ -101,9 +101,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHOR-02 | Phase 3.1 | Complete |
 | CHOR-03 | Phase 3.1 | Complete |
 | CHOR-04 | Phase 3.1 | Complete |
-| PUSH-01 | Phase 4 | Pending |
-| PUSH-02 | Phase 4 | Pending |
-| PUSH-03 | Phase 4 | Pending |
+| PUSH-01 | Phase 4 | Complete |
+| PUSH-02 | Phase 4 | Complete |
+| PUSH-03 | Phase 4 | Complete |
 | CALC-01 | Phase 4 | Pending |
 | CALC-02 | Phase 4 | Pending |
 
