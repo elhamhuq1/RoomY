@@ -1,6 +1,7 @@
 // Notification preferences: per-type toggles for expenses and chores
 // Persists to notification_preferences table via upsert
 
+import { colors } from "@/lib/theme/colors";
 import { useEffect, useState } from "react";
 import { View, Text, Switch, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -73,21 +74,21 @@ export default function NotificationsSettingsScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
         <Stack.Screen options={{ headerShown: true, title: "Notifications" }} />
-        <ActivityIndicator size="large" color="#f9a825" />
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-surface-50 px-6 pt-6">
+    <View className="flex-1 bg-neutral-bg px-6 pt-6">
       <Stack.Screen options={{ headerShown: true, title: "Notifications" }} />
 
       {/* Toggle card */}
       <View className="rounded-2xl bg-white shadow-sm">
         {/* Expenses toggle */}
-        <View className="flex-row items-center border-b border-surface-200 px-5 py-4">
+        <View className="flex-row items-center border-b border-neutral-border px-5 py-4">
           <View className="mr-4 h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
             <Ionicons name="wallet-outline" size={22} color="#3b82f6" />
           </View>
@@ -102,7 +103,7 @@ export default function NotificationsSettingsScreen() {
           <Switch
             value={expensesEnabled}
             onValueChange={(val) => handleToggle("expenses_enabled", val)}
-            trackColor={{ false: "#d1d5db", true: "#f9a825" }}
+            trackColor={{ false: "#d1d5db", true: colors.brand.DEFAULT }}
             thumbColor="#ffffff"
           />
         </View>
@@ -121,7 +122,7 @@ export default function NotificationsSettingsScreen() {
           <Switch
             value={choresEnabled}
             onValueChange={(val) => handleToggle("chores_enabled", val)}
-            trackColor={{ false: "#d1d5db", true: "#f9a825" }}
+            trackColor={{ false: "#d1d5db", true: colors.brand.DEFAULT }}
             thumbColor="#ffffff"
           />
         </View>

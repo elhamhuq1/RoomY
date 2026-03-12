@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { Stack } from "expo-router";
 
 export default function AppLayout() {
@@ -9,8 +10,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Add Expense",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -19,8 +20,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Expense",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -29,8 +30,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Settle Up",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -39,8 +40,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Settings",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -49,8 +50,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Profile",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -59,8 +60,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Modules",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -69,8 +70,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Members",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -79,8 +80,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Complete Trip",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -89,8 +90,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Trip History",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -99,8 +100,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Add Chore",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -109,8 +110,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Swap Requests",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />
@@ -119,8 +120,8 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Chore Dashboard",
-          headerTintColor: "#f9a825",
-          headerStyle: { backgroundColor: "#fefdfb" },
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
         }}
       />

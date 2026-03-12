@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
@@ -17,16 +18,7 @@ import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types/database";
 
 // Colors for avatar
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -153,16 +145,16 @@ export default function SettleScreen() {
 
   if (loadingProfile) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   if (success) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50 px-8">
-        <Ionicons name="checkmark-circle" size={72} color="#66bb6a" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
+        <Ionicons name="checkmark-circle" size={72} color={colors.semantic.success} />
         <Text className="mt-4 text-xl font-bold text-gray-800">
           Payment Recorded!
         </Text>
@@ -175,7 +167,7 @@ export default function SettleScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -249,7 +241,7 @@ export default function SettleScreen() {
             className={`flex-row items-center justify-center rounded-2xl py-4 ${
               !isValidAmount || submitting
                 ? "bg-gray-300"
-                : "bg-primary-500 active:bg-primary-600"
+                : "bg-brand-light0 active:bg-brand-dark"
             }`}
             onPress={handleRecordPayment}
             disabled={!isValidAmount || submitting}

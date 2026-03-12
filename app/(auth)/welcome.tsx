@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useRef, useState, useCallback } from "react";
 import {
   View,
@@ -48,11 +49,11 @@ export default function WelcomeScreen() {
   );
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       {/* Header area */}
       <View className="items-center pt-20 pb-6">
-        <View className="mb-4 h-20 w-20 items-center justify-center rounded-2xl bg-primary-100">
-          <Ionicons name="home" size={40} color="#f9a825" />
+        <View className="mb-4 h-20 w-20 items-center justify-center rounded-2xl bg-brand-light">
+          <Ionicons name="home" size={40} color={colors.brand.DEFAULT} />
         </View>
         <Text className="text-4xl font-bold text-gray-800">RoomY</Text>
         <Text className="mt-2 text-lg text-gray-500">
@@ -77,8 +78,8 @@ export default function WelcomeScreen() {
               className="items-center justify-center px-8"
             >
               <View className="w-full items-center rounded-2xl bg-white p-8 shadow-sm">
-                <View className="mb-5 h-24 w-24 items-center justify-center rounded-full bg-primary-50">
-                  <Ionicons name={prop.icon} size={44} color="#f9a825" />
+                <View className="mb-5 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
+                  <Ionicons name={prop.icon} size={44} color={colors.brand.DEFAULT} />
                 </View>
                 <Text className="mb-3 text-center text-2xl font-bold text-gray-800">
                   {prop.title}
@@ -98,7 +99,7 @@ export default function WelcomeScreen() {
               key={index}
               className={`h-2.5 rounded-full ${
                 index === activeIndex
-                  ? "w-8 bg-primary-500"
+                  ? "w-8 bg-brand-light0"
                   : "w-2.5 bg-gray-300"
               }`}
             />
@@ -109,7 +110,7 @@ export default function WelcomeScreen() {
       {/* CTA buttons */}
       <View className="px-8 pb-12 pt-6">
         <Pressable
-          className="mb-4 items-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+          className="mb-4 items-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
           onPress={() => router.push("/(auth)/sign-up")}
         >
           <Text className="text-lg font-bold text-white">Get Started</Text>
@@ -121,7 +122,7 @@ export default function WelcomeScreen() {
         >
           <Text className="text-base text-gray-500">
             Already have an account?{" "}
-            <Text className="font-semibold text-primary-600">Sign in</Text>
+            <Text className="font-semibold text-brand-dark">Sign in</Text>
           </Text>
         </Pressable>
       </View>

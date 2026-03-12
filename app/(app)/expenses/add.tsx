@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -17,16 +18,7 @@ import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types/database";
 
 // Colors for member initials avatars
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -235,15 +227,15 @@ export default function AddExpenseScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -260,7 +252,7 @@ export default function AddExpenseScreen() {
         <TextInput
           className="mb-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
           placeholder="What's the expense for?"
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={colors.neutral.tertiary}
           value={description}
           onChangeText={setDescription}
           autoFocus
@@ -277,7 +269,7 @@ export default function AddExpenseScreen() {
             {suggestions.map((s) => (
               <Pressable
                 key={s}
-                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 active:bg-primary-50"
+                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 active:bg-brand-light"
                 onPress={() => setDescription(s)}
               >
                 <Text className="text-sm text-gray-600">{s}</Text>
@@ -295,7 +287,7 @@ export default function AddExpenseScreen() {
             className="flex-1 text-lg text-gray-800"
             style={{ paddingVertical: 0 }}
             placeholder="0.00"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             keyboardType="decimal-pad"
             value={amount}
             onChangeText={handleAmountChange}
@@ -317,7 +309,7 @@ export default function AddExpenseScreen() {
                 key={member.user_id}
                 className={`items-center rounded-xl px-3 py-2 ${
                   isSelected
-                    ? "border-2 border-primary-500 bg-primary-50"
+                    ? "border-2 border-brand bg-brand-light"
                     : "border-2 border-transparent"
                 }`}
                 onPress={() => setPayerId(member.user_id)}
@@ -335,7 +327,7 @@ export default function AddExpenseScreen() {
                 </View>
                 <Text
                   className={`mt-1 text-xs ${
-                    isSelected ? "font-semibold text-primary-600" : "text-gray-500"
+                    isSelected ? "font-semibold text-brand-dark" : "text-gray-500"
                   }`}
                   numberOfLines={1}
                 >
@@ -373,7 +365,7 @@ export default function AddExpenseScreen() {
                 <View
                   className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
                     isChecked
-                      ? "bg-primary-500"
+                      ? "bg-brand-light0"
                       : "border-2 border-gray-300 bg-white"
                   }`}
                 >
@@ -424,7 +416,7 @@ export default function AddExpenseScreen() {
         <Pressable
           className={`flex-row items-center justify-center rounded-2xl py-4 ${
             canSubmit
-              ? "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand-light0 active:bg-brand-dark"
               : "bg-gray-200"
           }`}
           onPress={handleSubmit}

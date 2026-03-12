@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -104,17 +105,17 @@ export default function TripHistoryScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   if (trips.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50 px-8">
-        <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-primary-100">
-          <Ionicons name="time-outline" size={48} color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
+        <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
+          <Ionicons name="time-outline" size={48} color={colors.brand.DEFAULT} />
         </View>
         <Text className="text-2xl font-bold text-gray-800">
           No completed trips yet
@@ -127,7 +128,7 @@ export default function TripHistoryScreen() {
   }
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
@@ -145,8 +146,8 @@ export default function TripHistoryScreen() {
             >
               {/* Trip header */}
               <View className="flex-row items-center">
-                <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-primary-100">
-                  <Ionicons name="cart" size={20} color="#f9a825" />
+                <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-brand-light">
+                  <Ionicons name="cart" size={20} color={colors.brand.DEFAULT} />
                 </View>
                 <View className="flex-1">
                   <Text className="text-base font-semibold text-gray-800">
@@ -161,7 +162,7 @@ export default function TripHistoryScreen() {
                 <Ionicons
                   name={isExpanded ? "chevron-up" : "chevron-down"}
                   size={20}
-                  color="#9ca3af"
+                  color={colors.neutral.tertiary}
                 />
               </View>
 
@@ -176,7 +177,7 @@ export default function TripHistoryScreen() {
                       <Ionicons
                         name="checkmark-circle"
                         size={16}
-                        color="#9ca3af"
+                        color={colors.neutral.tertiary}
                         style={{ marginRight: 8 }}
                       />
                       <Text className="flex-1 text-sm text-gray-600">

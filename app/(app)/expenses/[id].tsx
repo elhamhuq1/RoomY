@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -16,16 +17,7 @@ import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import type { Profile, Expense, ExpenseSplit, Settlement } from "@/lib/types/database";
 
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -375,15 +367,15 @@ export default function ExpenseDetailScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   if (error && !expense && !settlement) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50 px-8">
+      <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
         <Ionicons name="alert-circle-outline" size={48} color="#ef5350" />
         <Text className="mt-3 text-base text-gray-500">{error}</Text>
       </View>
@@ -394,12 +386,12 @@ export default function ExpenseDetailScreen() {
   if (isSettlement && settlement) {
     return (
       <ScrollView
-        className="flex-1 bg-surface-50"
+        className="flex-1 bg-neutral-bg"
         contentContainerClassName="px-6 pt-6 pb-12"
       >
         <View className="items-center rounded-2xl bg-white p-6 shadow-sm">
           <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <Ionicons name="checkmark-circle" size={36} color="#66bb6a" />
+            <Ionicons name="checkmark-circle" size={36} color={colors.semantic.success} />
           </View>
 
           <Text className="text-2xl font-bold text-gray-800">
@@ -457,7 +449,7 @@ export default function ExpenseDetailScreen() {
   if (editing) {
     return (
       <KeyboardAvoidingView
-        className="flex-1 bg-surface-50"
+        className="flex-1 bg-neutral-bg"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
@@ -475,7 +467,7 @@ export default function ExpenseDetailScreen() {
             value={editDescription}
             onChangeText={setEditDescription}
             placeholder="Description"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
           />
 
           {/* Amount */}
@@ -492,7 +484,7 @@ export default function ExpenseDetailScreen() {
               value={editAmount}
               onChangeText={handleEditAmountChange}
               placeholder="0.00"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.neutral.tertiary}
             />
           </View>
 
@@ -513,7 +505,7 @@ export default function ExpenseDetailScreen() {
                   key={member.user_id}
                   className={`items-center rounded-xl px-3 py-2 ${
                     isSelected
-                      ? "border-2 border-primary-500 bg-primary-50"
+                      ? "border-2 border-brand bg-brand-light"
                       : "border-2 border-transparent"
                   }`}
                   onPress={() => setEditPayerId(member.user_id)}
@@ -532,7 +524,7 @@ export default function ExpenseDetailScreen() {
                   <Text
                     className={`mt-1 text-xs ${
                       isSelected
-                        ? "font-semibold text-primary-600"
+                        ? "font-semibold text-brand-dark"
                         : "text-gray-500"
                     }`}
                     numberOfLines={1}
@@ -572,7 +564,7 @@ export default function ExpenseDetailScreen() {
                   <View
                     className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
                       isChecked
-                        ? "bg-primary-500"
+                        ? "bg-brand-light0"
                         : "border-2 border-gray-300 bg-white"
                     }`}
                   >
@@ -617,7 +609,7 @@ export default function ExpenseDetailScreen() {
           <Pressable
             className={`mb-3 flex-row items-center justify-center rounded-2xl py-4 ${
               canSave
-                ? "bg-primary-500 active:bg-primary-600"
+                ? "bg-brand-light0 active:bg-brand-dark"
                 : "bg-gray-200"
             }`}
             onPress={handleSave}
@@ -637,7 +629,7 @@ export default function ExpenseDetailScreen() {
           </Pressable>
 
           <Pressable
-            className="flex-row items-center justify-center rounded-2xl border-2 border-gray-200 py-4 active:bg-surface-100"
+            className="flex-row items-center justify-center rounded-2xl border-2 border-gray-200 py-4 active:bg-neutral-surface"
             onPress={handleCancelEdit}
           >
             <Text className="text-lg font-bold text-gray-500">Cancel</Text>
@@ -650,7 +642,7 @@ export default function ExpenseDetailScreen() {
   // View mode
   return (
     <ScrollView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       contentContainerClassName="px-6 pt-6 pb-12"
       showsVerticalScrollIndicator={false}
     >
@@ -668,7 +660,7 @@ export default function ExpenseDetailScreen() {
           <Ionicons
             name="person-outline"
             size={16}
-            color="#9ca3af"
+            color={colors.neutral.tertiary}
             style={{ marginRight: 4 }}
           />
           <Text className="text-sm text-gray-500">
@@ -716,7 +708,7 @@ export default function ExpenseDetailScreen() {
 
       {/* Edit button */}
       <Pressable
-        className="mt-6 flex-row items-center justify-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+        className="mt-6 flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
         onPress={() => setEditing(true)}
       >
         <Ionicons

@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -17,16 +18,7 @@ import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types/database";
 
 // Colors for member initials avatars (same as expenses/add.tsx)
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -204,15 +196,15 @@ export default function CompleteTripScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -224,9 +216,9 @@ export default function CompleteTripScreen() {
       >
         {/* Summary */}
         {checkedCount > 0 && (
-          <View className="mb-6 flex-row items-center rounded-xl bg-primary-50 px-4 py-3">
-            <Ionicons name="cart" size={20} color="#f9a825" />
-            <Text className="ml-2 text-sm font-medium text-primary-700">
+          <View className="mb-6 flex-row items-center rounded-xl bg-brand-light px-4 py-3">
+            <Ionicons name="cart" size={20} color={colors.brand.DEFAULT} />
+            <Text className="ml-2 text-sm font-medium text-brand-dark">
               {checkedCount} item{checkedCount !== 1 ? "s" : ""} checked off
             </Text>
           </View>
@@ -242,7 +234,7 @@ export default function CompleteTripScreen() {
             className="flex-1 text-lg text-gray-800"
             style={{ paddingVertical: 0 }}
             placeholder="0.00"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             keyboardType="decimal-pad"
             value={amount}
             onChangeText={handleAmountChange}
@@ -265,7 +257,7 @@ export default function CompleteTripScreen() {
                 key={member.user_id}
                 className={`items-center rounded-xl px-3 py-2 ${
                   isSelected
-                    ? "border-2 border-primary-500 bg-primary-50"
+                    ? "border-2 border-brand bg-brand-light"
                     : "border-2 border-transparent"
                 }`}
                 onPress={() => setPayerId(member.user_id)}
@@ -284,7 +276,7 @@ export default function CompleteTripScreen() {
                 <Text
                   className={`mt-1 text-xs ${
                     isSelected
-                      ? "font-semibold text-primary-600"
+                      ? "font-semibold text-brand-dark"
                       : "text-gray-500"
                   }`}
                   numberOfLines={1}
@@ -323,7 +315,7 @@ export default function CompleteTripScreen() {
                 <View
                   className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
                     isChecked
-                      ? "bg-primary-500"
+                      ? "bg-brand-light0"
                       : "border-2 border-gray-300 bg-white"
                   }`}
                 >
@@ -365,7 +357,7 @@ export default function CompleteTripScreen() {
 
         {/* Per-person split summary */}
         {isValidAmount && selectedMembers.length > 0 && (
-          <View className="mb-6 rounded-xl bg-surface-100 px-4 py-3">
+          <View className="mb-6 rounded-xl bg-neutral-surface px-4 py-3">
             <Text className="text-center text-sm text-gray-500">
               {formatCurrency(parsedAmount)} split {selectedMembers.length} way
               {selectedMembers.length !== 1 ? "s" : ""} ={" "}
@@ -388,7 +380,7 @@ export default function CompleteTripScreen() {
         <Pressable
           className={`flex-row items-center justify-center rounded-2xl py-4 ${
             canSubmit
-              ? "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand-light0 active:bg-brand-dark"
               : "bg-gray-200"
           }`}
           onPress={handleSubmit}
@@ -401,7 +393,7 @@ export default function CompleteTripScreen() {
               <Ionicons
                 name="checkmark-circle"
                 size={22}
-                color={canSubmit ? "#fff" : "#9ca3af"}
+                color={canSubmit ? "#fff" : colors.neutral.tertiary}
                 style={{ marginRight: 8 }}
               />
               <Text

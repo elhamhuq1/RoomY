@@ -1,5 +1,6 @@
 // Root layout: AuthProvider + Stack with Protected guards + notification setup
 // Source: Expo Router protected routes docs (Pattern 3 from RESEARCH.md)
+import { colors } from "@/lib/theme/colors";
 import "@/global.css";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
@@ -73,8 +74,8 @@ function RootNavigator() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }

@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { Tabs, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, Pressable, View } from "react-native";
@@ -13,27 +14,27 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#f9a825",
-        tabBarInactiveTintColor: "#9ca3af",
+        tabBarActiveTintColor: colors.brand.DEFAULT,
+        tabBarInactiveTintColor: colors.neutral.tertiary,
         tabBarStyle: {
-          backgroundColor: "#fefdfb",
-          borderTopColor: "#faf3e8",
+          backgroundColor: colors.neutral.bg,
+          borderTopColor: colors.neutral.border,
           borderTopWidth: 1,
           paddingBottom: 4,
           paddingTop: 4,
           height: 56,
         },
         headerStyle: {
-          backgroundColor: "#fefdfb",
+          backgroundColor: colors.neutral.bg,
         },
         headerShadowVisible: false,
-        headerTintColor: "#374151",
+        headerTintColor: colors.neutral.text,
         headerRight: () => (
           <Pressable
             onPress={() => router.push("/(app)/settings")}
             className="mr-4"
           >
-            <Ionicons name="settings-outline" size={24} color="#9ca3af" />
+            <Ionicons name="settings-outline" size={24} color={colors.neutral.tertiary} />
           </Pressable>
         ),
       }}
@@ -70,13 +71,13 @@ export default function TabsLayout() {
                 onPress={() => router.push("/(app)/groceries/trip-history" as never)}
                 style={{ marginRight: 8 }}
               >
-                <Ionicons name="time-outline" size={24} color="#9ca3af" />
+                <Ionicons name="time-outline" size={24} color={colors.neutral.tertiary} />
               </Pressable>
               <Pressable
                 onPress={() => router.push("/(app)/settings" as never)}
                 style={{ marginRight: 16 }}
               >
-                <Ionicons name="settings-outline" size={24} color="#9ca3af" />
+                <Ionicons name="settings-outline" size={24} color={colors.neutral.tertiary} />
               </Pressable>
             </View>
           ),
@@ -106,25 +107,25 @@ export default function TabsLayout() {
                 }
                 style={{ marginRight: 8 }}
               >
-                <Ionicons name="information-circle-outline" size={24} color="#9ca3af" />
+                <Ionicons name="information-circle-outline" size={24} color={colors.neutral.tertiary} />
               </Pressable>
               <Pressable
                 onPress={() => router.push("/(app)/chores/swap-request" as never)}
                 style={{ marginRight: 8 }}
               >
-                <Ionicons name="swap-horizontal-outline" size={24} color="#9ca3af" />
+                <Ionicons name="swap-horizontal-outline" size={24} color={colors.neutral.tertiary} />
               </Pressable>
               <Pressable
                 onPress={() => router.push("/(app)/chores/dashboard" as never)}
                 style={{ marginRight: 8 }}
               >
-                <Ionicons name="stats-chart-outline" size={24} color="#9ca3af" />
+                <Ionicons name="stats-chart-outline" size={24} color={colors.neutral.tertiary} />
               </Pressable>
               <Pressable
                 onPress={() => router.push("/(app)/settings" as never)}
                 style={{ marginRight: 16 }}
               >
-                <Ionicons name="settings-outline" size={24} color="#9ca3af" />
+                <Ionicons name="settings-outline" size={24} color={colors.neutral.tertiary} />
               </Pressable>
             </View>
           ),

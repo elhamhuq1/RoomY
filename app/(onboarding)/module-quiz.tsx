@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect } from "react";
 import {
   View,
@@ -128,7 +129,7 @@ export default function ModuleQuizScreen() {
   }
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         contentContainerClassName="flex-grow px-8 pt-20 pb-12"
         showsVerticalScrollIndicator={false}
@@ -158,19 +159,19 @@ export default function ModuleQuizScreen() {
               <View
                 key={mod.key}
                 className={`flex-row items-center rounded-2xl border-2 bg-white p-5 shadow-sm ${
-                  isOn ? "border-primary-300" : "border-surface-200"
+                  isOn ? "border-brand" : "border-neutral-border"
                 }`}
               >
                 {/* Icon */}
                 <View
                   className={`mr-4 h-14 w-14 items-center justify-center rounded-2xl ${
-                    isOn ? "bg-primary-100" : "bg-gray-100"
+                    isOn ? "bg-brand-light" : "bg-gray-100"
                   }`}
                 >
                   <Ionicons
                     name={mod.icon}
                     size={28}
-                    color={isOn ? "#f9a825" : "#9ca3af"}
+                    color={isOn ? colors.brand.DEFAULT : colors.neutral.tertiary}
                   />
                 </View>
 
@@ -183,7 +184,7 @@ export default function ModuleQuizScreen() {
                     {mod.description}
                   </Text>
                   {mod.locked ? (
-                    <Text className="mt-1 text-xs font-medium text-primary-500">
+                    <Text className="mt-1 text-xs font-medium text-brand">
                       Always enabled
                     </Text>
                   ) : null}
@@ -196,7 +197,7 @@ export default function ModuleQuizScreen() {
                   disabled={mod.locked || loading}
                   trackColor={{
                     false: Platform.OS === "ios" ? undefined : "#d1d5db",
-                    true: "#f9a825",
+                    true: colors.brand.DEFAULT,
                   }}
                   thumbColor={
                     Platform.OS === "android"
@@ -215,7 +216,7 @@ export default function ModuleQuizScreen() {
         {/* Continue button */}
         <Pressable
           className={`items-center rounded-2xl py-4 ${
-            loading ? "bg-primary-300" : "bg-primary-500 active:bg-primary-600"
+            loading ? "bg-brand/50" : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleContinue}
           disabled={loading}

@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -130,7 +131,7 @@ export default function ModuleSettingsScreen() {
   }
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         contentContainerClassName="px-6 pt-6 pb-12"
         showsVerticalScrollIndicator={false}
@@ -159,19 +160,19 @@ export default function ModuleSettingsScreen() {
               <View
                 key={mod.key}
                 className={`flex-row items-center rounded-2xl border-2 bg-white p-5 shadow-sm ${
-                  isOn ? "border-primary-300" : "border-surface-200"
+                  isOn ? "border-brand" : "border-neutral-border"
                 }`}
               >
                 {/* Icon */}
                 <View
                   className={`mr-4 h-14 w-14 items-center justify-center rounded-2xl ${
-                    isOn ? "bg-primary-100" : "bg-gray-100"
+                    isOn ? "bg-brand-light" : "bg-gray-100"
                   }`}
                 >
                   <Ionicons
                     name={mod.icon}
                     size={28}
-                    color={isOn ? "#f9a825" : "#9ca3af"}
+                    color={isOn ? colors.brand.DEFAULT : colors.neutral.tertiary}
                   />
                 </View>
 
@@ -184,7 +185,7 @@ export default function ModuleSettingsScreen() {
                     {mod.description}
                   </Text>
                   {mod.locked ? (
-                    <Text className="mt-1 text-xs font-medium text-primary-500">
+                    <Text className="mt-1 text-xs font-medium text-brand">
                       Always enabled
                     </Text>
                   ) : null}
@@ -192,7 +193,7 @@ export default function ModuleSettingsScreen() {
 
                 {/* Toggle or saving indicator */}
                 {isSaving ? (
-                  <ActivityIndicator size="small" color="#f9a825" />
+                  <ActivityIndicator size="small" color={colors.brand.DEFAULT} />
                 ) : (
                   <Switch
                     value={isOn}
@@ -200,7 +201,7 @@ export default function ModuleSettingsScreen() {
                     disabled={mod.locked || saving !== null}
                     trackColor={{
                       false: Platform.OS === "ios" ? undefined : "#d1d5db",
-                      true: "#f9a825",
+                      true: colors.brand.DEFAULT,
                     }}
                     thumbColor={
                       Platform.OS === "android"

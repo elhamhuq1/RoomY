@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -96,15 +97,15 @@ export default function CreateHouseholdScreen() {
       inviteCode.slice(0, 4) + " " + inviteCode.slice(4);
 
     return (
-      <View className="flex-1 bg-surface-50 px-8 pt-20">
+      <View className="flex-1 bg-neutral-bg px-8 pt-20">
         <ScrollView
           contentContainerClassName="flex-grow justify-center pb-12"
           showsVerticalScrollIndicator={false}
         >
           {/* Success icon */}
           <View className="mb-6 items-center">
-            <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-accent-500/20">
-              <Ionicons name="checkmark-circle" size={56} color="#66bb6a" />
+            <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-semantic-success/20">
+              <Ionicons name="checkmark-circle" size={56} color={colors.semantic.success} />
             </View>
             <Text className="text-3xl font-bold text-gray-800">
               {trimmedName} is ready!
@@ -120,7 +121,7 @@ export default function CreateHouseholdScreen() {
               INVITE CODE
             </Text>
             <Text
-              className="text-4xl font-bold tracking-widest text-primary-600"
+              className="text-4xl font-bold tracking-widest text-brand-dark"
               style={{ fontVariant: ["tabular-nums"] }}
             >
               {formattedCode}
@@ -132,7 +133,7 @@ export default function CreateHouseholdScreen() {
 
           {/* Share button */}
           <Pressable
-            className="mb-4 flex-row items-center justify-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+            className="mb-4 flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
             onPress={handleShare}
           >
             <Ionicons
@@ -148,10 +149,10 @@ export default function CreateHouseholdScreen() {
 
           {/* Continue button */}
           <Pressable
-            className="items-center rounded-2xl border-2 border-primary-500 py-4 active:bg-primary-50"
+            className="items-center rounded-2xl border-2 border-brand py-4 active:bg-brand-light"
             onPress={handleContinue}
           >
-            <Text className="text-lg font-bold text-primary-600">
+            <Text className="text-lg font-bold text-brand-dark">
               Continue Setup
             </Text>
           </Pressable>
@@ -163,7 +164,7 @@ export default function CreateHouseholdScreen() {
   // Household name form
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -172,8 +173,8 @@ export default function CreateHouseholdScreen() {
       >
         {/* Header */}
         <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-primary-100">
-            <Ionicons name="home" size={44} color="#f9a825" />
+          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
+            <Ionicons name="home" size={44} color={colors.brand.DEFAULT} />
           </View>
           <Text className="text-3xl font-bold text-gray-800">
             Name Your Household
@@ -197,10 +198,10 @@ export default function CreateHouseholdScreen() {
           </Text>
           <TextInput
             className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              error ? "border-red-400" : "border-surface-200"
+              error ? "border-red-400" : "border-neutral-border"
             }`}
             placeholder='e.g., "The Elm Street Crew"'
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={householdName}
             onChangeText={(text) => {
               setHouseholdName(text);
@@ -216,8 +217,8 @@ export default function CreateHouseholdScreen() {
         <Pressable
           className={`items-center rounded-2xl py-4 ${
             !trimmedName || loading
-              ? "bg-primary-300"
-              : "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand/50"
+              : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleCreate}
           disabled={!trimmedName || loading}

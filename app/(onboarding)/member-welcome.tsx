@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -71,28 +72,28 @@ export default function MemberWelcomeScreen() {
 
   // Alternate colors for member avatars
   const avatarColors = [
-    "bg-primary-100",
-    "bg-accent-500/20",
+    "bg-brand-light",
+    "bg-semantic-success/20",
     "bg-blue-100",
     "bg-purple-100",
     "bg-pink-100",
   ];
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         contentContainerClassName="flex-grow justify-center px-8 py-12"
         showsVerticalScrollIndicator={false}
       >
         {/* Celebration header */}
         <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-accent-500/20">
-            <Ionicons name="checkmark-circle" size={56} color="#66bb6a" />
+          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-semantic-success/20">
+            <Ionicons name="checkmark-circle" size={56} color={colors.semantic.success} />
           </View>
           <Text className="text-4xl font-bold text-gray-800">
             You're in!
           </Text>
-          <Text className="mt-2 text-center text-xl font-semibold text-primary-600">
+          <Text className="mt-2 text-center text-xl font-semibold text-brand-dark">
             {params.household_name}
           </Text>
           <Text className="mt-1 text-center text-base text-gray-500">
@@ -107,7 +108,7 @@ export default function MemberWelcomeScreen() {
           </Text>
 
           {loading ? (
-            <ActivityIndicator color="#f9a825" className="py-4" />
+            <ActivityIndicator color={colors.brand.DEFAULT} className="py-4" />
           ) : (
             <View className="gap-3">
               {members.map((member, index) => (
@@ -138,7 +139,7 @@ export default function MemberWelcomeScreen() {
 
         {/* Continue button */}
         <Pressable
-          className="items-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+          className="items-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
           onPress={() => router.push("/(onboarding)/module-quiz")}
         >
           <Text className="text-lg font-bold text-white">Continue</Text>

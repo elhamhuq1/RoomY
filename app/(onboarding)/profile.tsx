@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -63,7 +64,7 @@ export default function ProfileSetupScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -72,13 +73,13 @@ export default function ProfileSetupScreen() {
       >
         {/* Avatar preview */}
         <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-primary-100">
+          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
             {initial ? (
-              <Text className="text-4xl font-bold text-primary-600">
+              <Text className="text-4xl font-bold text-brand-dark">
                 {initial}
               </Text>
             ) : (
-              <Text className="text-4xl text-primary-300">?</Text>
+              <Text className="text-4xl text-brand/50">?</Text>
             )}
           </View>
 
@@ -104,10 +105,10 @@ export default function ProfileSetupScreen() {
           </Text>
           <TextInput
             className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              error ? "border-red-400" : "border-surface-200"
+              error ? "border-red-400" : "border-neutral-border"
             }`}
             placeholder="Your name"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={displayName}
             onChangeText={(text) => {
               setDisplayName(text);
@@ -125,8 +126,8 @@ export default function ProfileSetupScreen() {
         <Pressable
           className={`items-center rounded-2xl py-4 ${
             !trimmedName || loading
-              ? "bg-primary-300"
-              : "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand/50"
+              : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleContinue}
           disabled={!trimmedName || loading}

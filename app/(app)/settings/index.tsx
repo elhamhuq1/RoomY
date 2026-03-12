@@ -76,10 +76,10 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <View className="flex-1 bg-surface-50 px-6 pt-6">
+    <View className="flex-1 bg-neutral-bg px-6 pt-6">
       {/* User card */}
       <View className="mb-6 flex-row items-center rounded-2xl bg-white p-5 shadow-sm">
-        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full bg-primary-500">
+        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full bg-brand-light0">
           <Text className="text-lg font-bold text-white">{initials}</Text>
         </View>
         <View className="flex-1">
@@ -97,8 +97,8 @@ export default function SettingsScreen() {
         {rows.map((row, index) => (
           <Pressable
             key={row.key}
-            className={`flex-row items-center px-5 py-4 active:bg-surface-100 ${
-              index < rows.length - 1 ? "border-b border-surface-200" : ""
+            className={`flex-row items-center px-5 py-4 active:bg-neutral-surface ${
+              index < rows.length - 1 ? "border-b border-neutral-border" : ""
             }`}
             onPress={() => {
               if (row.action) {
@@ -110,7 +110,7 @@ export default function SettingsScreen() {
           >
             <View
               className={`mr-4 h-10 w-10 items-center justify-center rounded-xl ${
-                row.destructive ? "bg-red-50" : "bg-surface-100"
+                row.destructive ? "bg-red-50" : "bg-neutral-surface"
               }`}
             >
               <Ionicons

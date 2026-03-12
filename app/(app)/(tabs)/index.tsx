@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
@@ -25,16 +26,7 @@ import {
 import * as Clipboard from "expo-clipboard";
 
 // Colors for member initials avatars
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -153,7 +145,7 @@ export default function DashboardScreen() {
     marks[selectedDate] = {
       ...marks[selectedDate],
       selected: true,
-      selectedColor: "#f9a825",
+      selectedColor: colors.brand.DEFAULT,
     };
     return marks;
   }, [expenses, chores, currentMonth, selectedDate]);
@@ -190,8 +182,8 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
@@ -202,7 +194,7 @@ export default function DashboardScreen() {
   if (isSoloCreator) {
     return (
       <ScrollView
-        className="flex-1 bg-surface-50"
+        className="flex-1 bg-neutral-bg"
         contentContainerClassName="flex-grow justify-center px-8 py-12"
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -211,8 +203,8 @@ export default function DashboardScreen() {
       >
         {/* Friendly icon */}
         <View className="mb-6 items-center">
-          <View className="mb-6 h-28 w-28 items-center justify-center rounded-full bg-primary-100">
-            <Ionicons name="people" size={56} color="#f9a825" />
+          <View className="mb-6 h-28 w-28 items-center justify-center rounded-full bg-brand-light">
+            <Ionicons name="people" size={56} color={colors.brand.DEFAULT} />
           </View>
           <Text className="text-3xl font-bold text-gray-800">
             Your household is ready!
@@ -231,7 +223,7 @@ export default function DashboardScreen() {
             INVITE CODE
           </Text>
           <Text
-            className="text-4xl font-bold tracking-widest text-primary-600"
+            className="text-4xl font-bold tracking-widest text-brand-dark"
             style={{ fontVariant: ["tabular-nums"] }}
           >
             {formattedCode}
@@ -243,7 +235,7 @@ export default function DashboardScreen() {
 
         {/* Share button */}
         <Pressable
-          className="mb-3 flex-row items-center justify-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+          className="mb-3 flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
           onPress={handleShare}
         >
           <Ionicons
@@ -259,16 +251,16 @@ export default function DashboardScreen() {
 
         {/* Copy code button */}
         <Pressable
-          className="flex-row items-center justify-center rounded-2xl border-2 border-primary-500 py-4 active:bg-primary-50"
+          className="flex-row items-center justify-center rounded-2xl border-2 border-brand py-4 active:bg-brand-light"
           onPress={handleCopyCode}
         >
           <Ionicons
             name={copied ? "checkmark" : "copy-outline"}
             size={20}
-            color="#f59b20"
+            color={colors.brand.DEFAULT}
             style={{ marginRight: 8 }}
           />
-          <Text className="text-lg font-bold text-primary-600">
+          <Text className="text-lg font-bold text-brand-dark">
             {copied ? "Copied!" : "Copy Code"}
           </Text>
         </Pressable>
@@ -326,7 +318,7 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       contentContainerClassName="px-6 pt-6 pb-12"
       showsVerticalScrollIndicator={false}
       refreshControl={
@@ -384,10 +376,10 @@ export default function DashboardScreen() {
             enableSwipeMonths={true}
             theme={{
               calendarBackground: "#ffffff",
-              todayTextColor: "#f9a825",
-              selectedDayBackgroundColor: "#f9a825",
+              todayTextColor: colors.brand.DEFAULT,
+              selectedDayBackgroundColor: colors.brand.DEFAULT,
               selectedDayTextColor: "#ffffff",
-              arrowColor: "#f9a825",
+              arrowColor: colors.brand.DEFAULT,
               dotStyle: { marginTop: 2 },
               textDayFontSize: 14,
               textMonthFontSize: 16,
@@ -407,7 +399,7 @@ export default function DashboardScreen() {
               {selectedDateEvents.map((event) => (
                 <Pressable
                   key={`${event.type}-${event.id}`}
-                  className="flex-row items-center border-b border-surface-100 px-4 py-3 active:bg-surface-50"
+                  className="flex-row items-center border-b border-neutral-border px-4 py-3 active:bg-neutral-bg"
                   onPress={() => router.push(event.deepLink as never)}
                 >
                   <Ionicons
@@ -462,11 +454,11 @@ export default function DashboardScreen() {
         {moduleCards.map((card) => (
           <Pressable
             key={card.key}
-            className="flex-row items-center rounded-2xl bg-white p-4 shadow-sm active:bg-surface-100"
+            className="flex-row items-center rounded-2xl bg-white p-4 shadow-sm active:bg-neutral-surface"
             onPress={() => router.push(card.route as never)}
           >
-            <View className="mr-4 h-12 w-12 items-center justify-center rounded-xl bg-primary-100">
-              <Ionicons name={card.icon} size={24} color="#f9a825" />
+            <View className="mr-4 h-12 w-12 items-center justify-center rounded-xl bg-brand-light">
+              <Ionicons name={card.icon} size={24} color={colors.brand.DEFAULT} />
             </View>
             <View className="flex-1">
               <Text className="text-base font-semibold text-gray-800">

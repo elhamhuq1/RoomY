@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
@@ -39,21 +40,21 @@ function QuantityStepper({
   onChange: (v: number) => void;
 }) {
   return (
-    <View className="flex-row items-center rounded-lg bg-surface-100">
+    <View className="flex-row items-center rounded-lg bg-neutral-surface">
       <Pressable
-        className="px-3 py-2 active:bg-surface-200"
+        className="px-3 py-2 active:bg-neutral-surface"
         onPress={() => onChange(Math.max(1, value - 1))}
       >
-        <Ionicons name="remove" size={16} color="#9ca3af" />
+        <Ionicons name="remove" size={16} color={colors.neutral.tertiary} />
       </Pressable>
       <Text className="min-w-[20px] text-center text-sm font-semibold text-gray-800">
         {value}
       </Text>
       <Pressable
-        className="px-3 py-2 active:bg-surface-200"
+        className="px-3 py-2 active:bg-neutral-surface"
         onPress={() => onChange(value + 1)}
       >
-        <Ionicons name="add" size={16} color="#9ca3af" />
+        <Ionicons name="add" size={16} color={colors.neutral.tertiary} />
       </Pressable>
     </View>
   );
@@ -407,7 +408,7 @@ export default function GroceriesScreen() {
             <Ionicons
               name={isChecked ? "checkbox" : "square-outline"}
               size={24}
-              color={isChecked ? "#9ca3af" : "#f9a825"}
+              color={isChecked ? colors.neutral.tertiary : colors.brand.DEFAULT}
             />
           </Pressable>
 
@@ -454,8 +455,8 @@ export default function GroceriesScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
@@ -466,16 +467,16 @@ export default function GroceriesScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       {/* Add item input */}
       <View className="flex-row items-center border-b border-gray-100 bg-white px-4 py-3">
         <TextInput
           ref={inputRef}
-          className="flex-1 rounded-xl border border-gray-200 bg-surface-50 px-4 py-2.5 text-base text-gray-800"
+          className="flex-1 rounded-xl border border-gray-200 bg-neutral-bg px-4 py-2.5 text-base text-gray-800"
           placeholder="Add an item..."
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={colors.neutral.tertiary}
           value={newItemName}
           onChangeText={setNewItemName}
           onSubmitEditing={addItem}
@@ -489,7 +490,7 @@ export default function GroceriesScreen() {
           <Ionicons
             name="add-circle"
             size={36}
-            color={newItemName.trim() ? "#f9a825" : "#d1d5db"}
+            color={newItemName.trim() ? colors.brand.DEFAULT : "#d1d5db"}
           />
         </Pressable>
       </View>
@@ -497,8 +498,8 @@ export default function GroceriesScreen() {
       {/* Empty state */}
       {isEmpty && (
         <View className="flex-1 items-center justify-center px-8">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-primary-100">
-            <Ionicons name="cart" size={48} color="#f9a825" />
+          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
+            <Ionicons name="cart" size={48} color={colors.brand.DEFAULT} />
           </View>
           <Text className="text-2xl font-bold text-gray-800">
             Your grocery list is empty
@@ -570,7 +571,7 @@ export default function GroceriesScreen() {
       {hasCheckedItems && (
         <View className="border-t border-gray-100 bg-white px-4 pb-6 pt-3">
           <Pressable
-            className="flex-row items-center justify-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+            className="flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
             onPress={() => router.push("/(app)/groceries/complete-trip")}
           >
             <Ionicons
@@ -612,7 +613,7 @@ export default function GroceriesScreen() {
                 Name
               </Text>
               <TextInput
-                className="mb-4 rounded-xl border border-gray-200 bg-surface-50 px-4 py-2.5 text-base text-gray-800"
+                className="mb-4 rounded-xl border border-gray-200 bg-neutral-bg px-4 py-2.5 text-base text-gray-800"
                 value={editingItem?.name ?? ""}
                 onChangeText={(text) =>
                   setEditingItem((prev) =>
@@ -630,7 +631,7 @@ export default function GroceriesScreen() {
               </Text>
               <View className="mb-6 flex-row items-center">
                 <Pressable
-                  className="h-10 w-10 items-center justify-center rounded-l-xl border border-gray-200 bg-surface-50 active:bg-surface-200"
+                  className="h-10 w-10 items-center justify-center rounded-l-xl border border-gray-200 bg-neutral-bg active:bg-neutral-surface"
                   onPress={() =>
                     setEditingItem((prev) =>
                       prev
@@ -647,7 +648,7 @@ export default function GroceriesScreen() {
                   </Text>
                 </View>
                 <Pressable
-                  className="h-10 w-10 items-center justify-center rounded-r-xl border border-gray-200 bg-surface-50 active:bg-surface-200"
+                  className="h-10 w-10 items-center justify-center rounded-r-xl border border-gray-200 bg-neutral-bg active:bg-neutral-surface"
                   onPress={() =>
                     setEditingItem((prev) =>
                       prev ? { ...prev, quantity: prev.quantity + 1 } : prev
@@ -669,7 +670,7 @@ export default function GroceriesScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  className="flex-1 items-center rounded-xl bg-primary-500 py-3 active:bg-primary-600"
+                  className="flex-1 items-center rounded-xl bg-brand-light0 py-3 active:bg-brand-dark"
                   onPress={saveEdit}
                 >
                   <Text className="text-base font-bold text-white">Save</Text>

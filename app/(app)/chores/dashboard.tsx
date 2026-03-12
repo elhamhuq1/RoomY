@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useCallback } from "react";
 import {
   View,
@@ -16,16 +17,7 @@ import type { ChoreCompletion, Profile } from "@/lib/types/database";
 // Constants
 // ---------------------------------------------------------------------------
 
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -275,8 +267,8 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
@@ -286,7 +278,7 @@ export default function DashboardScreen() {
   // -------------------------------------------------------------------------
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -348,11 +340,11 @@ export default function DashboardScreen() {
 
         {/* Household totals row */}
         <View className="mt-4 flex-row gap-3 px-4">
-          <View className="flex-1 items-center rounded-xl bg-primary-100 py-3">
-            <Text className="text-xl font-bold text-primary-700">
+          <View className="flex-1 items-center rounded-xl bg-brand-light py-3">
+            <Text className="text-xl font-bold text-brand-dark">
               {totalCompletions}
             </Text>
-            <Text className="text-xs text-primary-600">Completed</Text>
+            <Text className="text-xs text-brand-dark">Completed</Text>
           </View>
           <View className="flex-1 items-center rounded-xl bg-blue-100 py-3">
             <Text className="text-xl font-bold text-blue-700">
@@ -372,7 +364,7 @@ export default function DashboardScreen() {
         {totalCompletions === 0 && (
           <View className="mx-4 mt-8 items-center rounded-xl bg-white px-6 py-8">
             <View className="mb-3 h-14 w-14 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons name="bar-chart-outline" size={28} color="#9ca3af" />
+              <Ionicons name="bar-chart-outline" size={28} color={colors.neutral.tertiary} />
             </View>
             <Text className="text-base font-semibold text-gray-700">
               No chores completed this {periodLabel}
@@ -445,7 +437,7 @@ export default function DashboardScreen() {
                     </View>
 
                     {/* Completion count */}
-                    <Text className="text-2xl font-bold text-primary-700">
+                    <Text className="text-2xl font-bold text-brand-dark">
                       {member.completionCount}
                     </Text>
                   </View>
@@ -453,7 +445,7 @@ export default function DashboardScreen() {
                   {/* Progress bar */}
                   <View className="mt-3 h-2.5 overflow-hidden rounded-full bg-gray-200">
                     <View
-                      className="h-full rounded-full bg-primary-400"
+                      className="h-full rounded-full bg-brand"
                       style={{ width: `${barWidth}%` }}
                     />
                   </View>

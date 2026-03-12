@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -27,16 +28,7 @@ const FREQUENCIES = [
   { value: "custom", label: "Custom" },
 ] as const;
 
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -205,7 +197,7 @@ export default function AddChoreScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -222,7 +214,7 @@ export default function AddChoreScreen() {
           <TextInput
             className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
             placeholder="Chore name"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={name}
             onChangeText={setName}
             autoFocus={!params.suggestedName}
@@ -241,7 +233,7 @@ export default function AddChoreScreen() {
                 key={f.value}
                 className={`flex-1 items-center rounded-xl py-2.5 ${
                   frequency === f.value
-                    ? "bg-primary-500"
+                    ? "bg-brand-light0"
                     : "bg-white border border-gray-200"
                 }`}
                 onPress={() => setFrequency(f.value)}
@@ -282,7 +274,7 @@ export default function AddChoreScreen() {
           {loadingMembers ? (
             <ActivityIndicator
               size="small"
-              color="#f9a825"
+              color={colors.brand.DEFAULT}
               style={{ marginTop: 12 }}
             />
           ) : (
@@ -320,7 +312,7 @@ export default function AddChoreScreen() {
                   <Ionicons
                     name={member.selected ? "checkbox" : "square-outline"}
                     size={24}
-                    color={member.selected ? "#f9a825" : "#d1d5db"}
+                    color={member.selected ? colors.brand.DEFAULT : "#d1d5db"}
                   />
                 </Pressable>
               ))}
@@ -334,7 +326,7 @@ export default function AddChoreScreen() {
         <Pressable
           className={`flex-row items-center justify-center rounded-2xl py-4 ${
             canSubmit
-              ? "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand-light0 active:bg-brand-dark"
               : "bg-gray-200"
           }`}
           onPress={handleSubmit}
@@ -347,7 +339,7 @@ export default function AddChoreScreen() {
               <Ionicons
                 name="add-circle"
                 size={22}
-                color={canSubmit ? "#fff" : "#9ca3af"}
+                color={canSubmit ? "#fff" : colors.neutral.tertiary}
                 style={{ marginRight: 8 }}
               />
               <Text

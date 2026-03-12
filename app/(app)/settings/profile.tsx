@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -81,7 +82,7 @@ export default function ProfileSettingsScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -90,7 +91,7 @@ export default function ProfileSettingsScreen() {
       >
         {/* Avatar preview */}
         <View className="mb-8 items-center">
-          <View className="h-24 w-24 items-center justify-center rounded-full bg-primary-500">
+          <View className="h-24 w-24 items-center justify-center rounded-full bg-brand-light0">
             <Text className="text-3xl font-bold text-white">{initials}</Text>
           </View>
           <Text className="mt-2 text-sm text-gray-400">
@@ -123,10 +124,10 @@ export default function ProfileSettingsScreen() {
             className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
               error && !displayName.trim()
                 ? "border-red-400"
-                : "border-surface-200"
+                : "border-neutral-border"
             }`}
             placeholder="Your name"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={displayName}
             onChangeText={(text) => {
               setDisplayName(text);
@@ -144,9 +145,9 @@ export default function ProfileSettingsScreen() {
             Venmo Username
           </Text>
           <TextInput
-            className="rounded-xl border border-surface-200 bg-white px-4 py-3.5 text-base text-gray-800"
+            className="rounded-xl border border-neutral-border bg-white px-4 py-3.5 text-base text-gray-800"
             placeholder="@your-venmo (optional)"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={venmoUsername}
             onChangeText={(text) => {
               setVenmoUsername(text);
@@ -165,8 +166,8 @@ export default function ProfileSettingsScreen() {
         <Pressable
           className={`items-center rounded-2xl py-4 ${
             !hasChanges || loading
-              ? "bg-primary-300"
-              : "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand/50"
+              : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleSave}
           disabled={!hasChanges || loading}

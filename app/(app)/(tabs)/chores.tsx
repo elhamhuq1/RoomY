@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useCallback } from "react";
 import {
   View,
@@ -33,16 +34,7 @@ const SUGGESTED_CHORES = [
   { name: "Wipe counters", icon: "hand-left-outline" as const, frequency: "daily" as const },
 ];
 
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -454,8 +446,8 @@ export default function ChoresScreen() {
             )}
           </View>
           <View className="mt-0.5 flex-row items-center gap-2">
-            <View className="rounded-full bg-primary-100 px-2 py-0.5">
-              <Text className="text-xs font-medium text-primary-700">
+            <View className="rounded-full bg-brand-light px-2 py-0.5">
+              <Text className="text-xs font-medium text-brand-dark">
                 {getFrequencyLabel(chore.frequency)}
               </Text>
             </View>
@@ -549,8 +541,8 @@ export default function ChoresScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
@@ -561,15 +553,15 @@ export default function ChoresScreen() {
 
   if (isEmpty) {
     return (
-      <View className="flex-1 bg-surface-50">
+      <View className="flex-1 bg-neutral-bg">
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         >
           <View className="items-center px-8 pt-12">
-            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-primary-100">
-              <Ionicons name="checkbox" size={40} color="#f9a825" />
+            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-light">
+              <Ionicons name="checkbox" size={40} color={colors.brand.DEFAULT} />
             </View>
             <Text className="text-2xl font-bold text-gray-800">
               No chores yet!
@@ -597,8 +589,8 @@ export default function ChoresScreen() {
                     } as never)
                   }
                 >
-                  <View className="mr-2.5 h-8 w-8 items-center justify-center rounded-full bg-primary-100">
-                    <Ionicons name={suggestion.icon} size={16} color="#f9a825" />
+                  <View className="mr-2.5 h-8 w-8 items-center justify-center rounded-full bg-brand-light">
+                    <Ionicons name={suggestion.icon} size={16} color={colors.brand.DEFAULT} />
                   </View>
                   <Text className="flex-1 text-sm font-medium text-gray-700" numberOfLines={1}>
                     {suggestion.name}
@@ -612,7 +604,7 @@ export default function ChoresScreen() {
               className="mt-4 flex-row items-center justify-center rounded-xl border border-dashed border-gray-300 py-3.5 active:bg-gray-50"
               onPress={() => router.push("/(app)/chores/add" as never)}
             >
-              <Ionicons name="add" size={20} color="#9ca3af" />
+              <Ionicons name="add" size={20} color={colors.neutral.tertiary} />
               <Text className="ml-2 text-sm font-medium text-gray-500">
                 Create custom chore
               </Text>
@@ -622,7 +614,7 @@ export default function ChoresScreen() {
 
         {/* FAB */}
         <Pressable
-          className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-primary-500 active:bg-primary-600"
+          className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand-light0 active:bg-brand-dark"
           style={{ elevation: 4, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 }}
           onPress={() => router.push("/(app)/chores/add" as never)}
         >
@@ -637,7 +629,7 @@ export default function ChoresScreen() {
   // -------------------------------------------------------------------------
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -645,11 +637,11 @@ export default function ChoresScreen() {
       >
         {/* Summary header */}
         <View className="flex-row gap-3 px-4 pt-4 pb-2">
-          <View className="flex-1 items-center rounded-xl bg-primary-100 py-3">
-            <Text className="text-xl font-bold text-primary-700">
+          <View className="flex-1 items-center rounded-xl bg-brand-light py-3">
+            <Text className="text-xl font-bold text-brand-dark">
               {pendingCount}
             </Text>
-            <Text className="text-xs text-primary-600">Pending</Text>
+            <Text className="text-xs text-brand-dark">Pending</Text>
           </View>
           <View className="flex-1 items-center rounded-xl bg-red-100 py-3">
             <Text className="text-xl font-bold text-red-600">
@@ -726,7 +718,7 @@ export default function ChoresScreen() {
 
       {/* FAB */}
       <Pressable
-        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-primary-500 active:bg-primary-600"
+        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand-light0 active:bg-brand-dark"
         style={{ elevation: 4, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 }}
         onPress={() => router.push("/(app)/chores/add" as never)}
       >

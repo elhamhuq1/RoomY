@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -84,7 +85,7 @@ export default function JoinHouseholdScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -96,13 +97,13 @@ export default function JoinHouseholdScreen() {
           className="absolute left-8 top-16 z-10 h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm"
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={22} color="#374151" />
+          <Ionicons name="arrow-back" size={22} color={colors.neutral.text} />
         </Pressable>
 
         {/* Header */}
         <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-primary-100">
-            <Ionicons name="key" size={44} color="#f9a825" />
+          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
+            <Ionicons name="key" size={44} color={colors.brand.DEFAULT} />
           </View>
           <Text className="text-3xl font-bold text-gray-800">
             Enter Invite Code
@@ -123,7 +124,7 @@ export default function JoinHouseholdScreen() {
         <View className="mb-8">
           <TextInput
             className={`rounded-xl border bg-white px-4 py-4 text-center text-2xl font-bold tracking-widest text-gray-800 ${
-              error ? "border-red-400" : "border-surface-200"
+              error ? "border-red-400" : "border-neutral-border"
             }`}
             placeholder="ABCD EFGH"
             placeholderTextColor="#d1d5db"
@@ -144,8 +145,8 @@ export default function JoinHouseholdScreen() {
         <Pressable
           className={`items-center rounded-2xl py-4 ${
             trimmedCode.length < 8 || loading
-              ? "bg-primary-300"
-              : "bg-primary-500 active:bg-primary-600"
+              ? "bg-brand/50"
+              : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleJoin}
           disabled={trimmedCode.length < 8 || loading}

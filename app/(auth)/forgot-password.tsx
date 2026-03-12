@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -56,9 +57,9 @@ export default function ForgotPasswordScreen() {
   // Success state: confirmation message
   if (sent) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50 px-8">
-        <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-accent-500/20">
-          <Ionicons name="mail-outline" size={40} color="#66bb6a" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
+        <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-semantic-success/20">
+          <Ionicons name="mail-outline" size={40} color={colors.semantic.success} />
         </View>
         <Text className="mb-3 text-center text-2xl font-bold text-gray-800">
           Check Your Email
@@ -68,7 +69,7 @@ export default function ForgotPasswordScreen() {
           <Text className="font-semibold text-gray-700">{email}</Text>
         </Text>
         <Pressable
-          className="w-full items-center rounded-2xl bg-primary-500 py-4 active:bg-primary-600"
+          className="w-full items-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
           onPress={() => router.replace("/(auth)/sign-in")}
         >
           <Text className="text-lg font-bold text-white">Back to Sign In</Text>
@@ -79,7 +80,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View className="flex-grow justify-center px-8">
@@ -88,13 +89,13 @@ export default function ForgotPasswordScreen() {
           className="absolute left-8 top-16 z-10 h-10 w-10 items-center justify-center rounded-full bg-white"
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={22} color="#374151" />
+          <Ionicons name="arrow-back" size={22} color={colors.neutral.text} />
         </Pressable>
 
         {/* Header */}
         <View className="mb-8 items-center">
-          <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-            <Ionicons name="lock-closed-outline" size={32} color="#f9a825" />
+          <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-brand-light">
+            <Ionicons name="lock-closed-outline" size={32} color={colors.brand.DEFAULT} />
           </View>
           <Text className="text-2xl font-bold text-gray-800">
             Reset Password
@@ -118,10 +119,10 @@ export default function ForgotPasswordScreen() {
           </Text>
           <TextInput
             className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              emailError ? "border-red-400" : "border-surface-200"
+              emailError ? "border-red-400" : "border-neutral-border"
             }`}
             placeholder="you@example.com"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={email}
             onChangeText={(text) => {
               setEmail(text);
@@ -142,7 +143,7 @@ export default function ForgotPasswordScreen() {
         {/* Send reset link button */}
         <Pressable
           className={`items-center rounded-2xl py-4 ${
-            loading ? "bg-primary-300" : "bg-primary-500 active:bg-primary-600"
+            loading ? "bg-brand/50" : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleReset}
           disabled={loading}

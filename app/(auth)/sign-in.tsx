@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState } from "react";
 import {
   View,
@@ -107,7 +108,7 @@ export default function SignInScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -136,10 +137,10 @@ export default function SignInScreen() {
           </Text>
           <TextInput
             className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              emailError ? "border-red-400" : "border-surface-200"
+              emailError ? "border-red-400" : "border-neutral-border"
             }`}
             placeholder="you@example.com"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={email}
             onChangeText={(text) => {
               setEmail(text);
@@ -164,10 +165,10 @@ export default function SignInScreen() {
           </Text>
           <TextInput
             className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              passwordError ? "border-red-400" : "border-surface-200"
+              passwordError ? "border-red-400" : "border-neutral-border"
             }`}
             placeholder="Enter your password"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={colors.neutral.tertiary}
             value={password}
             onChangeText={(text) => {
               setPassword(text);
@@ -188,7 +189,7 @@ export default function SignInScreen() {
           className="mb-6 self-end py-2"
           onPress={() => router.push("/(auth)/forgot-password")}
         >
-          <Text className="text-sm font-medium text-primary-600">
+          <Text className="text-sm font-medium text-brand-dark">
             Forgot password?
           </Text>
         </Pressable>
@@ -196,7 +197,7 @@ export default function SignInScreen() {
         {/* Sign in button */}
         <Pressable
           className={`mb-6 items-center rounded-2xl py-4 ${
-            isDisabled ? "bg-primary-300" : "bg-primary-500 active:bg-primary-600"
+            isDisabled ? "bg-brand/50" : "bg-brand-light0 active:bg-brand-dark"
           }`}
           onPress={handleSignIn}
           disabled={isDisabled}
@@ -275,7 +276,7 @@ export default function SignInScreen() {
         >
           <Text className="text-base text-gray-500">
             Don't have an account?{" "}
-            <Text className="font-semibold text-primary-600">Sign up</Text>
+            <Text className="font-semibold text-brand-dark">Sign up</Text>
           </Text>
         </Pressable>
       </ScrollView>

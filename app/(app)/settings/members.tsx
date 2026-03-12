@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -16,16 +17,7 @@ import type { Profile } from "@/lib/types/database";
 import * as Clipboard from "expo-clipboard";
 
 // Colors for member initials avatars (same as dashboard)
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -174,8 +166,8 @@ export default function MembersSettingsScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
@@ -184,7 +176,7 @@ export default function MembersSettingsScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-surface-50"
+      className="flex-1 bg-neutral-bg"
       contentContainerClassName="px-6 pt-6 pb-12"
       showsVerticalScrollIndicator={false}
       refreshControl={
@@ -215,7 +207,7 @@ export default function MembersSettingsScreen() {
               key={member.user_id}
               className={`flex-row items-center px-5 py-4 ${
                 index < members.length - 1
-                  ? "border-b border-surface-200"
+                  ? "border-b border-neutral-border"
                   : ""
               }`}
             >
@@ -244,14 +236,14 @@ export default function MembersSettingsScreen() {
                   <View
                     className={`ml-2 rounded-full px-2 py-0.5 ${
                       member.role === "creator"
-                        ? "bg-primary-100"
+                        ? "bg-brand-light"
                         : "bg-gray-100"
                     }`}
                   >
                     <Text
                       className={`text-xs font-medium ${
                         member.role === "creator"
-                          ? "text-primary-600"
+                          ? "text-brand-dark"
                           : "text-gray-500"
                       }`}
                     >
@@ -277,7 +269,7 @@ export default function MembersSettingsScreen() {
         <View className="items-center rounded-2xl bg-white p-6 shadow-sm">
           {/* Code display */}
           <Text
-            className="text-3xl font-bold tracking-widest text-primary-600"
+            className="text-3xl font-bold tracking-widest text-brand-dark"
             style={{ fontVariant: ["tabular-nums"] }}
           >
             {formattedCode}
@@ -288,7 +280,7 @@ export default function MembersSettingsScreen() {
             <Ionicons
               name={isExpired ? "alert-circle" : "time-outline"}
               size={14}
-              color={isExpired ? "#ef4444" : "#9ca3af"}
+              color={isExpired ? "#ef4444" : colors.neutral.tertiary}
             />
             <Text
               className={`ml-1 text-xs ${
@@ -307,7 +299,7 @@ export default function MembersSettingsScreen() {
           <View className="mt-5 w-full gap-3">
             {/* Share button */}
             <Pressable
-              className="flex-row items-center justify-center rounded-2xl bg-primary-500 py-3.5 active:bg-primary-600"
+              className="flex-row items-center justify-center rounded-2xl bg-brand-light0 py-3.5 active:bg-brand-dark"
               onPress={handleShare}
             >
               <Ionicons
@@ -325,16 +317,16 @@ export default function MembersSettingsScreen() {
             <View className="flex-row gap-3">
               {/* Copy button */}
               <Pressable
-                className="flex-1 flex-row items-center justify-center rounded-2xl border-2 border-primary-500 py-3 active:bg-primary-50"
+                className="flex-1 flex-row items-center justify-center rounded-2xl border-2 border-brand py-3 active:bg-brand-light"
                 onPress={handleCopyCode}
               >
                 <Ionicons
                   name={copied ? "checkmark" : "copy-outline"}
                   size={18}
-                  color="#f59b20"
+                  color={colors.brand.DEFAULT}
                   style={{ marginRight: 6 }}
                 />
-                <Text className="text-sm font-bold text-primary-600">
+                <Text className="text-sm font-bold text-brand-dark">
                   {copied ? "Copied!" : "Copy"}
                 </Text>
               </Pressable>

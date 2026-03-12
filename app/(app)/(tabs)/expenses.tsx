@@ -1,3 +1,4 @@
+import { colors } from "@/lib/theme/colors";
 import { useState, useCallback } from "react";
 import {
   View,
@@ -16,16 +17,7 @@ import type { Profile, Expense, Settlement } from "@/lib/types/database";
 import * as Linking from "expo-linking";
 
 // Colors for member initials avatars
-const AVATAR_COLORS = [
-  "#f9a825",
-  "#66bb6a",
-  "#42a5f5",
-  "#ab47bc",
-  "#ef5350",
-  "#26a69a",
-  "#ff7043",
-  "#5c6bc0",
-];
+const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name
@@ -265,14 +257,14 @@ export default function ExpensesScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-50">
-        <ActivityIndicator size="large" color="#f9a825" />
+      <View className="flex-1 items-center justify-center bg-neutral-bg">
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-surface-50">
+    <View className="flex-1 bg-neutral-bg">
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 96 }}
@@ -289,7 +281,7 @@ export default function ExpensesScreen() {
 
           {allSettled ? (
             <View className="items-center py-6">
-              <Ionicons name="checkmark-circle" size={56} color="#66bb6a" />
+              <Ionicons name="checkmark-circle" size={56} color={colors.semantic.success} />
               <Text className="mt-3 text-lg font-semibold text-gray-700">
                 All settled up!
               </Text>
@@ -310,7 +302,7 @@ export default function ExpensesScreen() {
                     return (
                     <View
                       key={entry.user_id}
-                      className="mb-2 flex-row items-center rounded-xl bg-surface-50 p-3"
+                      className="mb-2 flex-row items-center rounded-xl bg-neutral-bg p-3"
                     >
                       <View
                         className="mr-3 h-10 w-10 items-center justify-center rounded-full"
@@ -353,7 +345,7 @@ export default function ExpensesScreen() {
                           </Pressable>
                         )}
                         <Pressable
-                          className="rounded-lg bg-primary-500 px-3 py-2 active:bg-primary-600"
+                          className="rounded-lg bg-brand-light0 px-3 py-2 active:bg-brand-dark"
                           onPress={() =>
                             router.push(
                               `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=owed_to_you${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
@@ -382,7 +374,7 @@ export default function ExpensesScreen() {
                     return (
                     <View
                       key={entry.user_id}
-                      className="mb-2 flex-row items-center rounded-xl bg-surface-50 p-3"
+                      className="mb-2 flex-row items-center rounded-xl bg-neutral-bg p-3"
                     >
                       <View
                         className="mr-3 h-10 w-10 items-center justify-center rounded-full"
@@ -408,7 +400,7 @@ export default function ExpensesScreen() {
                         </Text>
                       </View>
                       <Pressable
-                        className="rounded-lg bg-primary-500 px-3 py-2 active:bg-primary-600"
+                        className="rounded-lg bg-brand-light0 px-3 py-2 active:bg-brand-dark"
                         onPress={() =>
                           router.push(
                             `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=you_owe${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
@@ -434,8 +426,8 @@ export default function ExpensesScreen() {
         {groupedHistory.length === 0 ? (
           /* Empty state */
           <View className="items-center rounded-2xl bg-white p-8 shadow-sm">
-            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-primary-100">
-              <Ionicons name="wallet-outline" size={40} color="#f9a825" />
+            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-light">
+              <Ionicons name="wallet-outline" size={40} color={colors.brand.DEFAULT} />
             </View>
             <Text className="text-lg font-semibold text-gray-700">
               No expenses yet
@@ -458,7 +450,7 @@ export default function ExpensesScreen() {
                     return (
                       <Pressable
                         key={item.data.id}
-                        className={`flex-row items-center px-4 py-3 active:bg-surface-50 ${
+                        className={`flex-row items-center px-4 py-3 active:bg-neutral-bg ${
                           !isLast ? "border-b border-gray-100" : ""
                         }`}
                         onPress={() =>
@@ -471,7 +463,7 @@ export default function ExpensesScreen() {
                           <Ionicons
                             name="checkmark-circle"
                             size={22}
-                            color="#66bb6a"
+                            color={colors.semantic.success}
                           />
                         </View>
                         <View className="flex-1">
@@ -492,7 +484,7 @@ export default function ExpensesScreen() {
                   return (
                     <Pressable
                       key={item.data.id}
-                      className={`flex-row items-center px-4 py-3 active:bg-surface-50 ${
+                      className={`flex-row items-center px-4 py-3 active:bg-neutral-bg ${
                         !isLast ? "border-b border-gray-100" : ""
                       }`}
                       onPress={() =>
@@ -501,11 +493,11 @@ export default function ExpensesScreen() {
                         )
                       }
                     >
-                      <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-primary-100">
+                      <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-brand-light">
                         <Ionicons
                           name="receipt-outline"
                           size={20}
-                          color="#f9a825"
+                          color={colors.brand.DEFAULT}
                         />
                       </View>
                       <View className="flex-1">
@@ -530,9 +522,9 @@ export default function ExpensesScreen() {
 
       {/* FAB - Add Expense */}
       <Pressable
-        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-primary-500 shadow-lg active:bg-primary-600"
+        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand-light0 shadow-lg active:bg-brand-dark"
         style={{
-          shadowColor: "#f9a825",
+          shadowColor: colors.brand.DEFAULT,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
