@@ -46,7 +46,7 @@ Plans:
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 6: Design System + Components** - Design tokens, shared component library, and navigation chrome
-- [x] **Phase 7: Home Screen** - Calendar, balance summary, attention feed, weekly timeline (completed 2026-03-12)
+- [ ] **Phase 7: Home Screen** - Calendar, balance summary, attention feed, weekly timeline (UAT gap closure in progress)
 - [ ] **Phase 8: Expenses Screen** - Balance cards, differentiated history rows, date group headers
 - [ ] **Phase 9: Groceries + Chores** - Section headers, checkboxes, avatars, emoji icons, stats, dispute styling
 - [ ] **Phase 10: Onboarding Flow** - Welcome carousel, styled auth, avatar preview, setup cards, progress bar
@@ -81,12 +81,13 @@ Plans:
   3. Week-strip calendar shows 7 days with today highlighted and event dots, and expands to a full month view on tap
   4. Balance summary card renders with dark gradient background showing the net dollar amount and action buttons
   5. "Needs your attention" feed shows actionable cards for pending chores and disputes that the user can act on
-**Plans:** 3/3 plans complete
+**Plans:** 4 plans (3 complete + 1 gap closure)
 
 Plans:
-- [ ] 07-01-PLAN.md — Greeting header, members card, and balance summary card components
-- [ ] 07-02-PLAN.md — Collapsible week-strip calendar with updated dot colors
-- [ ] 07-03-PLAN.md — Attention feed, weekly timeline, and full home screen assembly
+- [x] 07-01-PLAN.md — Greeting header, members card, and balance summary card components
+- [x] 07-02-PLAN.md — Collapsible week-strip calendar with updated dot colors
+- [x] 07-03-PLAN.md — Attention feed, weekly timeline, and full home screen assembly
+- [ ] 07-04-PLAN.md — Gap closure: fix empty timeline, hide settled balance buttons, preserve refresh date
 
 ### Phase 8: Expenses Screen
 **Goal**: Users can visually distinguish between expenses and settlements at a glance, with clear balance information per member
@@ -137,7 +138,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 4. Engagement | v1.0 | 4/4 | Complete | - |
 | 5. (Reserved) | v1.0 | - | Skipped | - |
 | 6. Design System + Components | v1.1 | Complete    | 2026-03-12 | 2026-03-12 |
-| 7. Home Screen | v1.1 | Complete    | 2026-03-12 | - |
+| 7. Home Screen | v1.1 | 3/4 (gap closure) | In progress | - |
 | 8. Expenses Screen | v1.1 | 0/TBD | Not started | - |
 | 9. Groceries + Chores | v1.1 | 0/TBD | Not started | - |
 | 10. Onboarding Flow | v1.1 | 0/TBD | Not started | - |
