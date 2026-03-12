@@ -1,101 +1,121 @@
-import { colors } from "@/lib/theme/colors";
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 import {
   View,
-  Text,
-  Pressable,
   ScrollView,
   ActivityIndicator,
   RefreshControl,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
-import { useSession } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
-import type { Profile, Expense, Settlement } from "@/lib/types/database";
-import * as Linking from "expo-linking";
+  Share,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { useSession } from '@/lib/auth-context';
+import { supabase } from '@/lib/supabase';
+import { colors } from '@/lib/theme/colors';
+import type { Profile, Expense, Settlement } from '@/lib/types/database';
+import {
+  BalanceSection,
+  HistorySection,
+  EmptyState,
+} from '@/components/expenses';
+import type {
+  BalanceEntry,
+  HistoryItem,
+  GroupedHistory,
+  SplitWithProfile,
+} from '@/components/expenses';
 
-// Colors for member initials avatars
-const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+const BATCH_SIZE = 20;
 
 const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
   }).format(amount);
 
-function getDateLabel(dateStr: string): string {
+function getDateGroup(dateStr: string): 'TODAY' | 'YESTERDAY' | 'EARLIER' {
   const date = new Date(dateStr);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  if (date >= today) return "Today";
-  if (date >= yesterday) return "Yesterday";
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  if (date >= today) return 'TODAY';
+  if (date >= yesterday) return 'YESTERDAY';
+  return 'EARLIER';
 }
 
-type BalanceEntry = {
-  user_id: string;
-  net_amount: number;
-  profile: Profile | null;
-};
+function buildGroups(items: HistoryItem[]): GroupedHistory[] {
+  const groups: GroupedHistory[] = [];
+  let currentLabel = '';
+  let currentItems: HistoryItem[] = [];
 
-type HistoryItem =
-  | { type: "expense"; data: Expense; payerName: string }
-  | {
-      type: "settlement";
-      data: Settlement;
-      paidByName: string;
-      paidToName: string;
-    };
+  for (const item of items) {
+    const createdAt = item.data.created_at;
+    const label = getDateGroup(createdAt);
+    if (label !== currentLabel) {
+      if (currentItems.length > 0) {
+        groups.push({ label: currentLabel, items: currentItems });
+      }
+      currentLabel = label;
+      currentItems = [item];
+    } else {
+      currentItems.push(item);
+    }
+  }
+  if (currentItems.length > 0) {
+    groups.push({ label: currentLabel, items: currentItems });
+  }
 
-type GroupedHistory = {
-  label: string;
-  items: HistoryItem[];
-};
+  return groups;
+}
 
 export default function ExpensesScreen() {
   const router = useRouter();
   const { household, user } = useSession();
   const [balances, setBalances] = useState<BalanceEntry[]>([]);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [groupedHistory, setGroupedHistory] = useState<GroupedHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Inline expand state
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [splitsCache, setSplitsCache] = useState<
+    Record<string, SplitWithProfile[]>
+  >({});
+
+  // Pagination state
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // ---------- Data fetching ----------
 
   const fetchData = useCallback(async () => {
     if (!household?.id) return;
 
     try {
       // Fetch balances, expenses, and settlements in parallel
-      const [balanceResult, expenseResult, settlementResult] = await Promise.all(
-        [
-          supabase.rpc("get_household_balances", {
+      const [balanceResult, expenseResult, settlementResult] =
+        await Promise.all([
+          supabase.rpc('get_household_balances', {
             p_household_id: household.id,
           }),
           supabase
-            .from("expenses")
-            .select("*")
-            .eq("household_id", household.id)
-            .order("created_at", { ascending: false }),
+            .from('expenses')
+            .select('*')
+            .eq('household_id', household.id)
+            .order('created_at', { ascending: false })
+            .range(0, BATCH_SIZE - 1),
           supabase
-            .from("settlements")
-            .select("*")
-            .eq("household_id", household.id)
-            .order("created_at", { ascending: false }),
-        ]
-      );
+            .from('settlements')
+            .select('*')
+            .eq('household_id', household.id)
+            .order('created_at', { ascending: false })
+            .range(0, BATCH_SIZE - 1),
+        ]);
 
       // Process balances
       const balanceData = balanceResult.data;
@@ -104,9 +124,9 @@ export default function ExpensesScreen() {
           (b: { user_id: string }) => b.user_id
         );
         const { data: balProfiles } = await supabase
-          .from("profiles")
-          .select("*")
-          .in("id", balUserIds);
+          .from('profiles')
+          .select('*')
+          .in('id', balUserIds);
 
         setBalances(
           balanceData.map((b: { user_id: string; net_amount: number }) => ({
@@ -137,9 +157,9 @@ export default function ExpensesScreen() {
       let profileMap: Record<string, Profile> = {};
       if (profileIds.length > 0) {
         const { data: profiles } = await supabase
-          .from("profiles")
-          .select("*")
-          .in("id", profileIds);
+          .from('profiles')
+          .select('*')
+          .in('id', profileIds);
         if (profiles) {
           for (const p of profiles) {
             profileMap[p.id] = p as Profile;
@@ -148,71 +168,142 @@ export default function ExpensesScreen() {
       }
 
       // Build combined history items
-      const historyItems: HistoryItem[] = [];
+      const items: HistoryItem[] = [];
 
       for (const e of expenses) {
-        historyItems.push({
-          type: "expense",
+        items.push({
+          type: 'expense',
           data: e,
-          payerName:
-            profileMap[e.paid_by]?.display_name ?? "Unknown",
+          payerName: profileMap[e.paid_by]?.display_name ?? 'Unknown',
         });
       }
 
       for (const s of settlements) {
-        historyItems.push({
-          type: "settlement",
+        items.push({
+          type: 'settlement',
           data: s,
-          paidByName:
-            profileMap[s.paid_by]?.display_name ?? "Unknown",
-          paidToName:
-            profileMap[s.paid_to]?.display_name ?? "Unknown",
+          paidByName: profileMap[s.paid_by]?.display_name ?? 'Unknown',
+          paidToName: profileMap[s.paid_to]?.display_name ?? 'Unknown',
         });
       }
 
       // Sort by created_at descending
-      historyItems.sort((a, b) => {
-        const dateA =
-          a.type === "expense" ? a.data.created_at : a.data.created_at;
-        const dateB =
-          b.type === "expense" ? b.data.created_at : b.data.created_at;
-        return new Date(dateB).getTime() - new Date(dateA).getTime();
-      });
+      items.sort(
+        (a, b) =>
+          new Date(b.data.created_at).getTime() -
+          new Date(a.data.created_at).getTime()
+      );
 
-      // Group by date
-      const groups: GroupedHistory[] = [];
-      let currentLabel = "";
-      let currentItems: HistoryItem[] = [];
+      setHistoryItems(items);
+      setGroupedHistory(buildGroups(items));
 
-      for (const item of historyItems) {
-        const createdAt =
-          item.type === "expense"
-            ? item.data.created_at
-            : item.data.created_at;
-        const label = getDateLabel(createdAt);
-        if (label !== currentLabel) {
-          if (currentItems.length > 0) {
-            groups.push({ label: currentLabel, items: currentItems });
-          }
-          currentLabel = label;
-          currentItems = [item];
-        } else {
-          currentItems.push(item);
-        }
-      }
-      if (currentItems.length > 0) {
-        groups.push({ label: currentLabel, items: currentItems });
-      }
+      // Reset pagination
+      setOffset(BATCH_SIZE);
+      setHasMore(
+        expenses.length === BATCH_SIZE || settlements.length === BATCH_SIZE
+      );
 
-      setGroupedHistory(groups);
+      // Clear expanded state and splits cache on refresh
+      setExpandedId(null);
+      setSplitsCache({});
     } catch (err) {
-      console.error("Error fetching expense data:", err);
+      console.error('Error fetching expense data:', err);
       setBalances([]);
+      setHistoryItems([]);
       setGroupedHistory([]);
     }
   }, [household?.id]);
 
-  // Refetch on screen focus (returning from add/edit/settle screens)
+  // Load more items for pagination
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore || !household?.id) return;
+
+    setLoadingMore(true);
+    try {
+      const [expenseResult, settlementResult] = await Promise.all([
+        supabase
+          .from('expenses')
+          .select('*')
+          .eq('household_id', household.id)
+          .order('created_at', { ascending: false })
+          .range(offset, offset + BATCH_SIZE - 1),
+        supabase
+          .from('settlements')
+          .select('*')
+          .eq('household_id', household.id)
+          .order('created_at', { ascending: false })
+          .range(offset, offset + BATCH_SIZE - 1),
+      ]);
+
+      const expenses = (expenseResult.data as Expense[]) ?? [];
+      const settlements = (settlementResult.data as Settlement[]) ?? [];
+
+      if (expenses.length === 0 && settlements.length === 0) {
+        setHasMore(false);
+        setLoadingMore(false);
+        return;
+      }
+
+      // Fetch profiles for new items
+      const profileIdSet = new Set<string>();
+      for (const e of expenses) profileIdSet.add(e.paid_by);
+      for (const s of settlements) {
+        profileIdSet.add(s.paid_by);
+        profileIdSet.add(s.paid_to);
+      }
+      const profileIds = Array.from(profileIdSet);
+
+      let profileMap: Record<string, Profile> = {};
+      if (profileIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('id', profileIds);
+        if (profiles) {
+          for (const p of profiles) {
+            profileMap[p.id] = p as Profile;
+          }
+        }
+      }
+
+      const newItems: HistoryItem[] = [];
+      for (const e of expenses) {
+        newItems.push({
+          type: 'expense',
+          data: e,
+          payerName: profileMap[e.paid_by]?.display_name ?? 'Unknown',
+        });
+      }
+      for (const s of settlements) {
+        newItems.push({
+          type: 'settlement',
+          data: s,
+          paidByName: profileMap[s.paid_by]?.display_name ?? 'Unknown',
+          paidToName: profileMap[s.paid_to]?.display_name ?? 'Unknown',
+        });
+      }
+
+      // Merge with existing, re-sort, re-group
+      const merged = [...historyItems, ...newItems].sort(
+        (a, b) =>
+          new Date(b.data.created_at).getTime() -
+          new Date(a.data.created_at).getTime()
+      );
+
+      setHistoryItems(merged);
+      setGroupedHistory(buildGroups(merged));
+      setOffset((prev) => prev + BATCH_SIZE);
+      setHasMore(
+        expenses.length === BATCH_SIZE || settlements.length === BATCH_SIZE
+      );
+    } catch (err) {
+      console.error('Error loading more expenses:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadingMore, household?.id, offset, historyItems]);
+
+  // Refetch on screen focus
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
@@ -226,34 +317,118 @@ export default function ExpensesScreen() {
     setRefreshing(false);
   }, [fetchData]);
 
-  const owedToYou = balances.filter((b) => b.net_amount > 0);
-  const youOwe = balances.filter((b) => b.net_amount < 0);
-  const allSettled = balances.length === 0;
+  // ---------- Inline expand for expense splits ----------
 
-  function getRecentExpenseForUser(userId: string): { description: string; date: string } | null {
-    for (const group of groupedHistory) {
-      for (const item of group.items) {
-        if (item.type === 'expense') {
-          if (item.data.paid_by === userId || item.data.paid_by === user?.id) {
-            return {
-              description: item.data.description,
-              date: item.data.created_at,
-            };
+  const handleExpensePress = useCallback(
+    async (expenseId: string) => {
+      if (expandedId === expenseId) {
+        setExpandedId(null);
+        return;
+      }
+      setExpandedId(expenseId);
+
+      if (!splitsCache[expenseId]) {
+        try {
+          const { data: splitsData } = await supabase
+            .from('expense_splits')
+            .select('*')
+            .eq('expense_id', expenseId);
+
+          if (splitsData && splitsData.length > 0) {
+            const splitUserIds = splitsData.map((s) => s.user_id);
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('id, display_name')
+              .in('id', splitUserIds);
+
+            const profileMap: Record<string, { display_name: string }> = {};
+            if (profiles) {
+              for (const p of profiles) {
+                profileMap[p.id] = { display_name: p.display_name };
+              }
+            }
+
+            const splitsWithProfiles: SplitWithProfile[] = splitsData.map(
+              (s) => ({
+                id: s.id,
+                user_id: s.user_id,
+                share_amount: String(s.share_amount),
+                profile: profileMap[s.user_id] ?? null,
+              })
+            );
+
+            setSplitsCache((prev) => ({
+              ...prev,
+              [expenseId]: splitsWithProfiles,
+            }));
+          } else {
+            setSplitsCache((prev) => ({
+              ...prev,
+              [expenseId]: [],
+            }));
           }
+        } catch (err) {
+          console.error('Error fetching splits:', err);
+          setSplitsCache((prev) => ({
+            ...prev,
+            [expenseId]: [],
+          }));
         }
       }
-    }
-    return null;
-  }
+    },
+    [expandedId, splitsCache]
+  );
 
-  function handleVenmoRequest(venmoUsername: string, amount: number, description?: string, date?: string) {
-    const username = venmoUsername.replace(/^@/, "");
-    const note = description && date
-      ? `${description} - ${new Date(date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
-      : `RoomY: Balance settlement for ${household?.name ?? "household"}`;
-    const url = `https://venmo.com/${username}?txn=charge&amount=${Math.abs(amount).toFixed(2)}&note=${encodeURIComponent(note)}`;
-    Linking.openURL(url);
-  }
+  // ---------- Action handlers ----------
+
+  const handleRemind = useCallback(
+    async (memberName: string, amount: number) => {
+      try {
+        await Share.share({
+          message: `Hey ${memberName}, you owe ${formatCurrency(amount)} on RoomY. Can you settle up?`,
+        });
+      } catch {
+        // User cancelled share or share failed -- no action needed
+      }
+    },
+    []
+  );
+
+  const handleSettle = useCallback(
+    (userId: string, amount: number) => {
+      router.push(
+        `/(app)/expenses/settle?userId=${userId}&amount=${amount.toFixed(2)}&direction=you_owe` as never
+      );
+    },
+    [router]
+  );
+
+  const handleMemberPress = useCallback(
+    (userId: string) => {
+      router.push(
+        `/(app)/expenses/member-history?userId=${userId}` as never
+      );
+    },
+    [router]
+  );
+
+  // ---------- Scroll handler for pagination ----------
+
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, layoutMeasurement, contentSize } =
+        event.nativeEvent;
+      if (
+        contentOffset.y + layoutMeasurement.height >=
+        contentSize.height - 200
+      ) {
+        loadMore();
+      }
+    },
+    [loadMore]
+  );
+
+  // ---------- Loading state ----------
 
   if (loading) {
     return (
@@ -267,259 +442,46 @@ export default function ExpensesScreen() {
     <View className="flex-1 bg-neutral-bg">
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 96 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 16,
+          paddingBottom: 96,
+        }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        onScroll={handleScroll}
+        scrollEventThrottle={400}
       >
-        {/* Balance Dashboard */}
-        <View className="mb-4 rounded-2xl bg-white p-4 shadow-sm">
-          <Text className="mb-3 text-lg font-bold text-gray-800">
-            Balances
-          </Text>
-
-          {allSettled ? (
-            <View className="items-center py-6">
-              <Ionicons name="checkmark-circle" size={56} color={colors.semantic.success} />
-              <Text className="mt-3 text-lg font-semibold text-gray-700">
-                All settled up!
-              </Text>
-              <Text className="mt-1 text-sm text-gray-400">
-                No outstanding balances with your roommates.
-              </Text>
-            </View>
-          ) : (
-            <View>
-              {/* Owed to you */}
-              {owedToYou.length > 0 && (
-                <View className="mb-3">
-                  <Text className="mb-2 text-sm font-semibold text-green-600">
-                    Owed to you
-                  </Text>
-                  {owedToYou.map((entry, index) => {
-                    const recentExpense = getRecentExpenseForUser(entry.user_id);
-                    return (
-                    <View
-                      key={entry.user_id}
-                      className="mb-2 flex-row items-center rounded-xl bg-neutral-bg p-3"
-                    >
-                      <View
-                        className="mr-3 h-10 w-10 items-center justify-center rounded-full"
-                        style={{
-                          backgroundColor:
-                            AVATAR_COLORS[index % AVATAR_COLORS.length],
-                        }}
-                      >
-                        <Text className="text-xs font-bold text-white">
-                          {getInitials(
-                            entry.profile?.display_name ?? "Unknown"
-                          )}
-                        </Text>
-                      </View>
-                      <View className="mr-2 flex-1">
-                        <Text className="text-sm font-medium text-gray-800">
-                          {entry.profile?.display_name ?? "Unknown"}
-                        </Text>
-                        <Text className="text-base font-bold text-green-600">
-                          {formatCurrency(entry.net_amount)}
-                        </Text>
-                      </View>
-                      <View className="flex-row gap-2">
-                        {entry.profile?.venmo_username && (
-                          <Pressable
-                            className="rounded-lg px-3 py-2 active:opacity-70"
-                            style={{ backgroundColor: "#3D95CE" }}
-                            onPress={() =>
-                              handleVenmoRequest(
-                                entry.profile!.venmo_username!,
-                                entry.net_amount,
-                                recentExpense?.description,
-                                recentExpense?.date
-                              )
-                            }
-                          >
-                            <Text className="text-xs font-semibold text-white">
-                              Request
-                            </Text>
-                          </Pressable>
-                        )}
-                        <Pressable
-                          className="rounded-lg bg-brand px-3 py-2 active:bg-brand-dark"
-                          onPress={() =>
-                            router.push(
-                              `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=owed_to_you${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
-                            )
-                          }
-                        >
-                          <Text className="text-xs font-semibold text-white">
-                            Settle Up
-                          </Text>
-                        </Pressable>
-                      </View>
-                    </View>
-                    );
-                  })}
-                </View>
-              )}
-
-              {/* You owe */}
-              {youOwe.length > 0 && (
-                <View>
-                  <Text className="mb-2 text-sm font-semibold text-red-500">
-                    You owe
-                  </Text>
-                  {youOwe.map((entry, index) => {
-                    const recentExpense = getRecentExpenseForUser(entry.user_id);
-                    return (
-                    <View
-                      key={entry.user_id}
-                      className="mb-2 flex-row items-center rounded-xl bg-neutral-bg p-3"
-                    >
-                      <View
-                        className="mr-3 h-10 w-10 items-center justify-center rounded-full"
-                        style={{
-                          backgroundColor:
-                            AVATAR_COLORS[
-                              (index + owedToYou.length) % AVATAR_COLORS.length
-                            ],
-                        }}
-                      >
-                        <Text className="text-xs font-bold text-white">
-                          {getInitials(
-                            entry.profile?.display_name ?? "Unknown"
-                          )}
-                        </Text>
-                      </View>
-                      <View className="mr-2 flex-1">
-                        <Text className="text-sm font-medium text-gray-800">
-                          {entry.profile?.display_name ?? "Unknown"}
-                        </Text>
-                        <Text className="text-base font-bold text-red-500">
-                          {formatCurrency(Math.abs(entry.net_amount))}
-                        </Text>
-                      </View>
-                      <Pressable
-                        className="rounded-lg bg-brand px-3 py-2 active:bg-brand-dark"
-                        onPress={() =>
-                          router.push(
-                            `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=you_owe${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
-                          )
-                        }
-                      >
-                        <Text className="text-xs font-semibold text-white">
-                          Settle Up
-                        </Text>
-                      </Pressable>
-                    </View>
-                    );
-                  })}
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-
-        {/* Expense History */}
-        <Text className="mb-3 text-lg font-bold text-gray-800">History</Text>
+        <BalanceSection
+          balances={balances}
+          currentUserId={user?.id ?? ''}
+          onSettle={handleSettle}
+          onRemind={handleRemind}
+          onMemberPress={handleMemberPress}
+        />
 
         {groupedHistory.length === 0 ? (
-          /* Empty state */
-          <View className="items-center rounded-2xl bg-white p-8 shadow-sm">
-            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-light">
-              <Ionicons name="wallet-outline" size={40} color={colors.brand.DEFAULT} />
-            </View>
-            <Text className="text-lg font-semibold text-gray-700">
-              No expenses yet
-            </Text>
-            <Text className="mt-1 text-center text-sm text-gray-400">
-              Add your first expense to start tracking.
-            </Text>
-          </View>
+          <EmptyState
+            onAddExpense={() => router.push('/(app)/expenses/add' as never)}
+          />
         ) : (
-          groupedHistory.map((group) => (
-            <View key={group.label} className="mb-4">
-              <Text className="mb-2 text-sm font-semibold text-gray-400">
-                {group.label}
-              </Text>
-              <View className="rounded-2xl bg-white shadow-sm">
-                {group.items.map((item, idx) => {
-                  const isLast = idx === group.items.length - 1;
+          <HistorySection
+            groups={groupedHistory}
+            expandedId={expandedId}
+            splitsCache={splitsCache}
+            onExpensePress={handleExpensePress}
+            currentUserId={user?.id ?? ''}
+          />
+        )}
 
-                  if (item.type === "settlement") {
-                    return (
-                      <Pressable
-                        key={item.data.id}
-                        className={`flex-row items-center px-4 py-3 active:bg-neutral-bg ${
-                          !isLast ? "border-b border-gray-100" : ""
-                        }`}
-                        onPress={() =>
-                          router.push(
-                            `/(app)/expenses/${item.data.id}?type=settlement` as never
-                          )
-                        }
-                      >
-                        <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                          <Ionicons
-                            name="checkmark-circle"
-                            size={22}
-                            color={colors.semantic.success}
-                          />
-                        </View>
-                        <View className="flex-1">
-                          <Text className="text-sm font-semibold text-gray-800">
-                            {item.paidByName} paid {item.paidToName}
-                          </Text>
-                          <Text className="text-xs text-gray-400">
-                            Settlement
-                          </Text>
-                        </View>
-                        <Text className="text-sm font-semibold text-green-600">
-                          {formatCurrency(Number(item.data.amount))}
-                        </Text>
-                      </Pressable>
-                    );
-                  }
-
-                  return (
-                    <Pressable
-                      key={item.data.id}
-                      className={`flex-row items-center px-4 py-3 active:bg-neutral-bg ${
-                        !isLast ? "border-b border-gray-100" : ""
-                      }`}
-                      onPress={() =>
-                        router.push(
-                          `/(app)/expenses/${item.data.id}` as never
-                        )
-                      }
-                    >
-                      <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-brand-light">
-                        <Ionicons
-                          name="receipt-outline"
-                          size={20}
-                          color={colors.brand.DEFAULT}
-                        />
-                      </View>
-                      <View className="flex-1">
-                        <Text className="text-sm font-semibold text-gray-800">
-                          {item.data.description}
-                        </Text>
-                        <Text className="text-xs text-gray-400">
-                          paid by {item.payerName}
-                        </Text>
-                      </View>
-                      <Text className="text-sm font-semibold text-gray-700">
-                        {formatCurrency(Number(item.data.amount))}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          ))
+        {loadingMore && (
+          <View className="items-center py-4">
+            <ActivityIndicator size="small" color={colors.brand.DEFAULT} />
+          </View>
         )}
       </ScrollView>
-
     </View>
   );
 }
