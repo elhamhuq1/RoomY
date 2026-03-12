@@ -49,7 +49,7 @@ export const CHORE_DOT: DotMarking = { key: "chore", color: "#22c55e" };
  * Project chore due dates within a month range based on frequency.
  * Walks both forward and backward from next_due_at to cover the full month.
  */
-function projectChoreDates(chore: Chore, monthDate: Date): string[] {
+export function projectChoreDates(chore: Chore, monthDate: Date): string[] {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
   const anchor = parseISO(chore.next_due_at);

@@ -3,10 +3,7 @@ import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   format,
-  startOfWeek,
-  endOfWeek,
   parseISO,
-  isWithinInterval,
   isSameDay,
 } from 'date-fns';
 import { Avatar } from '@/components/ui/Avatar';
@@ -34,22 +31,17 @@ type DayGroup = {
 
 export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
   const dayGroups = useMemo(() => {
-    const now = new Date();
-    const weekStart = startOfWeek(now, { weekStartsOn: 0 });
-    const weekEnd = endOfWeek(now, { weekStartsOn: 0 });
-
-    // Filter chores for the current week (or a specific date)
-    const filtered = chores.filter((chore) => {
-      const dueDate = parseISO(chore.dueDate);
-      if (selectedDate) {
-        return isSameDay(dueDate, parseISO(selectedDate));
-      }
-      return isWithinInterval(dueDate, { start: weekStart, end: weekEnd });
-    });
+    // Upstream weekChores is already projected and week-filtered.
+    // If a specific date is selected, narrow to that single day.
+    const visible = selectedDate
+      ? chores.filter((chore) =>
+          isSameDay(parseISO(chore.dueDate), parseISO(selectedDate))
+        )
+      : chores;
 
     // Group by day
     const groups = new Map<string, TimelineChore[]>();
-    for (const chore of filtered) {
+    for (const chore of visible) {
       const dateKey = format(parseISO(chore.dueDate), 'yyyy-MM-dd');
       const existing = groups.get(dateKey) ?? [];
       existing.push(chore);

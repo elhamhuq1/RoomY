@@ -19,6 +19,7 @@ import {
   isWithinInterval,
 } from 'date-fns';
 import { useSession } from '@/lib/auth-context';
+import { projectChoreDates } from '@/lib/calendar-utils';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme/colors';
 import type { Profile, Expense, Chore } from '@/lib/types/database';
@@ -236,31 +237,42 @@ export default function DashboardScreen() {
       });
   }, [chores, members]);
 
-  // Week chores for timeline
+  // Week chores for timeline (projected from recurring frequency)
   const weekChores = useMemo(() => {
-    const now = new Date();
-    const wStart = startOfWeek(now, { weekStartsOn: 0 });
-    const wEnd = endOfWeek(now, { weekStartsOn: 0 });
+    const selected = parseISO(selectedDate);
+    const wStart = startOfWeek(selected, { weekStartsOn: 0 });
+    const wEnd = endOfWeek(selected, { weekStartsOn: 0 });
 
-    return chores
-      .filter((c) => {
-        const dueDate = parseISO(c.next_due_at);
-        return isWithinInterval(dueDate, { start: wStart, end: wEnd });
-      })
-      .map((c) => {
-        const assignee = members.find((m) => m.user_id === c.current_assignee);
-        return {
-          id: c.id,
-          name: c.name,
-          assigneeId: c.current_assignee ?? '',
-          assigneeName: assignee?.display_name ?? 'Unassigned',
-          dueDate: c.next_due_at,
-          isCompleted: c.last_completed_at
-            ? isSameDay(parseISO(c.last_completed_at), parseISO(c.next_due_at))
-            : false,
-        };
-      });
-  }, [chores, members]);
+    const entries: {
+      id: string;
+      name: string;
+      assigneeId: string;
+      assigneeName: string;
+      dueDate: string;
+      isCompleted: boolean;
+    }[] = [];
+
+    for (const chore of chores) {
+      const projected = projectChoreDates(chore, selected);
+      for (const dateStr of projected) {
+        if (isWithinInterval(parseISO(dateStr), { start: wStart, end: wEnd })) {
+          const assignee = members.find((m) => m.user_id === chore.current_assignee);
+          entries.push({
+            id: `${chore.id}-${dateStr}`,
+            name: chore.name,
+            assigneeId: chore.current_assignee ?? '',
+            assigneeName: assignee?.display_name ?? 'Unassigned',
+            dueDate: dateStr,
+            isCompleted: chore.last_completed_at
+              ? isSameDay(parseISO(chore.last_completed_at), parseISO(dateStr))
+              : false,
+          });
+        }
+      }
+    }
+
+    return entries;
+  }, [chores, members, selectedDate]);
 
   // Determine if date filter is active (not today)
   const todayString = format(new Date(), 'yyyy-MM-dd');
