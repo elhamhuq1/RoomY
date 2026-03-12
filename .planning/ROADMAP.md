@@ -97,7 +97,11 @@ Plans:
   1. Balance section shows member rows with avatars, owe amounts, and working remind/settle action buttons
   2. Expense rows display with amber icon containers and bold amounts, while settlement rows display with green icons and dimmed text
   3. History entries are grouped under overline-styled date headers (TODAY, YESTERDAY, EARLIER)
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Expense child components and parent screen rewrite with design system, inline expand, and pagination
+- [ ] 08-02-PLAN.md — Per-member expense breakdown screen and visual verification
 
 ### Phase 9: Groceries + Chores
 **Goal**: Grocery and chore screens use consistent design system components with clear visual states for item status, member attribution, and task urgency
@@ -139,6 +143,6 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 5. (Reserved) | v1.0 | - | Skipped | - |
 | 6. Design System + Components | v1.1 | Complete    | 2026-03-12 | 2026-03-12 |
 | 7. Home Screen | v1.1 | 3/4 (gap closure) | In progress | - |
-| 8. Expenses Screen | v1.1 | 0/TBD | Not started | - |
+| 8. Expenses Screen | v1.1 | 0/2 | Not started | - |
 | 9. Groceries + Chores | v1.1 | 0/TBD | Not started | - |
 | 10. Onboarding Flow | v1.1 | 0/TBD | Not started | - |
