@@ -22,8 +22,9 @@ result: pass
 
 ### 3. Balance Summary Card
 expected: A dark gradient card (dark slate) shows your net balance amount. Green if others owe you, red if you owe others, or a checkmark with "All settled up" if zero. "Settle Up" and "Request" buttons are visible at the bottom of the card.
-result: pass
-note: UX improvement — hide Settle Up/Request buttons when "All settled up" since tapping them causes a forever loading screen with nothing to settle.
+result: issue
+reported: "balance card always shows All settled up even when another user added an expense for me to pay. Buttons should also be hidden when truly settled."
+severity: major
 
 ### 4. Week Strip Calendar
 expected: A 7-day week strip shows the current week. Today's date is highlighted. Tapping another day selects it. Tapping the expand control opens a full month calendar view. Tapping a day in the month view collapses back to the week strip.
@@ -52,7 +53,7 @@ note: UX improvement — pull-to-refresh should preserve selected date instead o
 
 total: 8
 passed: 7
-issues: 1
+issues: 2
 pending: 0
 skipped: 0
 
@@ -102,3 +103,16 @@ skipped: 0
     - "Make fetchAllData accept selectedDate and scope expense query to that month"
     - "Derive weekChores from selectedDate instead of new Date()"
   debug_session: ".planning/debug/pull-refresh-resets-date.md"
+
+- truth: "Balance Summary Card shows correct net balance when other users add expenses"
+  status: failed
+  reason: "User reported: another user added an expense for me to pay but the balance card still shows All settled up"
+  severity: major
+  test: 3
+  root_cause: "myNetAmount computed via balances.find(b => b.user_id === user?.id) but get_household_balances() RPC only returns rows for OTHER users (WHERE other_user != auth.uid()). Current user's ID never in result set, so myBalance is always undefined and myNetAmount always 0."
+  artifacts:
+    - path: "app/(app)/(tabs)/index.tsx"
+      issue: "Lines 170-173: myNetAmount looks for current user ID in data that only contains other user IDs"
+  missing:
+    - "Replace .find() with .reduce() to sum all net_amount values across balance rows for overall net position"
+  debug_session: ".planning/debug/balance-card-not-updating.md"
