@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 
 ## Current Position
 
-Phase: 6 of 10 (Design System + Components)
-Plan: 3 of 4 in current phase
-Status: Executing
-Last activity: 2026-03-12 -- Completed 06-03 tab bar + FAB navigation chrome
+Phase: 6 of 10 (Design System + Components) -- COMPLETE
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-03-12 -- Completed 06-04 visual verification (UAT 10/10 passed)
 
-Progress: [###############.....] 75% (v1.1 Phase 6: 3/4 plans)
+Progress: [####################] 100% (v1.1 Phase 6: 4/4 plans)
 
 ## Performance Metrics
 
@@ -33,14 +33,14 @@ Progress: [###############.....] 75% (v1.1 Phase 6: 3/4 plans)
 | 04 Engagement | 4 | 13min | 3.3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 3min, 2min, 2min, 2min
-- Trend: Stable
+- Last 5 plans: 3min, 2min, 2min, 2min, 20min
+- Trend: UAT plan took longer (human-in-loop verification + 3 bug fixes)
 
 **By Phase (v1.1):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 06 Design System | 3 | 11min | 3.7min |
+| 06 Design System | 4 | 31min | 7.8min |
 
 *Updated after each plan completion*
 
@@ -66,6 +66,7 @@ Recent decisions affecting current work:
 - [06-02]: IconContainer hardcodes color-600 hex for Ionicons color prop (cannot use NativeWind classes)
 - [06-03]: Groceries tab excluded from FAB (has inline text input for adding items)
 - [06-03]: Existing in-screen FABs left in place; deduplication deferred to later phases
+- [06-04]: Old inline FABs removed from expenses/chores during UAT -- overlapping with layout FAB was a real UX bug, not deferrable
 
 ### Pending Todos
 
@@ -74,13 +75,13 @@ None yet.
 ### Blockers/Concerns
 
 - [Research]: expo-blur intensity mapping (CSS blur 12px -> intensity ~25-35) requires visual tuning in Phase 10
-- [Research]: Colored shadow string format (boxShadow hex+alpha vs rgba) needs quick test in Phase 6
-- [Research]: NativeWind fontSize tuple behavior with fontWeight + letterSpacing needs verification in Phase 6
+- [Resolved 06-03]: Colored shadow -- used iOS shadow props (shadowColor, shadowOffset, shadowOpacity, shadowRadius) directly in FAB.tsx
+- [Resolved 06-01]: NativeWind fontSize tuples work with fontWeight/letterSpacing in Tailwind config extend
 - [Resolved 06-02]: Deterministic member color via hashString(userId) % 8 gradient pairs -- simple charCodeAt hash, no DB storage needed
 - [Research]: Gradient interpolation scope for onboarding carousel (static-per-slide vs scroll-handler) -- decide during Phase 10 planning
 
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 06-03-PLAN.md
+Stopped at: Completed 06-04-PLAN.md -- Phase 6 complete
 Resume file: None

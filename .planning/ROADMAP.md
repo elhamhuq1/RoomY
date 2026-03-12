@@ -45,7 +45,7 @@ Plans:
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 6: Design System + Components** - Design tokens, shared component library, and navigation chrome
+- [x] **Phase 6: Design System + Components** - Design tokens, shared component library, and navigation chrome
 - [ ] **Phase 7: Home Screen** - Calendar, balance summary, attention feed, weekly timeline
 - [ ] **Phase 8: Expenses Screen** - Balance cards, differentiated history rows, date group headers
 - [ ] **Phase 9: Groceries + Chores** - Section headers, checkboxes, avatars, emoji icons, stats, dispute styling
@@ -66,10 +66,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 4 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Design tokens (colors, typography, elevation) and full orange-to-green palette migration
-- [ ] 06-02-PLAN.md — Shared UI components (Avatar, Card, Badge, Button, IconContainer, Toggle)
-- [ ] 06-03-PLAN.md — Tab bar branded styling and FAB component
-- [ ] 06-04-PLAN.md — Visual verification checkpoint on device
+- [x] 06-01-PLAN.md — Design tokens (colors, typography, elevation) and full orange-to-green palette migration
+- [x] 06-02-PLAN.md — Shared UI components (Avatar, Card, Badge, Button, IconContainer, Toggle)
+- [x] 06-03-PLAN.md — Tab bar branded styling and FAB component
+- [x] 06-04-PLAN.md — Visual verification checkpoint on device
 
 ### Phase 7: Home Screen
 **Goal**: The daily landing screen gives users an at-a-glance view of their household, finances, schedule, and pending tasks
@@ -131,7 +131,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 3.1. Chores | v1.0 | 2/2 | Complete | - |
 | 4. Engagement | v1.0 | 4/4 | Complete | - |
 | 5. (Reserved) | v1.0 | - | Skipped | - |
-| 6. Design System + Components | v1.1 | 0/4 | Not started | - |
+| 6. Design System + Components | v1.1 | 4/4 | Complete | 2026-03-12 |
 | 7. Home Screen | v1.1 | 0/TBD | Not started | - |
 | 8. Expenses Screen | v1.1 | 0/TBD | Not started | - |
 | 9. Groceries + Chores | v1.1 | 0/TBD | Not started | - |
