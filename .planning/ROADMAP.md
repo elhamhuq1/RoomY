@@ -143,6 +143,6 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 5. (Reserved) | v1.0 | - | Skipped | - |
 | 6. Design System + Components | v1.1 | Complete    | 2026-03-12 | 2026-03-12 |
 | 7. Home Screen | v1.1 | 3/4 (gap closure) | In progress | - |
-| 8. Expenses Screen | v1.1 | 2/2 | Complete | 2026-03-12 |
+| 8. Expenses Screen | v1.1 | Complete    | 2026-03-12 | 2026-03-12 |
 | 9. Groceries + Chores | v1.1 | 0/TBD | Not started | - |
 | 10. Onboarding Flow | v1.1 | 0/TBD | Not started | - |
