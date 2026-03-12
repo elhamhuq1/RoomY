@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 08-expenses-screen
 source: [08-01-SUMMARY.md, 08-02 checkpoint]
 started: 2026-03-12T22:00:00Z
@@ -64,4 +64,28 @@ skipped: 0
 
 ## Gaps
 
-[none — 2 UX improvements noted on tests 7 and 9 for future iteration]
+- truth: "Expandable expense rows should have a visual affordance indicating they can be tapped to expand"
+  status: failed
+  reason: "User reported: not clear to the user that they can expand rows. Should add a small arrow/chevron indicator."
+  severity: cosmetic
+  test: 7
+  root_cause: "ExpenseRow.tsx has no chevron icon — nothing signals the row is expandable"
+  artifacts:
+    - path: "components/expenses/ExpenseRow.tsx"
+      issue: "No expand/collapse affordance icon"
+  missing:
+    - "Add a small chevron-down icon that rotates to chevron-up when expanded"
+
+- truth: "All roommates should be accessible for per-member expense breakdown, not just those with non-zero balances"
+  status: failed
+  reason: "User reported: per-member navigation should be a dedicated section listing ALL roommates, since balance section hides zero-balance members making them unreachable."
+  severity: minor
+  test: 9
+  root_cause: "Per-member navigation is only available through BalanceMemberRow tap, which filters out zero-balance members"
+  artifacts:
+    - path: "components/expenses/BalanceSection.tsx"
+      issue: "Zero-balance members filtered out, no alternate navigation path"
+    - path: "app/(app)/(tabs)/expenses.tsx"
+      issue: "No dedicated roommate list section"
+  missing:
+    - "Add a 'View expenses by roommate' section listing all household members regardless of balance"
