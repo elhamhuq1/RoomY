@@ -3,17 +3,17 @@
 **Defined:** 2026-03-10
 **Core Value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
 
-## v1 Requirements
+## v1 Requirements (Complete)
 
-Requirements for initial release. Each maps to roadmap phases.
+All v1.0 requirements shipped and validated.
 
 ### Authentication & Household
 
-- [ ] **AUTH-01**: User can sign up and sign in with email/password
-- [ ] **AUTH-02**: User can create a profile with display name and Venmo username
-- [ ] **AUTH-03**: User can create a household and receive an invite code
-- [ ] **AUTH-04**: User can join a household by entering an invite code
-- [ ] **AUTH-05**: User completes onboarding quiz that configures enabled modules
+- [x] **AUTH-01**: User can sign up and sign in with email/password
+- [x] **AUTH-02**: User can create a profile with display name and Venmo username
+- [x] **AUTH-03**: User can create a household and receive an invite code
+- [x] **AUTH-04**: User can join a household by entering an invite code
+- [x] **AUTH-05**: User completes onboarding quiz that configures enabled modules
 
 ### Expenses & Balances
 
@@ -43,11 +43,75 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PUSH-02**: User receives push notifications for chore reminders
 - [x] **PUSH-03**: User receives push notifications for grocery list updates
 - [x] **CALC-01**: User can view a shared household calendar
-- [ ] **CALC-02**: Recurring expense due dates and chore schedules appear on calendar
+- [x] **CALC-02**: Recurring expense due dates and chore schedules appear on calendar
 
-## v2 Requirements
+## v1.1 Requirements — UI Redesign
 
-Deferred to future release. Tracked but not in current roadmap.
+Presentation-layer redesign. All backend logic, data models, and navigation structure stay untouched.
+
+### Design System
+
+- [ ] **DSYS-01**: App uses an intentional color token system (brand green, semantic colors, neutrals) replacing all hardcoded orange values
+- [ ] **DSYS-02**: App uses a consistent typography scale with 8 defined presets (page title, key number, section heading, card title, body, metadata, overline, badge)
+- [ ] **DSYS-03**: App uses a two-tier elevation system (shadow, shadowMd) consistently across all cards and interactive elements
+
+### Shared Components
+
+- [ ] **COMP-01**: Avatar component renders gradient circles with member-unique colors, supports 6 sizes, and shows colored shadow
+- [ ] **COMP-02**: Card component provides consistent container styling (white bg, border, radius, shadow, padding) across all screens
+- [ ] **COMP-03**: Badge component renders pill-shaped status indicators with semantic color variants
+- [ ] **COMP-04**: Button component provides primary (filled) and outline variants with consistent sizing
+- [ ] **COMP-05**: Icon container component renders 40x40 rounded squares with semantic background colors
+- [ ] **COMP-06**: Toggle switch component animates between on/off states with brand coloring and locked state support
+
+### Onboarding
+
+- [ ] **ONBD-01**: Welcome screen shows a 3-slide carousel with gradient hero sections, glassmorphism logo, and emoji feature badges
+- [ ] **ONBD-02**: Sign up screen uses styled form inputs, branded primary button, and properly styled social auth buttons
+- [ ] **ONBD-03**: Display name screen shows a live avatar preview that updates as the user types
+- [ ] **ONBD-04**: Setup choice screen presents create/join options as large cards with gradient icon containers
+- [ ] **ONBD-05**: Household name screen shows a branded house icon and styled input
+- [ ] **ONBD-06**: Invite code screen shows a celebration layout with prominent code display and share/continue buttons
+- [ ] **ONBD-07**: Module selection screen uses toggle cards with visual active/inactive states
+- [ ] **ONBD-08**: Onboarding flow shows a 3-segment step progress bar on applicable screens
+
+### Home Screen
+
+- [ ] **HOME-01**: Home screen shows a time-aware greeting header with date and settings icon button
+- [ ] **HOME-02**: Home screen shows a members card with household name overline, avatar row, and invite link
+- [ ] **HOME-03**: Home screen shows a collapsible week-strip calendar with event dots, expandable to full month
+- [ ] **HOME-04**: Home screen shows a dark gradient balance summary card with dollar amount and action buttons
+- [ ] **HOME-05**: Home screen shows a "needs your attention" feed with actionable cards for pending chores, disputes, and updates
+- [ ] **HOME-06**: Home screen shows a "this week" vertical timeline with chore items, member avatars, and completion status
+
+### Expenses UI
+
+- [ ] **XPUI-01**: Expenses screen shows balance cards with member rows, owe amounts, and remind/settle actions
+- [ ] **XPUI-02**: Expense history visually differentiates expenses (amber icon, bold amount) from settlements (green icon, dimmed text)
+- [ ] **XPUI-03**: Expense history uses overline-styled date group headers (TODAY, YESTERDAY, EARLIER)
+
+### Groceries UI
+
+- [ ] **GRUI-01**: Grocery list splits into "TO GET" and "DONE" sections with item counts in overline headers
+- [ ] **GRUI-02**: Grocery items show circle checkboxes (unchecked: empty circle, checked: brand fill with checkmark)
+- [ ] **GRUI-03**: Grocery item rows show a member avatar indicating who added each item
+- [ ] **GRUI-04**: Quick-add input uses card-styled input field with a branded square add button
+
+### Chores UI
+
+- [ ] **CHUI-01**: Chores screen shows a stats row with pending (warning), disputed (danger), and streak (brand + fire emoji) cards
+- [ ] **CHUI-02**: Chore rows show emoji icons in rounded icon containers mapped by chore type
+- [ ] **CHUI-03**: Chores screen separates "YOUR CHORES" from "HOUSEHOLD" sections with overline headers
+- [ ] **CHUI-04**: Disputed chore rows use danger-tinted background and border for visual urgency
+
+### Navigation
+
+- [ ] **NAVG-01**: Tab bar uses branded styling (84px height, white bg, green active color, tertiary inactive)
+- [ ] **NAVG-02**: FAB uses rounded-square shape (52px, 16px radius) with brand background and colored shadow
+
+## Future Requirements
+
+Deferred beyond v1.1. Tracked but not in current roadmap.
 
 ### Expenses
 
@@ -64,6 +128,12 @@ Deferred to future release. Tracked but not in current roadmap.
 
 - **INFR-01**: Offline support with sync for grocery list and expense entry
 
+### Visual Polish
+
+- **VISL-01**: Dark mode support with full token variant
+- **VISL-02**: Skeleton loading screens
+- **VISL-03**: Custom pull-to-refresh animation
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -76,6 +146,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | Multi-currency support | USD only -- target users are in the same US household |
 | AI-powered suggestions | Decision space too small for AI to add value in 2-4 person households |
 | Income-based splitting | Requires sensitive financial disclosure, creates social friction |
+| Dark mode | Doubles design surface area; build tokens to support later but don't implement now |
+| Custom icon library | Ionicons already covers all needed glyphs; keep existing |
+| Custom fonts | System fonts are intentional per design spec for performance and native feel |
+| Backend changes | Presentation-layer only milestone |
+| New features | This milestone is purely visual redesign |
 
 ## Traceability
 
@@ -83,37 +158,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 5 | Pending |
-| AUTH-02 | Phase 5 | Pending |
-| AUTH-03 | Phase 5 | Pending |
-| AUTH-04 | Phase 5 | Pending |
-| AUTH-05 | Phase 5 | Pending |
-| EXPN-01 | Phase 2 | Complete |
-| EXPN-02 | Phase 2 | Complete |
-| EXPN-03 | Phase 2 | Complete |
-| EXPN-04 | Phase 2 | Complete |
-| EXPN-05 | Phase 2 | Complete |
-| EXPN-06 | Phase 2 | Complete |
-| GROC-01 | Phase 3 | Complete |
-| GROC-02 | Phase 3 | Complete |
-| GROC-03 | Phase 3 | Complete |
-| CHOR-01 | Phase 3.1 | Complete |
-| CHOR-02 | Phase 3.1 | Complete |
-| CHOR-03 | Phase 3.1 | Complete |
-| CHOR-04 | Phase 3.1 | Complete |
-| PUSH-01 | Phase 4 | Complete |
-| PUSH-02 | Phase 4 | Complete |
-| PUSH-03 | Phase 4 | Complete |
-| CALC-01 | Phase 4 | Complete |
-| CALC-02 | Phase 5 | Pending |
+| DSYS-01 | — | Pending |
+| DSYS-02 | — | Pending |
+| DSYS-03 | — | Pending |
+| COMP-01 | — | Pending |
+| COMP-02 | — | Pending |
+| COMP-03 | — | Pending |
+| COMP-04 | — | Pending |
+| COMP-05 | — | Pending |
+| COMP-06 | — | Pending |
+| ONBD-01 | — | Pending |
+| ONBD-02 | — | Pending |
+| ONBD-03 | — | Pending |
+| ONBD-04 | — | Pending |
+| ONBD-05 | — | Pending |
+| ONBD-06 | — | Pending |
+| ONBD-07 | — | Pending |
+| ONBD-08 | — | Pending |
+| HOME-01 | — | Pending |
+| HOME-02 | — | Pending |
+| HOME-03 | — | Pending |
+| HOME-04 | — | Pending |
+| HOME-05 | — | Pending |
+| HOME-06 | — | Pending |
+| XPUI-01 | — | Pending |
+| XPUI-02 | — | Pending |
+| XPUI-03 | — | Pending |
+| GRUI-01 | — | Pending |
+| GRUI-02 | — | Pending |
+| GRUI-03 | — | Pending |
+| GRUI-04 | — | Pending |
+| CHUI-01 | — | Pending |
+| CHUI-02 | — | Pending |
+| CHUI-03 | — | Pending |
+| CHUI-04 | — | Pending |
+| NAVG-01 | — | Pending |
+| NAVG-02 | — | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Mapped to phases: 23
-- Unmapped: 0
-- Satisfied: 17
-- Pending (gap closure): 6 (AUTH-01–05, CALC-02 → Phase 5)
+- v1.1 requirements: 36 total
+- Mapped to phases: 0
+- Unmapped: 36
 
 ---
 *Requirements defined: 2026-03-10*
-*Last updated: 2026-03-10 after roadmap creation*
+*Last updated: 2026-03-12 after v1.1 UI Redesign requirements definition*
