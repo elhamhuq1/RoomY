@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 6 - Design System + Components
+**Current focus:** Phase 7 - Home Screen
 
 ## Current Position
 
-Phase: 6 of 10 (Design System + Components) -- COMPLETE
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-03-12 -- Completed 06-04 visual verification (UAT 10/10 passed)
+Phase: 7 of 10 (Home Screen)
+Plan: 2 of 3 in current phase
+Status: Executing
+Last activity: 2026-03-12 -- Completed 07-02 CalendarSection component with red/coral expense dots
 
-Progress: [####################] 100% (v1.1 Phase 6: 4/4 plans)
+Progress: [##############......] 67% (v1.1 Phase 7: 2/3 plans)
 
 ## Performance Metrics
 
@@ -41,8 +41,10 @@ Progress: [####################] 100% (v1.1 Phase 6: 4/4 plans)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 06 Design System | 4 | 31min | 7.8min |
+| 07 Home Screen | 2 | 8min | 4.0min |
 
 *Updated after each plan completion*
+| Phase 07 P01 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,6 +69,9 @@ Recent decisions affecting current work:
 - [06-03]: Groceries tab excluded from FAB (has inline text input for adding items)
 - [06-03]: Existing in-screen FABs left in place; deduplication deferred to later phases
 - [06-04]: Old inline FABs removed from expenses/chores during UAT -- overlapping with layout FAB was a real UX bug, not deferrable
+- [07-01]: BalanceSummaryCard uses inline borderRadius style on LinearGradient for reliability over NativeWind className
+- [07-01]: MembersCard handles solo vs multi-member invite prominence inline via conditional rendering
+- [07-01]: Section components are presentational only -- accept typed props, no data fetching inside
 
 ### Pending Todos
 
@@ -83,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 06-04-PLAN.md -- Phase 6 complete
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
