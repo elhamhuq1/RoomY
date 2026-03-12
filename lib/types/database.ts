@@ -6,6 +6,7 @@ export interface Profile {
   display_name: string;
   venmo_username: string | null;
   avatar_url: string | null;
+  expo_push_token: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -125,15 +126,24 @@ export interface ChoreSwapRequest {
   resolved_at: string | null;
 }
 
+export interface NotificationPreferences {
+  user_id: string;
+  expenses_enabled: boolean;
+  chores_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Supabase Database type for client generic
 export interface Database {
   public: {
     Tables: {
       profiles: {
         Row: Profile;
-        Insert: Omit<Profile, "created_at" | "updated_at"> & {
+        Insert: Omit<Profile, "created_at" | "updated_at" | "expo_push_token"> & {
           created_at?: string;
           updated_at?: string;
+          expo_push_token?: string | null;
         };
         Update: Partial<Omit<Profile, "id">>;
       };
@@ -246,6 +256,16 @@ export interface Database {
           resolved_at?: string | null;
         };
         Update: Partial<Omit<ChoreSwapRequest, "id">>;
+      };
+      notification_preferences: {
+        Row: NotificationPreferences;
+        Insert: Omit<NotificationPreferences, "created_at" | "updated_at"> & {
+          expenses_enabled?: boolean;
+          chores_enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Omit<NotificationPreferences, "user_id">>;
       };
     };
     Functions: {
