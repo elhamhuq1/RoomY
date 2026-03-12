@@ -43,24 +43,38 @@ export async function registerForPushNotifications(
     Constants?.expoConfig?.extra?.eas?.projectId ??
     Constants?.easConfig?.projectId;
 
-  const tokenData = await Notifications.getExpoPushTokenAsync({
-    projectId,
-  });
-  const token = tokenData.data;
-
-  // Store token in profiles table
-  const { error } = await supabase
-    .from("profiles")
-    .update({ expo_push_token: token })
-    .eq("id", userId);
-
-  if (error) {
-    console.error("Failed to store push token:", error.message);
-  } else {
-    console.log("Push token registered:", token);
+  if (!projectId) {
+    console.log(
+      "Push notifications: no EAS projectId found. " +
+      "Push token registration requires an EAS-configured build. " +
+      "Skipping registration."
+    );
+    return null;
   }
 
-  return token;
+  try {
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId,
+    });
+    const token = tokenData.data;
+
+    // Store token in profiles table
+    const { error } = await supabase
+      .from("profiles")
+      .update({ expo_push_token: token })
+      .eq("id", userId);
+
+    if (error) {
+      console.error("Failed to store push token:", error.message);
+    } else {
+      console.log("Push token registered:", token);
+    }
+
+    return token;
+  } catch (err) {
+    console.error("Push token registration failed:", err);
+    return null;
+  }
 }
 
 /**
