@@ -45,6 +45,7 @@ Progress: [##############......] 67% (v1.1 Phase 7: 2/3 plans)
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
+| Phase 07 P02 | 4min | 1 task | 2 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [07-01]: BalanceSummaryCard uses inline borderRadius style on LinearGradient for reliability over NativeWind className
 - [07-01]: MembersCard handles solo vs multi-member invite prominence inline via conditional rendering
 - [07-01]: Section components are presentational only -- accept typed props, no data fetching inside
+- [07-02]: Custom week-strip + Calendar toggle used instead of ExpandableCalendar to avoid ScrollView gesture conflicts
+- [07-02]: Expense dot color changed from blue (#3b82f6) to red/coral (#EF4444) per design spec
 
 ### Pending Todos
 
@@ -88,5 +91,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 07-01-PLAN.md
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None

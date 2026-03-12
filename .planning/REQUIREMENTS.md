@@ -79,7 +79,7 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 - [x] **HOME-01**: Home screen shows a time-aware greeting header with date and settings icon button
 - [x] **HOME-02**: Home screen shows a members card with household name overline, avatar row, and invite link
-- [ ] **HOME-03**: Home screen shows a collapsible week-strip calendar with event dots, expandable to full month
+- [x] **HOME-03**: Home screen shows a collapsible week-strip calendar with event dots, expandable to full month
 - [x] **HOME-04**: Home screen shows a dark gradient balance summary card with dollar amount and action buttons
 - [ ] **HOME-05**: Home screen shows a "needs your attention" feed with actionable cards for pending chores, disputes, and updates
 - [ ] **HOME-06**: Home screen shows a "this week" vertical timeline with chore items, member avatars, and completion status
@@ -171,7 +171,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAVG-02 | Phase 6 | Complete |
 | HOME-01 | Phase 7 | Complete |
 | HOME-02 | Phase 7 | Complete |
-| HOME-03 | Phase 7 | Pending |
+| HOME-03 | Phase 7 | Complete |
 | HOME-04 | Phase 7 | Complete |
 | HOME-05 | Phase 7 | Pending |
 | HOME-06 | Phase 7 | Pending |
