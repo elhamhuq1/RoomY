@@ -282,11 +282,11 @@ export default function DashboardScreen() {
   // ---------- Navigation handlers ----------
 
   const handleSettleUp = useCallback(() => {
-    router.push('/(app)/expenses/settle' as never);
+    router.push('/(app)/(tabs)/expenses' as never);
   }, [router]);
 
   const handleRequest = useCallback(() => {
-    router.push('/(app)/expenses/add' as never);
+    router.push('/(app)/(tabs)/expenses' as never);
   }, [router]);
 
   const handleBalanceCardPress = useCallback(() => {

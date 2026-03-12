@@ -61,7 +61,10 @@ export default function SettleScreen() {
   // Fetch the other person's profile
   useEffect(() => {
     async function fetchProfile() {
-      if (!otherUserId) return;
+      if (!otherUserId) {
+        setLoadingProfile(false);
+        return;
+      }
       const { data } = await supabase
         .from("profiles")
         .select("*")

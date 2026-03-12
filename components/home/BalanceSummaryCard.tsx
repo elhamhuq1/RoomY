@@ -69,20 +69,24 @@ export function BalanceSummaryCard({
           </Text>
         </View>
 
-        {/* Action buttons - hidden when settled */}
-        {!isSettled && (
-          <View className="mt-4 flex-row gap-3">
+        {/* Action buttons - conditional on balance direction */}
+        {isOwe && (
+          <View className="mt-4">
             <Button
               title="Settle Up"
               variant="primary"
               onPress={onSettleUp}
-              className="flex-1"
+              className="w-full"
             />
+          </View>
+        )}
+        {isOwed && (
+          <View className="mt-4">
             <Button
               title="Request"
               variant="outline"
               onPress={onRequest}
-              className="flex-1"
+              className="w-full"
             />
           </View>
         )}
