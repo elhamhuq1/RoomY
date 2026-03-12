@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 07-home-screen
 source: [07-01-SUMMARY.md, 07-02-SUMMARY.md, 07-03-SUMMARY.md]
 started: 2026-03-12T18:00:00Z
@@ -63,27 +63,42 @@ skipped: 0
   reason: "User reported: did not pass, I don't see any of what you described even though I have chores and expenses for the current week"
   severity: major
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "weekChores useMemo in index.tsx filters by single next_due_at timestamp instead of using projectChoreDates() frequency-based projection. Completed chores have next_due_at pushed forward outside current week, so weekChores is empty. CalendarSection works because it uses projectChoreDates() correctly."
+  artifacts:
+    - path: "app/(app)/(tabs)/index.tsx"
+      issue: "weekChores useMemo (lines 240-263) uses single-point isWithinInterval instead of projectChoreDates()"
+    - path: "components/home/WeeklyTimeline.tsx"
+      issue: "Redundant second week-filter (lines 42-48) should be removed once upstream fixed"
+  missing:
+    - "Use projectChoreDates() from lib/calendar-utils.ts to project recurring chore dates within the week"
+    - "Remove redundant week-filtering inside WeeklyTimeline.tsx"
+  debug_session: ".planning/debug/weekly-timeline-empty.md"
 
 - truth: "Balance Summary Card hides Settle Up/Request buttons when all settled up"
   status: failed
   reason: "User reported: buttons show when all settled up, tapping Settle Up causes forever loading screen because nothing to settle"
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "BalanceSummaryCard.tsx renders buttons unconditionally — only reduces opacity to 0.7 when isSettled. No conditional hide, no disabled prop. handleSettleUp in index.tsx navigates without balance guard."
+  artifacts:
+    - path: "components/home/BalanceSummaryCard.tsx"
+      issue: "Lines 72-89: buttons always rendered, only opacity reduced when settled"
+    - path: "app/(app)/(tabs)/index.tsx"
+      issue: "Lines 271-273: handleSettleUp navigates unconditionally"
+  missing:
+    - "Wrap buttons in {!isSettled && (...)} conditional to hide when zero balance"
+  debug_session: ".planning/debug/balance-buttons-when-settled.md"
 
-- truth: "Pull-to-refresh preserves selected calendar date"
+- truth: "Pull-to-refresh preserves selected calendar date context"
   status: failed
   reason: "User reported: selecting a different week then refreshing resets back to current week instead of preserving selection"
   severity: minor
   test: 8
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "fetchAllData always scopes expenses to current month (new Date()) and weekChores always computes for current week (new Date()), both ignoring selectedDate. After refresh, data snaps back to current-week scope even though CalendarSection still shows correct selected date."
+  artifacts:
+    - path: "app/(app)/(tabs)/index.tsx"
+      issue: "fetchAllData uses startOfMonth(new Date()) for expense scope (lines 73-74); weekChores uses new Date() for week boundaries (lines 240-243)"
+  missing:
+    - "Make fetchAllData accept selectedDate and scope expense query to that month"
+    - "Derive weekChores from selectedDate instead of new Date()"
+  debug_session: ".planning/debug/pull-refresh-resets-date.md"
