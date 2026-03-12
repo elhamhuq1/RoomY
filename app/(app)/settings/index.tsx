@@ -59,6 +59,13 @@ export default function SettingsScreen() {
       route: "/(app)/settings/members",
     },
     {
+      key: "notifications",
+      title: "Notifications",
+      subtitle: "Manage push notification preferences",
+      icon: "notifications-outline",
+      route: "/(app)/settings/notifications",
+    },
+    {
       key: "signout",
       title: "Sign Out",
       subtitle: "",
