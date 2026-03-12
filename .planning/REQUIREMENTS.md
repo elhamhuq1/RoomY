@@ -51,9 +51,9 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 ### Design System
 
-- [ ] **DSYS-01**: App uses an intentional color token system (brand green, semantic colors, neutrals) replacing all hardcoded orange values
-- [ ] **DSYS-02**: App uses a consistent typography scale with 8 defined presets (page title, key number, section heading, card title, body, metadata, overline, badge)
-- [ ] **DSYS-03**: App uses a two-tier elevation system (shadow, shadowMd) consistently across all cards and interactive elements
+- [x] **DSYS-01**: App uses an intentional color token system (brand green, semantic colors, neutrals) replacing all hardcoded orange values
+- [x] **DSYS-02**: App uses a consistent typography scale with 8 defined presets (page title, key number, section heading, card title, body, metadata, overline, badge)
+- [x] **DSYS-03**: App uses a two-tier elevation system (shadow, shadowMd) consistently across all cards and interactive elements
 
 ### Shared Components
 
@@ -158,9 +158,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DSYS-01 | Phase 6 | Pending |
-| DSYS-02 | Phase 6 | Pending |
-| DSYS-03 | Phase 6 | Pending |
+| DSYS-01 | Phase 6 | Complete |
+| DSYS-02 | Phase 6 | Complete |
+| DSYS-03 | Phase 6 | Complete |
 | COMP-01 | Phase 6 | Pending |
 | COMP-02 | Phase 6 | Pending |
 | COMP-03 | Phase 6 | Pending |
