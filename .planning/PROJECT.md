@@ -8,23 +8,48 @@ A mobile app for roommates to manage shared household expenses, groceries, and c
 
 Roommates can see exactly who owes what and settle up with one tap — no awkward conversations, no mental math, no forgotten debts.
 
+## Current Milestone: v1.1 UI Redesign
+
+**Goal:** Make the app look polished and trustworthy — replace the developer-prototype aesthetic with an intentional design system that builds user confidence.
+
+**Target features:**
+- Design token system (colors, typography, spacing, shadows)
+- Shared component library (Avatar, Badge, Card, Icon containers)
+- Home screen rebuild (week-strip calendar, balance summary, attention feed)
+- Expenses screen rebuild (balance cards, differentiated history rows)
+- Groceries screen rebuild (to-get/done sections, member attribution)
+- Chores screen rebuild (emoji icons, stats row, dispute styling)
+- Tab bar and navigation polish
+
+**Design references:**
+- `docs/DESIGN_SPEC.md` — full specification
+- `docs/reference-mockup.jsx` — visual target
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ User authentication and profiles — v1.0
+- ✓ Household creation and roommate invites — v1.0
+- ✓ Household onboarding quiz — v1.0
+- ✓ Utility/bill splitting with Venmo deep links — v1.0
+- ✓ Balance tracking (who owes who) — v1.0
+- ✓ Shared grocery list with real-time sync — v1.0
+- ✓ Grocery trip to expense conversion — v1.0
+- ✓ Chore assignment, rotation, and contribution tracking — v1.0
+- ✓ Push notifications (expenses, chores) — v1.0
+- ✓ Shared household calendar — v1.0
 
 ### Active
 
-- [ ] Household onboarding quiz that recommends which modules to enable
-- [ ] Utility/bill splitting with recurring expenses
-- [ ] Shared grocery list with automatic cost splitting
-- [ ] Chore assignment and rotation tracking
-- [ ] Shared household calendar
-- [ ] Balance tracking (who owes who, running totals)
-- [ ] One-tap Venmo request via deep links
-- [ ] Household creation and roommate invites
-- [ ] User authentication and profiles
+- [ ] Intentional color system replacing default orange-everything palette
+- [ ] Typography hierarchy with clear visual weight
+- [ ] Shared component library (Avatar, Badge, Card)
+- [ ] Home screen with calendar, balance summary, attention feed
+- [ ] Expenses screen with visual expense/settlement differentiation
+- [ ] Groceries screen with to-get/done sections and member attribution
+- [ ] Chores screen with emoji icons, stats, and dispute highlighting
+- [ ] Polished tab bar and navigation
 
 ### Out of Scope
 
@@ -33,6 +58,8 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - Public app store release — v1 is for personal use
 - Social features beyond the household — this isn't a social network
 - Receipt scanning / OCR — manual entry is fine for v1
+- Backend changes — presentation layer only, all data models and APIs stay untouched
+- New features — this milestone is purely visual redesign
 
 ## Context
 
@@ -48,17 +75,19 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - **Platform**: Expo (React Native) — must work for dev on both Linux and macOS
 - **Payments**: No Stripe/built-in payments — Venmo deep links only
 - **Scope**: v1 is personal use for their own household
-- **Team**: Two developers, no designer — UI should be clean but doesn't need to be fancy
+- **Team**: Two developers, no designer — design guided by reference mockup and spec
 - **Backend**: Needs a backend for shared state between roommates (real-time sync preferred)
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Expo (React Native) over native Swift | One dev is on Linux, can't run Xcode — Expo lets both devs test via QR code | — Pending |
-| Venmo deep links over built-in payments | Personal project, no business account needed — Venmo is already how they pay each other | — Pending |
-| Modular features via onboarding quiz | Not every household needs every feature — quiz recommends a setup | — Pending |
-| Mobile first | Roommates interact with this at home, not at a desk | — Pending |
+| Expo (React Native) over native Swift | One dev is on Linux, can't run Xcode — Expo lets both devs test via QR code | ✓ Good |
+| Venmo deep links over built-in payments | Personal project, no business account needed — Venmo is already how they pay each other | ✓ Good |
+| Modular features via onboarding quiz | Not every household needs every feature — quiz recommends a setup | ✓ Good |
+| Mobile first | Roommates interact with this at home, not at a desk | ✓ Good |
+| Green primary color (#2D6A4F) | Trust/money association, distinct from default orange — per design spec | — Pending |
+| Presentation-only redesign | All backend logic untouched — reduces risk and keeps functionality intact | — Pending |
 
 ---
-*Last updated: 2026-03-10 after initialization*
+*Last updated: 2026-03-11 after v1.1 milestone start*

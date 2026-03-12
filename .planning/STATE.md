@@ -2,20 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-10)
+See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 4: Engagement
+**Current focus:** v1.1 UI Redesign
 
 ## Current Position
 
-**Phase:** 4 of 4 (Engagement)
-**Current Plan:** Not started
-**Total Plans in Phase:** 4
-**Status:** Milestone complete
-**Last Activity:** 2026-03-12
-
-**Progress:** [████████░░] 83%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-11 — Milestone v1.1 started
 
 ## Performance Metrics
 
