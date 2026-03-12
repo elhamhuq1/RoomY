@@ -94,12 +94,13 @@ Plans:
   2. User receives push notifications for chore reminders and grocery list updates
   3. User can view a shared household calendar showing upcoming events
   4. Recurring expense due dates and chore schedules appear automatically on the calendar
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 - [ ] 04-01-PLAN.md — Shared household calendar on Home tab with month grid, color-coded dots, day detail expansion
 - [ ] 04-02-PLAN.md — Notification database migration, Edge Functions for expense and chore push notifications
 - [ ] 04-03-PLAN.md — Client-side push registration, notification handler, preferences settings screen
+- [ ] 04-04-PLAN.md — Gap closure: bound event list scroll height, fix push token crash in Expo Go
 
 ## Progress
 
@@ -112,4 +113,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 & 3.1 (parallel) -> 4
 | 2. Expense Splitting | 4/5 | In Progress | - |
 | 3. Groceries | 2/3 | In Progress | - |
 | 3.1. Chores | 0/2 | Not started | - |
-| 4. Engagement | 0/3 | Not started | - |
+| 4. Engagement | 0/4 | Not started | - |
