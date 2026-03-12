@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,17 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { Calendar, DateData } from "react-native-calendars";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
-import type { Profile } from "@/lib/types/database";
+import type { Profile, Expense, Chore } from "@/lib/types/database";
+import {
+  buildMarkedDates,
+  getEventsForDate,
+  type CalendarEvent,
+} from "@/lib/calendar-utils";
 
 import * as Clipboard from "expo-clipboard";
 
@@ -50,6 +58,14 @@ export default function DashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Calendar state
+  const [selectedDate, setSelectedDate] = useState(
+    format(new Date(), "yyyy-MM-dd")
+  );
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [chores, setChores] = useState<Chore[]>([]);
 
   const inviteCode = household?.invite_code ?? "";
   const formattedCode = inviteCode
@@ -90,11 +106,69 @@ export default function DashboardScreen() {
     fetchMembers();
   }, [fetchMembers]);
 
+  // Fetch calendar data (expenses + chores for visible month)
+  const fetchCalendarData = useCallback(async () => {
+    if (!household?.id) return;
+
+    const monthStart = startOfMonth(currentMonth).toISOString();
+    const monthEnd = endOfMonth(currentMonth).toISOString();
+
+    const [expensesRes, choresRes] = await Promise.all([
+      supabase
+        .from("expenses")
+        .select("*")
+        .eq("household_id", household.id)
+        .gte("created_at", monthStart)
+        .lte("created_at", monthEnd),
+      supabase
+        .from("chores")
+        .select("*")
+        .eq("household_id", household.id)
+        .eq("is_active", true),
+    ]);
+
+    if (expensesRes.data) setExpenses(expensesRes.data as Expense[]);
+    if (choresRes.data) setChores(choresRes.data as Chore[]);
+  }, [household?.id, currentMonth]);
+
+  // Refetch calendar data when month changes
+  useEffect(() => {
+    fetchCalendarData();
+  }, [fetchCalendarData]);
+
+  // Refresh calendar data on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchCalendarData();
+    }, [fetchCalendarData])
+  );
+
+  // Compute marked dates for calendar
+  const markedDates = useMemo(() => {
+    const marks = buildMarkedDates(expenses, chores, currentMonth);
+    // Add selected date highlight
+    if (!marks[selectedDate]) {
+      marks[selectedDate] = { dots: [] };
+    }
+    marks[selectedDate] = {
+      ...marks[selectedDate],
+      selected: true,
+      selectedColor: "#f9a825",
+    };
+    return marks;
+  }, [expenses, chores, currentMonth, selectedDate]);
+
+  // Compute events for selected date
+  const selectedDateEvents = useMemo(
+    () => getEventsForDate(selectedDate, expenses, chores),
+    [selectedDate, expenses, chores]
+  );
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchMembers();
+    await Promise.all([fetchMembers(), fetchCalendarData()]);
     setRefreshing(false);
-  }, [fetchMembers]);
+  }, [fetchMembers, fetchCalendarData]);
 
   async function handleShare() {
     if (!inviteCode) return;
@@ -292,6 +366,86 @@ export default function DashboardScreen() {
             </Text>
           </View>
         ))}
+      </View>
+
+      {/* Calendar */}
+      <View className="mt-6">
+        <Text className="mb-3 text-lg font-semibold text-gray-700">
+          Calendar
+        </Text>
+        <View className="overflow-hidden rounded-2xl bg-white shadow-sm">
+          <Calendar
+            markingType="multi-dot"
+            markedDates={markedDates}
+            onDayPress={(day: DateData) => setSelectedDate(day.dateString)}
+            onMonthChange={(month: DateData) => {
+              setCurrentMonth(new Date(month.year, month.month - 1, 1));
+            }}
+            enableSwipeMonths={true}
+            theme={{
+              calendarBackground: "#ffffff",
+              todayTextColor: "#f9a825",
+              selectedDayBackgroundColor: "#f9a825",
+              selectedDayTextColor: "#ffffff",
+              arrowColor: "#f9a825",
+              dotStyle: { marginTop: 2 },
+              textDayFontSize: 14,
+              textMonthFontSize: 16,
+              textDayHeaderFontSize: 13,
+            }}
+          />
+        </View>
+
+        {/* Day detail list */}
+        <View className="mt-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+          {selectedDateEvents.length > 0 ? (
+            selectedDateEvents.map((event) => (
+              <Pressable
+                key={`${event.type}-${event.id}`}
+                className="flex-row items-center border-b border-surface-100 px-4 py-3 active:bg-surface-50"
+                onPress={() => router.push(event.deepLink as never)}
+              >
+                <Ionicons
+                  name={event.icon as keyof typeof Ionicons.glyphMap}
+                  size={22}
+                  color={event.color}
+                  style={{ marginRight: 12 }}
+                />
+                <View className="flex-1">
+                  <Text className="text-base font-medium text-gray-800">
+                    {event.title}
+                  </Text>
+                  <Text className="text-sm text-gray-400">
+                    {event.detail}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={16}
+                  color="#d1d5db"
+                />
+              </Pressable>
+            ))
+          ) : (
+            <View className="items-center py-6">
+              <Text className="text-sm text-gray-400">
+                No events on this day
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Color legend */}
+        <View className="mt-3 flex-row items-center justify-center gap-6">
+          <View className="flex-row items-center">
+            <View className="mr-2 h-3 w-3 rounded-full bg-[#3b82f6]" />
+            <Text className="text-xs text-gray-500">Expenses</Text>
+          </View>
+          <View className="flex-row items-center">
+            <View className="mr-2 h-3 w-3 rounded-full bg-[#22c55e]" />
+            <Text className="text-xs text-gray-500">Chores</Text>
+          </View>
+        </View>
       </View>
 
       {/* Module cards */}
