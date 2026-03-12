@@ -1,17 +1,28 @@
 import { colors } from "@/lib/theme/colors";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, usePathname, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, Pressable, View } from "react-native";
 import { useSession } from "@/lib/auth-context";
+import { FAB } from "@/components/ui/FAB";
 
 export default function TabsLayout() {
   const router = useRouter();
+  const pathname = usePathname();
   const { householdSettings } = useSession();
 
   const groceriesEnabled = householdSettings?.groceries_enabled ?? false;
   const choresEnabled = householdSettings?.chores_enabled ?? false;
 
+  const getFABConfig = () => {
+    if (pathname.includes('/expenses')) return { icon: 'add', onPress: () => router.push('/(app)/expenses/add' as never) };
+    if (pathname.includes('/chores')) return { icon: 'add', onPress: () => router.push('/(app)/chores/create' as never) };
+    return null; // No FAB on home or groceries tab (groceries has inline add)
+  };
+
+  const fabConfig = getFABConfig();
+
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.brand.DEFAULT,
@@ -136,5 +147,7 @@ export default function TabsLayout() {
         }}
       />
     </Tabs>
+    {fabConfig && <FAB icon={fabConfig.icon} onPress={fabConfig.onPress} />}
+    </View>
   );
 }
