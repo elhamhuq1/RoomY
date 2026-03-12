@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 8 of 10 (Expenses Screen)
-Plan: 1 of 2 in current phase
-Status: In Progress
-Last activity: 2026-03-12 -- Completed 08-01 Expenses screen components and parent rewrite
+Plan: 2 of 2 in current phase -- PHASE COMPLETE
+Status: Phase Complete
+Last activity: 2026-03-12 -- Completed 08-02 Per-member breakdown and visual verification
 
-Progress: [##########..........] 50% (v1.1 Phase 8: 1/2 plans)
+Progress: [####################] 100% (v1.1 Phase 8: 2/2 plans)
 
 ## Performance Metrics
 
@@ -42,7 +42,7 @@ Progress: [##########..........] 50% (v1.1 Phase 8: 1/2 plans)
 |-------|-------|-------|----------|
 | 06 Design System | 4 | 31min | 7.8min |
 | 07 Home Screen | 4 | 17min | 4.3min |
-| 08 Expenses Screen | 1/2 | 3min | 3.0min |
+| 08 Expenses Screen | 2/2 | 6min | 3.0min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
@@ -50,6 +50,7 @@ Progress: [##########..........] 50% (v1.1 Phase 8: 1/2 plans)
 | Phase 07 P03 | 5min | 2 tasks | 3 files |
 | Phase 07 P04 | 4min | 2 tasks | 5 files |
 | Phase 08 P01 | 3min | 2 tasks | 8 files |
+| Phase 08 P02 | 3min | 2 tasks | 1 file |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Recent decisions affecting current work:
 - [07-04]: fetchAllData scoped to selectedDate month so pull-to-refresh preserves calendar context
 - [08-01]: Separated touch zones (left Pressable for row, right Button for action) to avoid RN event bubbling
 - [08-01]: Card p-0 override for HistorySection cards since items manage their own px-4 padding
+- [08-02]: Reused ExpenseRow/SettlementRow from Plan 01 barrel export for member-history screen consistency
+- [08-02]: All Phase 8 requirements (XPUI-01, XPUI-02, XPUI-03) visually verified via 10-point UAT checklist
 
 ### Pending Todos
 
@@ -104,5 +107,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 08-01-PLAN.md -- Expenses screen components and parent rewrite
+Stopped at: Completed 08-02-PLAN.md -- Phase 8 complete (per-member breakdown + visual verification)
 Resume file: None
