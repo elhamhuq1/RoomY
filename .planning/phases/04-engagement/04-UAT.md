@@ -1,5 +1,5 @@
 ---
-status: complete
+status: resolved
 phase: 04-engagement
 source: [04-01-SUMMARY.md, 04-02-SUMMARY.md]
 started: 2026-03-12T02:00:00Z
@@ -79,21 +79,29 @@ skipped: 0
 ## Gaps
 
 - truth: "Event list below calendar should be scrollable with max 5 visible items to avoid taking up too much space on Home tab"
-  status: failed
+  status: resolved
   reason: "User reported: pass, but for a certain day the event list should show 5 in the users view and then if there are more than 5 users should be able to scroll on the event list because if there's like 10 it takes up a lot of space on the home page"
   severity: minor
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Day detail container in index.tsx renders all events in a plain View with no maxHeight or ScrollView — list grows unbounded"
+  artifacts:
+    - path: "app/(app)/(tabs)/index.tsx"
+      issue: "Lines 400-436 — day detail container has no height constraint, renders events via flat .map() in a View"
+  missing:
+    - "Wrap event list in ScrollView with maxHeight ~280px (5 items) and nestedScrollEnabled={true}"
   debug_session: ""
 
 - truth: "Push token registration should not crash in Expo Go — must handle missing projectId gracefully"
-  status: failed
+  status: resolved
   reason: "User reported: ERROR Push token registration failed: [Error: No \"projectId\" found. If \"projectId\" can't be inferred from the manifest (for instance, in bare workflow), you have to pass it in yourself.]"
   severity: blocker
   test: 12
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "getExpoPushTokenAsync called with undefined projectId — no EAS config in app.json and Expo Go doesn't auto-populate it"
+  artifacts:
+    - path: "lib/notifications.ts"
+      issue: "Lines 42-48 — projectId resolves to undefined, passed directly to getExpoPushTokenAsync which throws"
+    - path: "app.json"
+      issue: "No extra.eas.projectId field, no EAS project linked"
+  missing:
+    - "Add if (!projectId) guard before getExpoPushTokenAsync — log message and return null gracefully"
   debug_session: ""
