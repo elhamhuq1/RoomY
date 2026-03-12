@@ -282,12 +282,38 @@ export default function DashboardScreen() {
   // ---------- Navigation handlers ----------
 
   const handleSettleUp = useCallback(() => {
-    router.push('/(app)/(tabs)/expenses' as never);
-  }, [router]);
+    // Find the member we owe the most (most negative net_amount)
+    const oweRows = balances.filter((b) => Number(b.net_amount) < 0);
+    if (oweRows.length === 0) return;
+    const biggest = oweRows.reduce((a, b) =>
+      Number(a.net_amount) < Number(b.net_amount) ? a : b
+    );
+    router.push({
+      pathname: '/(app)/expenses/settle',
+      params: {
+        userId: biggest.user_id,
+        amount: Math.abs(Number(biggest.net_amount)).toFixed(2),
+        direction: 'you_owe',
+      },
+    } as never);
+  }, [router, balances]);
 
   const handleRequest = useCallback(() => {
-    router.push('/(app)/(tabs)/expenses' as never);
-  }, [router]);
+    // Find the member who owes us the most (most positive net_amount)
+    const owedRows = balances.filter((b) => Number(b.net_amount) > 0);
+    if (owedRows.length === 0) return;
+    const biggest = owedRows.reduce((a, b) =>
+      Number(a.net_amount) > Number(b.net_amount) ? a : b
+    );
+    router.push({
+      pathname: '/(app)/expenses/settle',
+      params: {
+        userId: biggest.user_id,
+        amount: Number(biggest.net_amount).toFixed(2),
+        direction: 'owed_to_you',
+      },
+    } as never);
+  }, [router, balances]);
 
   const handleBalanceCardPress = useCallback(() => {
     router.push('/(app)/(tabs)/expenses' as never);

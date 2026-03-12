@@ -19,31 +19,33 @@ re_verification_meta:
 human_verification:
   - test: "Open app at different times of day (before noon, 12-5pm, after 5pm)"
     expected: "Greeting reads 'Good morning', 'Good afternoon', or 'Good evening' respectively"
-    why_human: "Device clock behavior can only be confirmed visually at runtime"
+    result: passed
   - test: "View home screen calendar in default (collapsed) week strip state"
     expected: "Today has brand-color circular background; selected date has full brand background"
-    why_human: "NativeWind class rendering on device can differ from static analysis"
+    result: passed
   - test: "Tap the chevron on the calendar section, then tap a day in the expanded view"
     expected: "Calendar smoothly expands to full month view; tapping a day collapses back to week strip"
-    why_human: "LayoutAnimation behavior depends on JS thread timing on actual device"
+    result: passed
   - test: "View home screen on a physical device"
     expected: "Balance card shows dark diagonal gradient from slate-800 to slate-900 with legible white text"
-    why_human: "expo-linear-gradient rendering and inline borderRadius must be visually confirmed"
+    result: passed
   - test: "Use app in household where all balances are settled, no overdue chores, no disputes, no chores due today"
     expected: "Attention section shows checkmark icon and 'All caught up!' message with no cards"
-    why_human: "Requires real household data state; cannot be verified statically"
+    result: passed
   - test: "Log in with account that created a household with no other members"
     expected: "Home screen shows only GreetingHeader and MembersCard with prominent invite UI; no balance card, calendar, attention feed, or timeline"
-    why_human: "Requires a single-member household to test the isSoloCreator path"
+    result: passed
   - test: "Pull down on home screen scroll view after navigating to a non-today week"
     expected: "Spinner appears and all data reloads; selected calendar date is preserved (not reset to today)"
-    why_human: "RefreshControl behavior requires interactive gestures; date-preservation requires live state"
+    result: passed
   - test: "Have another user add an expense splitting with you; open home screen"
     expected: "Balance card shows a non-zero net amount (positive or negative), not 'All settled up'"
-    why_human: "Requires live Supabase data from get_household_balances RPC to verify .reduce() fix"
+    result: passed
   - test: "With recurring chores (weekly/daily) set up, select a week where next_due_at falls outside the week"
     expected: "WeeklyTimeline shows projected chore entries for that week"
-    why_human: "Requires live chore data with known frequencies to confirm projectChoreDates projection end-to-end"
+    result: passed
+human_verification_status: all_passed
+human_verification_date: 2026-03-12
 ---
 
 # Phase 7: Home Screen Verification Report
@@ -146,67 +148,23 @@ All task commits confirmed in git history:
 | `10fd25a` | 07-04 Task 1 | Fix WeeklyTimeline recurring chore projection |
 | `d6d0659` | 07-04 Task 2 | Fix balance .reduce(), hide settled buttons, date-aware refresh |
 
-### Human Verification Required
+### Human Verification — All Passed (2026-03-12)
 
-The following behaviors can only be confirmed at runtime on a device:
+All 9 device-only behaviors confirmed by user testing:
 
-#### 1. Greeting Time-of-Day Text
-
-**Test:** Open the app at different times of day (before noon, 12-5 pm, after 5 pm).
-**Expected:** Greeting reads "Good morning", "Good afternoon", or "Good evening" respectively.
-**Why human:** Logic is correct in code but actual device clock behavior can only be confirmed visually.
-
-#### 2. Calendar Week Strip — Today Highlight
-
-**Test:** View the home screen with the calendar in its default (collapsed) week strip state.
-**Expected:** Today has a brand-color circular background (`bg-brand-light`); selected date (also today by default) has full brand background (`bg-brand`).
-**Why human:** NativeWind class rendering on device can differ from static analysis.
-
-#### 3. Calendar Expand/Collapse Animation
-
-**Test:** Tap the chevron icon on the calendar section.
-**Expected:** Calendar smoothly expands to full month view. Tapping a day in the full view collapses back to week strip.
-**Why human:** `LayoutAnimation` behavior depends on JS thread timing on the actual device.
-
-#### 4. Balance Card — Dark Gradient
-
-**Test:** View the home screen on a physical device.
-**Expected:** Balance card shows a dark diagonal gradient from slate-800 to slate-900 with white text legible against it.
-**Why human:** `expo-linear-gradient` rendering and inline `borderRadius` on `LinearGradient` must be visually confirmed.
-
-#### 5. Attention Feed — Empty State
-
-**Test:** Use the app in a household where all balances are settled, no overdue chores, no disputes, no chores due today.
-**Expected:** The "Needs Your Attention" section shows the checkmark icon and "All caught up!" message.
-**Why human:** Requires real household data state to trigger; cannot be verified statically.
-
-#### 6. Solo Creator Layout
-
-**Test:** Log in with an account that created a household but has no other members.
-**Expected:** Home screen shows only GreetingHeader and MembersCard with prominent "Invite your roommates" UI. No balance card, calendar, attention feed, or timeline.
-**Why human:** Requires a single-member household to test the `isSoloCreator` path.
-
-#### 7. Pull-to-Refresh Preserves Date
-
-**Test:** Navigate to a non-today week in the calendar. Pull down on the home screen scroll view.
-**Expected:** Spinner appears and all data reloads; the selected calendar date is preserved (not reset to today's week).
-**Why human:** `RefreshControl` behavior requires interactive gestures; date-preservation requires live state verification.
-
-#### 8. Balance Card — Live Amount (Plan 04 Fix)
-
-**Test:** Have another user add an expense splitting with you. Open the home screen.
-**Expected:** Balance card shows the correct non-zero net amount (not "All settled up").
-**Why human:** Requires live Supabase data from `get_household_balances` RPC to verify the `.reduce()` fix works with real RPC output.
-
-#### 9. WeeklyTimeline — Recurring Chores (Plan 04 Fix)
-
-**Test:** With recurring chores (weekly or daily frequency) set up, select a week in the calendar where `next_due_at` falls outside the week.
-**Expected:** WeeklyTimeline shows projected chore entries for that week despite `next_due_at` being outside it.
-**Why human:** Requires live chore data with known frequencies to confirm `projectChoreDates` projection works end-to-end.
+1. ✓ Greeting Time-of-Day Text
+2. ✓ Calendar Week Strip — Today Highlight
+3. ✓ Calendar Expand/Collapse Animation
+4. ✓ Balance Card — Dark Gradient
+5. ✓ Attention Feed — Empty State
+6. ✓ Solo Creator Layout
+7. ✓ Pull-to-Refresh Preserves Date
+8. ✓ Balance Card — Live Amount (Plan 04 Fix)
+9. ✓ WeeklyTimeline — Recurring Chores (Plan 04 Fix)
 
 ### Gaps Summary
 
-No gaps. All 17 observable truths verified across all 4 plans, all 9 artifacts substantive (not stubs), all 13 key links wired, all 6 requirements satisfied. The 4 UAT bugs from Plan 04 (WeeklyTimeline empty, balance always zero, settled buttons still visible, pull-to-refresh resetting date) are all confirmed fixed in the codebase. 9 human verification items remain for device-only behaviors.
+No gaps. All 17 observable truths verified across all 4 plans, all 9 artifacts substantive (not stubs), all 13 key links wired, all 6 requirements satisfied. The 4 UAT bugs from Plan 04 are all confirmed fixed. All 9 human verification items passed on device (2026-03-12).
 
 ---
 

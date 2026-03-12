@@ -65,7 +65,7 @@ Each task was committed atomically:
 
 1. **Task 1: Update calendar-utils dot colors and create CalendarSection component** - `9f5b107` (feat)
 
-**Plan metadata:** [pending] (docs: complete plan)
+**Plan metadata:** `996267d` (docs: complete plan)
 
 ## Files Created/Modified
 - `components/home/CalendarSection.tsx` - Collapsible week-strip/month calendar with event dots and color legend
