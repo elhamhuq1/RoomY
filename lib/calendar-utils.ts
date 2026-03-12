@@ -42,8 +42,8 @@ export type CalendarEvent = {
   deepLink: string;
 };
 
-const EXPENSE_DOT: DotMarking = { key: "expense", color: "#3b82f6" };
-const CHORE_DOT: DotMarking = { key: "chore", color: "#22c55e" };
+export const EXPENSE_DOT: DotMarking = { key: "expense", color: "#EF4444" };
+export const CHORE_DOT: DotMarking = { key: "chore", color: "#22c55e" };
 
 /**
  * Project chore due dates within a month range based on frequency.
@@ -126,7 +126,7 @@ function stepDate(
 
 /**
  * Build markedDates object for react-native-calendars (multi-dot marking).
- * Blue dots for expenses, green dots for chores.
+ * Red/coral dots for expenses, green dots for chores.
  */
 export function buildMarkedDates(
   expenses: Expense[],
@@ -194,7 +194,7 @@ export function getEventsForDate(
         title: expense.description,
         detail: `$${Number(expense.amount).toFixed(2)}`,
         icon: "wallet",
-        color: "#3b82f6",
+        color: "#EF4444",
         deepLink: `/(app)/expenses/${expense.id}`,
       });
     }
