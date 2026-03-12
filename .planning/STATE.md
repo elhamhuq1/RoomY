@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 6 of 10 (Design System + Components)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-12 -- Completed 06-01 design tokens and palette migration
+Last activity: 2026-03-12 -- Completed 06-03 tab bar + FAB navigation chrome
 
-Progress: [###########.........] 55% (v1.1 Phase 6: 1/4 plans)
+Progress: [###############.....] 75% (v1.1 Phase 6: 3/4 plans)
 
 ## Performance Metrics
 
@@ -33,14 +33,14 @@ Progress: [###########.........] 55% (v1.1 Phase 6: 1/4 plans)
 | 04 Engagement | 4 | 13min | 3.3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 3min, 4min, 3min, 2min
+- Last 5 plans: 4min, 3min, 2min, 2min, 2min
 - Trend: Stable
 
 **By Phase (v1.1):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 06 Design System | 1 | 7min | 7.0min |
+| 06 Design System | 3 | 11min | 3.7min |
 
 *Updated after each plan completion*
 
@@ -60,6 +60,12 @@ Recent decisions affecting current work:
 - [06-01]: Brand green (#10B981) kept separate from semantic success (#22C55E)
 - [06-01]: headerTintColor uses neutral.text for readability over brand expression
 - [06-01]: AVATAR_COLORS temporary arrays until Avatar component in Plan 02
+- [06-02]: 8 gradient hue families for avatar differentiation (emerald, blue, violet, pink, amber, red, cyan, lime)
+- [06-02]: Card uses Platform.OS check for Android elevation alongside NativeWind shadow class
+- [06-02]: Toggle syncs animation via useEffect on value prop change for controlled component behavior
+- [06-02]: IconContainer hardcodes color-600 hex for Ionicons color prop (cannot use NativeWind classes)
+- [06-03]: Groceries tab excluded from FAB (has inline text input for adding items)
+- [06-03]: Existing in-screen FABs left in place; deduplication deferred to later phases
 
 ### Pending Todos
 
@@ -70,11 +76,11 @@ None yet.
 - [Research]: expo-blur intensity mapping (CSS blur 12px -> intensity ~25-35) requires visual tuning in Phase 10
 - [Research]: Colored shadow string format (boxShadow hex+alpha vs rgba) needs quick test in Phase 6
 - [Research]: NativeWind fontSize tuple behavior with fontWeight + letterSpacing needs verification in Phase 6
-- [Research]: Deterministic member color assignment strategy (sort by user_id vs created_at vs DB-stored index) -- decide at start of Phase 6
+- [Resolved 06-02]: Deterministic member color via hashString(userId) % 8 gradient pairs -- simple charCodeAt hash, no DB storage needed
 - [Research]: Gradient interpolation scope for onboarding carousel (static-per-slide vs scroll-handler) -- decide during Phase 10 planning
 
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 06-01-PLAN.md
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None

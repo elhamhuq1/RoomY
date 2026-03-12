@@ -106,8 +106,8 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 ### Navigation
 
-- [ ] **NAVG-01**: Tab bar uses branded styling (84px height, white bg, green active color, tertiary inactive)
-- [ ] **NAVG-02**: FAB uses rounded-square shape (52px, 16px radius) with brand background and colored shadow
+- [x] **NAVG-01**: Tab bar uses branded styling (84px height, white bg, green active color, tertiary inactive)
+- [x] **NAVG-02**: FAB uses rounded-square shape (52px, 16px radius) with brand background and colored shadow
 
 ## Future Requirements
 
@@ -167,8 +167,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-04 | Phase 6 | Pending |
 | COMP-05 | Phase 6 | Pending |
 | COMP-06 | Phase 6 | Pending |
-| NAVG-01 | Phase 6 | Pending |
-| NAVG-02 | Phase 6 | Pending |
+| NAVG-01 | Phase 6 | Complete |
+| NAVG-02 | Phase 6 | Complete |
 | HOME-01 | Phase 7 | Pending |
 | HOME-02 | Phase 7 | Pending |
 | HOME-03 | Phase 7 | Pending |
