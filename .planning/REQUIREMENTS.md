@@ -158,48 +158,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DSYS-01 | — | Pending |
-| DSYS-02 | — | Pending |
-| DSYS-03 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| COMP-05 | — | Pending |
-| COMP-06 | — | Pending |
-| ONBD-01 | — | Pending |
-| ONBD-02 | — | Pending |
-| ONBD-03 | — | Pending |
-| ONBD-04 | — | Pending |
-| ONBD-05 | — | Pending |
-| ONBD-06 | — | Pending |
-| ONBD-07 | — | Pending |
-| ONBD-08 | — | Pending |
-| HOME-01 | — | Pending |
-| HOME-02 | — | Pending |
-| HOME-03 | — | Pending |
-| HOME-04 | — | Pending |
-| HOME-05 | — | Pending |
-| HOME-06 | — | Pending |
-| XPUI-01 | — | Pending |
-| XPUI-02 | — | Pending |
-| XPUI-03 | — | Pending |
-| GRUI-01 | — | Pending |
-| GRUI-02 | — | Pending |
-| GRUI-03 | — | Pending |
-| GRUI-04 | — | Pending |
-| CHUI-01 | — | Pending |
-| CHUI-02 | — | Pending |
-| CHUI-03 | — | Pending |
-| CHUI-04 | — | Pending |
-| NAVG-01 | — | Pending |
-| NAVG-02 | — | Pending |
+| DSYS-01 | Phase 6 | Pending |
+| DSYS-02 | Phase 6 | Pending |
+| DSYS-03 | Phase 6 | Pending |
+| COMP-01 | Phase 6 | Pending |
+| COMP-02 | Phase 6 | Pending |
+| COMP-03 | Phase 6 | Pending |
+| COMP-04 | Phase 6 | Pending |
+| COMP-05 | Phase 6 | Pending |
+| COMP-06 | Phase 6 | Pending |
+| NAVG-01 | Phase 6 | Pending |
+| NAVG-02 | Phase 6 | Pending |
+| HOME-01 | Phase 7 | Pending |
+| HOME-02 | Phase 7 | Pending |
+| HOME-03 | Phase 7 | Pending |
+| HOME-04 | Phase 7 | Pending |
+| HOME-05 | Phase 7 | Pending |
+| HOME-06 | Phase 7 | Pending |
+| XPUI-01 | Phase 8 | Pending |
+| XPUI-02 | Phase 8 | Pending |
+| XPUI-03 | Phase 8 | Pending |
+| GRUI-01 | Phase 9 | Pending |
+| GRUI-02 | Phase 9 | Pending |
+| GRUI-03 | Phase 9 | Pending |
+| GRUI-04 | Phase 9 | Pending |
+| CHUI-01 | Phase 9 | Pending |
+| CHUI-02 | Phase 9 | Pending |
+| CHUI-03 | Phase 9 | Pending |
+| CHUI-04 | Phase 9 | Pending |
+| ONBD-01 | Phase 10 | Pending |
+| ONBD-02 | Phase 10 | Pending |
+| ONBD-03 | Phase 10 | Pending |
+| ONBD-04 | Phase 10 | Pending |
+| ONBD-05 | Phase 10 | Pending |
+| ONBD-06 | Phase 10 | Pending |
+| ONBD-07 | Phase 10 | Pending |
+| ONBD-08 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 36 total
-- Mapped to phases: 0
-- Unmapped: 36
+- Mapped to phases: 36
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-10*
-*Last updated: 2026-03-12 after v1.1 UI Redesign requirements definition*
+*Last updated: 2026-03-12 after v1.1 roadmap creation*
