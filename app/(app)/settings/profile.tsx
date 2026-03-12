@@ -91,7 +91,7 @@ export default function ProfileSettingsScreen() {
       >
         {/* Avatar preview */}
         <View className="mb-8 items-center">
-          <View className="h-24 w-24 items-center justify-center rounded-full bg-brand-light0">
+          <View className="h-24 w-24 items-center justify-center rounded-full bg-brand">
             <Text className="text-3xl font-bold text-white">{initials}</Text>
           </View>
           <Text className="mt-2 text-sm text-gray-400">
@@ -167,7 +167,7 @@ export default function ProfileSettingsScreen() {
           className={`items-center rounded-2xl py-4 ${
             !hasChanges || loading
               ? "bg-brand/50"
-              : "bg-brand-light0 active:bg-brand-dark"
+              : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleSave}
           disabled={!hasChanges || loading}

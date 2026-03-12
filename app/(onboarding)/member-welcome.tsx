@@ -139,7 +139,7 @@ export default function MemberWelcomeScreen() {
 
         {/* Continue button */}
         <Pressable
-          className="items-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+          className="items-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
           onPress={() => router.push("/(onboarding)/module-quiz")}
         >
           <Text className="text-lg font-bold text-white">Continue</Text>

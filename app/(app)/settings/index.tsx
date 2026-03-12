@@ -79,7 +79,7 @@ export default function SettingsScreen() {
     <View className="flex-1 bg-neutral-bg px-6 pt-6">
       {/* User card */}
       <View className="mb-6 flex-row items-center rounded-2xl bg-white p-5 shadow-sm">
-        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full bg-brand-light0">
+        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full bg-brand">
           <Text className="text-lg font-bold text-white">{initials}</Text>
         </View>
         <View className="flex-1">

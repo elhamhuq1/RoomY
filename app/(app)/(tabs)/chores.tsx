@@ -614,7 +614,7 @@ export default function ChoresScreen() {
 
         {/* FAB */}
         <Pressable
-          className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand-light0 active:bg-brand-dark"
+          className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand active:bg-brand-dark"
           style={{ elevation: 4, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 }}
           onPress={() => router.push("/(app)/chores/add" as never)}
         >
@@ -718,7 +718,7 @@ export default function ChoresScreen() {
 
       {/* FAB */}
       <Pressable
-        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand-light0 active:bg-brand-dark"
+        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand active:bg-brand-dark"
         style={{ elevation: 4, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 }}
         onPress={() => router.push("/(app)/chores/add" as never)}
       >

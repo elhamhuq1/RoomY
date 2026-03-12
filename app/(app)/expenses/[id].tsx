@@ -564,7 +564,7 @@ export default function ExpenseDetailScreen() {
                   <View
                     className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
                       isChecked
-                        ? "bg-brand-light0"
+                        ? "bg-brand"
                         : "border-2 border-gray-300 bg-white"
                     }`}
                   >
@@ -609,7 +609,7 @@ export default function ExpenseDetailScreen() {
           <Pressable
             className={`mb-3 flex-row items-center justify-center rounded-2xl py-4 ${
               canSave
-                ? "bg-brand-light0 active:bg-brand-dark"
+                ? "bg-brand active:bg-brand-dark"
                 : "bg-gray-200"
             }`}
             onPress={handleSave}
@@ -708,7 +708,7 @@ export default function ExpenseDetailScreen() {
 
       {/* Edit button */}
       <Pressable
-        className="mt-6 flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+        className="mt-6 flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
         onPress={() => setEditing(true)}
       >
         <Ionicons

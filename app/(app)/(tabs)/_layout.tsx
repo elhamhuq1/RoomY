@@ -15,7 +15,7 @@ export default function TabsLayout() {
 
   const getFABConfig = () => {
     if (pathname.includes('/expenses')) return { icon: 'add', onPress: () => router.push('/(app)/expenses/add' as never) };
-    if (pathname.includes('/chores')) return { icon: 'add', onPress: () => router.push('/(app)/chores/create' as never) };
+    if (pathname.includes('/chores')) return { icon: 'add', onPress: () => router.push('/(app)/chores/add' as never) };
     return null; // No FAB on home or groceries tab (groceries has inline add)
   };
 

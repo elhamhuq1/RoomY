@@ -299,7 +299,7 @@ export default function MembersSettingsScreen() {
           <View className="mt-5 w-full gap-3">
             {/* Share button */}
             <Pressable
-              className="flex-row items-center justify-center rounded-2xl bg-brand-light0 py-3.5 active:bg-brand-dark"
+              className="flex-row items-center justify-center rounded-2xl bg-brand py-3.5 active:bg-brand-dark"
               onPress={handleShare}
             >
               <Ionicons

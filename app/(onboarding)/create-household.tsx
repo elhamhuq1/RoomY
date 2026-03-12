@@ -133,7 +133,7 @@ export default function CreateHouseholdScreen() {
 
           {/* Share button */}
           <Pressable
-            className="mb-4 flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+            className="mb-4 flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
             onPress={handleShare}
           >
             <Ionicons
@@ -218,7 +218,7 @@ export default function CreateHouseholdScreen() {
           className={`items-center rounded-2xl py-4 ${
             !trimmedName || loading
               ? "bg-brand/50"
-              : "bg-brand-light0 active:bg-brand-dark"
+              : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleCreate}
           disabled={!trimmedName || loading}

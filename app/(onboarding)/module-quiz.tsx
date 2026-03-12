@@ -216,7 +216,7 @@ export default function ModuleQuizScreen() {
         {/* Continue button */}
         <Pressable
           className={`items-center rounded-2xl py-4 ${
-            loading ? "bg-brand/50" : "bg-brand-light0 active:bg-brand-dark"
+            loading ? "bg-brand/50" : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleContinue}
           disabled={loading}

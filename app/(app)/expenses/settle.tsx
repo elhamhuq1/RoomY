@@ -241,7 +241,7 @@ export default function SettleScreen() {
             className={`flex-row items-center justify-center rounded-2xl py-4 ${
               !isValidAmount || submitting
                 ? "bg-gray-300"
-                : "bg-brand-light0 active:bg-brand-dark"
+                : "bg-brand active:bg-brand-dark"
             }`}
             onPress={handleRecordPayment}
             disabled={!isValidAmount || submitting}

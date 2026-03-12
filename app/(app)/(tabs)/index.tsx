@@ -235,7 +235,7 @@ export default function DashboardScreen() {
 
         {/* Share button */}
         <Pressable
-          className="mb-3 flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+          className="mb-3 flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
           onPress={handleShare}
         >
           <Ionicons

@@ -197,7 +197,7 @@ export default function SignInScreen() {
         {/* Sign in button */}
         <Pressable
           className={`mb-6 items-center rounded-2xl py-4 ${
-            isDisabled ? "bg-brand/50" : "bg-brand-light0 active:bg-brand-dark"
+            isDisabled ? "bg-brand/50" : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleSignIn}
           disabled={isDisabled}

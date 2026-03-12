@@ -571,7 +571,7 @@ export default function GroceriesScreen() {
       {hasCheckedItems && (
         <View className="border-t border-gray-100 bg-white px-4 pb-6 pt-3">
           <Pressable
-            className="flex-row items-center justify-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+            className="flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
             onPress={() => router.push("/(app)/groceries/complete-trip")}
           >
             <Ionicons
@@ -670,7 +670,7 @@ export default function GroceriesScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  className="flex-1 items-center rounded-xl bg-brand-light0 py-3 active:bg-brand-dark"
+                  className="flex-1 items-center rounded-xl bg-brand py-3 active:bg-brand-dark"
                   onPress={saveEdit}
                 >
                   <Text className="text-base font-bold text-white">Save</Text>

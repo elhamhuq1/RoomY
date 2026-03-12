@@ -233,7 +233,7 @@ export default function AddChoreScreen() {
                 key={f.value}
                 className={`flex-1 items-center rounded-xl py-2.5 ${
                   frequency === f.value
-                    ? "bg-brand-light0"
+                    ? "bg-brand"
                     : "bg-white border border-gray-200"
                 }`}
                 onPress={() => setFrequency(f.value)}
@@ -326,7 +326,7 @@ export default function AddChoreScreen() {
         <Pressable
           className={`flex-row items-center justify-center rounded-2xl py-4 ${
             canSubmit
-              ? "bg-brand-light0 active:bg-brand-dark"
+              ? "bg-brand active:bg-brand-dark"
               : "bg-gray-200"
           }`}
           onPress={handleSubmit}

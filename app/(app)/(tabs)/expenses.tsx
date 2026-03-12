@@ -345,7 +345,7 @@ export default function ExpensesScreen() {
                           </Pressable>
                         )}
                         <Pressable
-                          className="rounded-lg bg-brand-light0 px-3 py-2 active:bg-brand-dark"
+                          className="rounded-lg bg-brand px-3 py-2 active:bg-brand-dark"
                           onPress={() =>
                             router.push(
                               `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=owed_to_you${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
@@ -400,7 +400,7 @@ export default function ExpensesScreen() {
                         </Text>
                       </View>
                       <Pressable
-                        className="rounded-lg bg-brand-light0 px-3 py-2 active:bg-brand-dark"
+                        className="rounded-lg bg-brand px-3 py-2 active:bg-brand-dark"
                         onPress={() =>
                           router.push(
                             `/(app)/expenses/settle?userId=${entry.user_id}&amount=${Math.abs(entry.net_amount).toFixed(2)}&direction=you_owe${recentExpense ? `&description=${encodeURIComponent(recentExpense.description)}&date=${encodeURIComponent(recentExpense.date)}` : ''}` as never
@@ -522,7 +522,7 @@ export default function ExpensesScreen() {
 
       {/* FAB - Add Expense */}
       <Pressable
-        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand-light0 shadow-lg active:bg-brand-dark"
+        className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-brand shadow-lg active:bg-brand-dark"
         style={{
           shadowColor: colors.brand.DEFAULT,
           shadowOffset: { width: 0, height: 4 },

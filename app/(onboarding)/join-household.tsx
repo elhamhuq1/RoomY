@@ -146,7 +146,7 @@ export default function JoinHouseholdScreen() {
           className={`items-center rounded-2xl py-4 ${
             trimmedCode.length < 8 || loading
               ? "bg-brand/50"
-              : "bg-brand-light0 active:bg-brand-dark"
+              : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleJoin}
           disabled={trimmedCode.length < 8 || loading}

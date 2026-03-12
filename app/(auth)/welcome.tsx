@@ -99,7 +99,7 @@ export default function WelcomeScreen() {
               key={index}
               className={`h-2.5 rounded-full ${
                 index === activeIndex
-                  ? "w-8 bg-brand-light0"
+                  ? "w-8 bg-brand"
                   : "w-2.5 bg-gray-300"
               }`}
             />
@@ -110,7 +110,7 @@ export default function WelcomeScreen() {
       {/* CTA buttons */}
       <View className="px-8 pb-12 pt-6">
         <Pressable
-          className="mb-4 items-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+          className="mb-4 items-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
           onPress={() => router.push("/(auth)/sign-up")}
         >
           <Text className="text-lg font-bold text-white">Get Started</Text>

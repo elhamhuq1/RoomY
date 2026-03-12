@@ -127,7 +127,7 @@ export default function ProfileSetupScreen() {
           className={`items-center rounded-2xl py-4 ${
             !trimmedName || loading
               ? "bg-brand/50"
-              : "bg-brand-light0 active:bg-brand-dark"
+              : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleContinue}
           disabled={!trimmedName || loading}

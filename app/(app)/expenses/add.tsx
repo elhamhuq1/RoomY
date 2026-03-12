@@ -365,7 +365,7 @@ export default function AddExpenseScreen() {
                 <View
                   className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
                     isChecked
-                      ? "bg-brand-light0"
+                      ? "bg-brand"
                       : "border-2 border-gray-300 bg-white"
                   }`}
                 >
@@ -416,7 +416,7 @@ export default function AddExpenseScreen() {
         <Pressable
           className={`flex-row items-center justify-center rounded-2xl py-4 ${
             canSubmit
-              ? "bg-brand-light0 active:bg-brand-dark"
+              ? "bg-brand active:bg-brand-dark"
               : "bg-gray-200"
           }`}
           onPress={handleSubmit}

@@ -69,7 +69,7 @@ export default function ForgotPasswordScreen() {
           <Text className="font-semibold text-gray-700">{email}</Text>
         </Text>
         <Pressable
-          className="w-full items-center rounded-2xl bg-brand-light0 py-4 active:bg-brand-dark"
+          className="w-full items-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
           onPress={() => router.replace("/(auth)/sign-in")}
         >
           <Text className="text-lg font-bold text-white">Back to Sign In</Text>
@@ -143,7 +143,7 @@ export default function ForgotPasswordScreen() {
         {/* Send reset link button */}
         <Pressable
           className={`items-center rounded-2xl py-4 ${
-            loading ? "bg-brand/50" : "bg-brand-light0 active:bg-brand-dark"
+            loading ? "bg-brand/50" : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleReset}
           disabled={loading}
