@@ -1,232 +1,442 @@
-# Stack Research
+# Technology Stack: UI Redesign Additions
 
-**Domain:** Roommate household management mobile app (expense splitting, shared lists, chore tracking)
-**Researched:** 2026-03-10
-**Confidence:** HIGH
+**Project:** RoomY v1.1 UI Redesign
+**Researched:** 2026-03-11
+**Scope:** New libraries and configuration changes needed for the visual redesign. This does NOT cover the existing stack (Expo SDK 54, NativeWind v4, Supabase, expo-router) -- only what must be ADDED or CHANGED.
 
-## Recommended Stack
+---
 
-### Core Technologies
+## Existing Stack (DO NOT CHANGE)
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Expo SDK | 55 | App framework | The de facto standard for React Native in 2026. SDK 55 ships with React Native 0.83 and React 19.2. New Architecture is now the only option (legacy dropped). Enables both devs to test via QR code on Linux and macOS without native build tools. |
-| React Native | 0.83 | Cross-platform UI | Bundled with Expo SDK 55. Runs Hermes v1 with improved JS engine performance, better ES6+ support. New Architecture provides better performance via JSI and Fabric renderer. |
-| TypeScript | ~5.7 | Type safety | Non-negotiable for any new RN project. Catches expense calculation bugs at compile time. Expo SDK 55 templates ship with TypeScript by default. |
-| Expo Router | v7 (SDK 55) | Navigation | File-based routing bundled with SDK 55. Automatic deep linking (critical for Venmo and Supabase auth callbacks), typed routes, native tab navigation API. Replaces the need for standalone React Navigation setup. |
-| Supabase | ^2.99.0 (@supabase/supabase-js) | Backend-as-a-Service | PostgreSQL-based BaaS with auth, realtime subscriptions, row-level security, and edge functions. Relational data model fits expense/balance tracking perfectly (users, households, expenses, balances are inherently relational). Official Expo integration guide exists. Free tier is generous for a personal-use app. |
+These are already installed and working. Listed for reference only.
 
-### Database & Backend
+| Technology | Version | Status |
+|------------|---------|--------|
+| Expo SDK | 54 | Installed |
+| React Native | 0.81.5 | Installed |
+| NativeWind | 4.2.2 | Installed |
+| Tailwind CSS | 3.4.19 | Installed |
+| react-native-reanimated | ~4.1.1 | Installed |
+| react-native-gesture-handler | ~2.28.0 | Installed |
+| react-native-calendars | ^1.1314.0 | Installed |
+| @expo/vector-icons | ^15.0.2 | Installed |
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Supabase (PostgreSQL) | Hosted | Primary database | Relational model is ideal for expense splitting: households have members, members have expenses, expenses produce balances. SQL queries can compute running totals and debt simplification natively. Row-level security ensures roommates only see their own household data. |
-| Supabase Auth | Included | Authentication | Email/password + magic links out of the box. Deep link integration with Expo Router for email verification. No need to build auth from scratch. Supports invite flows (email a roommate a link to join). |
-| Supabase Realtime | Included | Live sync | When one roommate adds an expense, others see it instantly via Postgres changes subscriptions. Critical for shared grocery lists and chore updates. No additional infrastructure needed. |
-| Supabase Edge Functions | Included | Server-side logic | Deno-based serverless functions for debt simplification calculations, recurring expense scheduling, and notification triggers. Runs close to the database for low latency. |
+**Architecture note:** SDK 54 runs the New Architecture by default (React Native 0.81). This means the `boxShadow` style property works cross-platform (iOS and Android) without needing legacy `shadowColor`/`shadowOffset`/`elevation` hacks. NativeWind v4's `shadow-*` classes use the legacy shadow props internally, but we can use `style` prop for custom colored shadows where needed.
 
-### State Management & Data Fetching
+---
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| TanStack Query (React Query) | ^5.90 (@tanstack/react-query) | Server state management | Handles caching, background refetching, optimistic updates, and loading/error states for all Supabase data. Pairs with Supabase client for automatic cache invalidation on realtime events. DevTools plugin now available for Expo. |
-| Zustand | ^5.0.11 | Client state management | ~1KB, zero-boilerplate global state for UI concerns: active household selection, onboarding quiz state, navigation state, filter/sort preferences. Not for server data (that is TanStack Query's job). Synchronous API, works perfectly with React 19. |
+## New Dependencies to Install
 
-### Styling & UI
+### Required Libraries
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| NativeWind | v5 (preview) | Utility-first styling | Tailwind CSS for React Native. Compiles to native StyleSheet.create at build time (zero runtime cost). Both devs likely know Tailwind from web. v5 supports React Native 0.81+ and is built on Tailwind v4.1+. Install via `nativewind@preview`. |
-| Expo Router Native Tabs | Bundled (SDK 55) | Tab navigation | SDK 55 default template includes platform-native tab bar. Uses iOS UITabBar and Android Material tabs. No additional UI library needed for navigation chrome. |
+| Library | Version | Purpose | Why This One |
+|---------|---------|---------|--------------|
+| expo-linear-gradient | ~15.0.8 | Gradient backgrounds on avatar circles, hero sections, balance card, setup choice cards | First-party Expo package. Included in Expo Go (no dev build needed). Provides `LinearGradient` component with `colors`, `start`, `end` props. The design spec calls for gradients in 8+ places -- avatars, carousel hero, balance card, icon containers, option cards, house icon. |
+| expo-blur | ~15.0.8 | Glass-morphism effect on onboarding welcome carousel (logo container, emoji badge) | First-party Expo package. Included in Expo Go. Provides `BlurView` with `intensity` (1-100) and `tint` props. The design spec requires `backdrop-filter: blur(12px)` on two glass containers in the welcome carousel. `BlurView` is the React Native equivalent. |
+| react-native-svg | 15.12.1 | SVG-based gradient avatars with precise circular clipping | Already a transitive dependency via other packages but needs explicit install for direct import. Enables `<Circle>` + `<LinearGradient>` + `<Defs>` for per-member gradient avatars that are true circles with gradient fills. Alternative: use `expo-linear-gradient` with `borderRadius` and `overflow: hidden` for simpler cases. |
 
-### Forms & Validation
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| React Hook Form | ^7.71 | Form state management | Minimal re-renders, Controller component works natively with RN inputs. Expense entry forms, chore assignment forms, onboarding quiz -- all need form state. ~9KB gzipped. |
-| Zod | ^4.3 | Schema validation | TypeScript-first validation. Infers types from schemas so you define the shape once and get both runtime validation and compile-time types. Use with @hookform/resolvers for react-hook-form integration. v4 is faster and slimmer than v3. |
-
-### Supporting Libraries
-
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| expo-secure-store | ^55.0 | Encrypted key-value storage | Store Supabase auth tokens securely. Uses iOS Keychain and Android Keystore under the hood. Required for session persistence. |
-| expo-notifications | ^55.0 | Push notifications | Notify roommates of new expenses, chore reminders, payment requests. Requires development build (not Expo Go). Use Expo Push Notification service (free). |
-| expo-linking | ^55.0 | Deep linking / URL handling | Open Venmo with pre-filled payment requests. Handle Supabase auth email callbacks. Critical for the one-tap Venmo flow. |
-| react-native-reanimated | ^4.x (SDK 55 bundled) | Animations | Gesture-driven transitions, shared element animations (enabled by default in SDK 55). Used by NativeWind v5 internally. |
-| day.js | ^1.11 | Date manipulation | 2KB minified. Format recurring expense dates, chore rotation schedules, calendar displays. Lighter than date-fns for a mobile app where bundle size matters. |
-| expo-image | ^55.0 | Image handling | Profile photos, household avatars. Replaces react-native-fast-image with an Expo-native solution. Supports caching, blurhash placeholders. |
-| @react-native-async-storage/async-storage | ^2.x | Unencrypted local storage | Cache non-sensitive data (user preferences, onboarding completion flag). Use expo-secure-store for anything auth-related. |
-
-### Development & Testing Tools
-
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| jest-expo | Unit testing preset | Mocks native Expo modules. Use `jest-expo/universal` for cross-platform test runs. |
-| @testing-library/react-native | Component testing | Replaces deprecated react-test-renderer (incompatible with React 19). Query components by text/role, not implementation details. |
-| Expo Dev Client | Custom development build | Required for push notifications and any native module testing. Replaces Expo Go for development once native deps are added. |
-| EAS Build | Cloud builds | Builds iOS binaries without a Mac (Linux dev can trigger iOS builds in the cloud). Critical for the two-person cross-OS team. |
-| EAS Update | Over-the-air updates | Push JS-only fixes without rebuilding. Hermes bytecode diffing in SDK 55 reduces update sizes by ~75%. |
-| TypeScript strict mode | Type safety | Enable `strict: true` in tsconfig.json from day one. Catches null pointer bugs in expense calculations. |
-| ESLint + Prettier | Code formatting | Use `eslint-config-expo` for Expo-specific linting rules. Keep code consistent across two developers. |
-
-## Installation
+### Installation Command
 
 ```bash
-# Create new Expo project with SDK 55 default template
-npx create-expo-app@latest RoomY --template default@sdk-55
-
-# Core dependencies
-npx expo install @supabase/supabase-js @tanstack/react-query zustand
-
-# Forms & validation
-npx expo install react-hook-form zod @hookform/resolvers
-
-# Styling (NativeWind v5 preview)
-npx expo install nativewind@preview react-native-css
-
-# Date handling
-npx expo install dayjs
-
-# These are bundled with SDK 55 but may need explicit install:
-npx expo install expo-secure-store expo-notifications expo-linking expo-image
-
-# Dev dependencies
-npx expo install --dev jest-expo @testing-library/react-native
+npx expo install expo-linear-gradient expo-blur react-native-svg
 ```
 
-## Alternatives Considered
+This resolves compatible versions automatically via `bundledNativeModules.json`. All three are included in Expo Go -- no development build required.
 
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| Supabase | Firebase (Firestore) | If you need robust offline-first sync with automatic conflict resolution. Firestore excels at offline mode. But its NoSQL model is a poor fit for relational expense data, and vendor lock-in to Google is heavier. |
-| Supabase | Convex | If you want end-to-end TypeScript with server functions that feel like calling local functions. Newer, smaller ecosystem. Less battle-tested for mobile. |
-| NativeWind v5 | Tamagui | If building a design system with advanced theming and cross-platform web+native parity. More complex setup, steeper learning curve, 75k weekly downloads vs NativeWind's 403k. Overkill for a two-dev personal project. |
-| NativeWind v5 | StyleSheet.create (vanilla) | If team does not know Tailwind. But both devs are CS majors who likely used Tailwind on web projects. NativeWind accelerates UI development significantly. |
-| Zustand | Redux Toolkit | If you have a large team (5+) that needs strict state mutation patterns and middleware ecosystem. 15KB vs Zustand's 1KB. For a two-dev app, Redux is overhead with no benefit. |
-| Zustand | Jotai | If your state is mostly independent atoms (like form fields). Zustand is better for the "household context" pattern where multiple pieces of state relate to each other. |
-| TanStack Query | SWR | If you want a simpler API for basic fetching. TanStack Query has better mutation support, optimistic updates, and DevTools -- all critical for an expense app where writes are frequent. |
-| day.js | date-fns | If you want tree-shakable functional API and don't mind ~18KB. day.js is 2KB and sufficient for this app's date needs (formatting, recurring schedules). |
-| React Hook Form | Formik | Formik re-renders the entire form on every keystroke. React Hook Form isolates re-renders to changed fields. In a mobile context, this matters for performance. Formik is also less actively maintained. |
-| Expo Router v7 | React Navigation 7 | Only if you need navigation patterns Expo Router doesn't support. In practice, Expo Router wraps React Navigation and adds file-based routing, typed routes, and automatic deep linking. There is no reason to use bare React Navigation in an Expo project in 2026. |
+---
 
-## What NOT to Use
+## NativeWind Theme Configuration Changes
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| Expo Go (for development beyond prototyping) | Cannot run push notifications, custom native modules, or dev client features. SDK 55 leans heavily on New Architecture features that require a development build. | Expo Dev Client via `npx expo run:android` / `npx expo run:ios`, or EAS Build for cloud builds. |
-| react-test-renderer | Deprecated. Does not support React 19 (which SDK 55 uses via React 19.2). Will cause cryptic failures. | @testing-library/react-native |
-| AsyncStorage for auth tokens | Unencrypted. Auth tokens stored in plain text are a security vulnerability, even for a personal app. | expo-secure-store (uses OS keychain/keystore). |
-| Moment.js | Deprecated since 2020. 329KB minified. Still appears in old tutorials. | day.js (2KB, largely Moment-compatible API). |
-| Redux (classic, not Toolkit) | Massive boilerplate, no longer recommended even by Redux team. | Zustand for client state, TanStack Query for server state. |
-| react-native-fast-image | Unmaintained, doesn't support New Architecture. Was the go-to image library but is now abandoned. | expo-image (maintained by Expo, supports SDK 55). |
-| NativeWind v4 (stable) | Compatibility issues with Reanimated v4 and New Architecture. v5 is designed for RN 0.81+ and is the forward path. | NativeWind v5 (preview). Monitor for stable release. |
-| Stripe / in-app payments | Project explicitly scopes out payment processing. No merchant account needed. Adds regulatory complexity for zero benefit. | Venmo deep links via expo-linking. |
+The existing `tailwind.config.js` has the old orange-based color palette. Replace it entirely with the design spec's green-based token system.
 
-## Venmo Integration Pattern
+### Updated tailwind.config.js
 
-This is project-specific but critical to get right. Venmo provides deep links for payment requests:
-
-```typescript
-// Mobile deep link (opens Venmo app directly)
-const venmoMobileUrl = `venmo://paycharge?txn=charge&recipients=${username}&amount=${amount}&note=${encodeURIComponent(note)}`;
-
-// Web fallback (works if Venmo app not installed)
-const venmoWebUrl = `https://venmo.com/${username}?txn=charge&amount=${amount}&note=${encodeURIComponent(note)}`;
-
-// Usage with expo-linking
-import * as Linking from 'expo-linking';
-
-async function requestVenmoPayment(username: string, amount: number, note: string) {
-  const mobileUrl = `venmo://paycharge?txn=charge&recipients=${username}&amount=${amount}&note=${encodeURIComponent(note)}`;
-  const canOpen = await Linking.canOpenURL(mobileUrl);
-
-  if (canOpen) {
-    await Linking.openURL(mobileUrl);
-  } else {
-    // Fall back to web URL
-    await Linking.openURL(`https://venmo.com/${username}?txn=charge&amount=${amount}&note=${encodeURIComponent(note)}`);
-  }
-}
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
+    "./lib/**/*.{js,jsx,ts,tsx}",
+  ],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+      colors: {
+        // Brand
+        brand: {
+          DEFAULT: "#2D6A4F",
+          light: "#D8F3DC",
+          muted: "#95D5B2",
+          dark: "#1B4332",
+        },
+        // Semantic
+        danger: {
+          DEFAULT: "#E5383B",
+          light: "#FFE5E5",
+        },
+        warning: {
+          DEFAULT: "#F4A261",
+          light: "#FFF3E0",
+        },
+        success: {
+          DEFAULT: "#40916C",
+          light: "#E8F5E9",
+        },
+        // Neutral (override defaults)
+        bg: "#FAFAF8",
+        card: "#FFFFFF",
+        text: {
+          DEFAULT: "#1A1A1A",
+          secondary: "#8E8E93",
+          tertiary: "#AEAEB2",
+        },
+        border: "#F0EFEB",
+        // Member colors (for avatar JS logic, not usually in classes)
+        member: {
+          elham: "#E76F51",
+          tk: "#264653",
+          elham3: "#7209B7",
+        },
+      },
+      borderRadius: {
+        xl: "16px",
+        "2xl": "24px",
+        "3xl": "28px",
+        "4xl": "30px",
+      },
+      fontSize: {
+        // Design spec typography scale
+        "page-title": ["26px", { lineHeight: "32px", fontWeight: "700", letterSpacing: "-0.02em" }],
+        "key-number": ["34px", { lineHeight: "40px", fontWeight: "700", letterSpacing: "-0.02em" }],
+        "section-heading": ["18px", { lineHeight: "24px", fontWeight: "700", letterSpacing: "-0.01em" }],
+        "card-title": ["16px", { lineHeight: "22px", fontWeight: "700" }],
+        "body": ["15px", { lineHeight: "22px", fontWeight: "600" }],
+        "metadata": ["13px", { lineHeight: "18px", fontWeight: "500" }],
+        "overline": ["11px", { lineHeight: "16px", fontWeight: "600", letterSpacing: "0.06em" }],
+        "badge": ["11px", { lineHeight: "14px", fontWeight: "600", letterSpacing: "0.02em" }],
+      },
+    },
+  },
+  plugins: [],
+};
 ```
 
-**Parameters:**
-- `txn`: "charge" for requests, "pay" for payments
-- `recipients`: Venmo username, email, or phone number
-- `amount`: Decimal number (no $ symbol)
-- `note`: URL-encoded description (e.g., "March rent - electric bill")
+**Key decisions in this config:**
 
-## Version Compatibility Matrix
+1. **Flat semantic names** (`brand`, `danger`, `warning`, `success`) instead of numbered scales (no `brand-50` through `brand-900`). The design spec defines exactly 2-4 shades per semantic group -- a numbered scale would create unused utilities and confuse implementation.
 
-| Package | Compatible With | Notes |
-|---------|-----------------|-------|
-| expo@55 | react-native@0.83, react@19.2 | SDK 55 pins these versions. Do not manually override. |
-| nativewind@preview (v5) | react-native@0.81+ | Built for New Architecture. Requires react-native-css. |
-| react-native-reanimated@4.x | expo@55 | New Architecture only (matches SDK 55 requirement). Check bundledNativeModules.json for exact patch version. |
-| @tanstack/react-query@5.x | react@18+ | Works with React 19.2 in SDK 55. |
-| zustand@5.x | react@18+ | Uses native useSyncExternalStore, compatible with React 19.2. |
-| zod@4.x | TypeScript 5.0+ | v4 is stable as of early 2026. Faster and smaller than v3. |
-| react-hook-form@7.x | react@16.8+ | Fully compatible with React 19.2. |
-| @supabase/supabase-js@2.x | Any JS runtime | Isomorphic client, works in React Native without polyfills. |
-| jest-expo@55 | jest@29+ | Match jest-expo version to your SDK version. |
+2. **`text` as a color group** maps to NativeWind classes like `text-text` (primary), `text-text-secondary`, `text-text-tertiary`. Slightly awkward naming but avoids collision with Tailwind's built-in `text-*` utilities.
 
-## Node.js Requirement
+3. **`fontSize` with full tuples** including lineHeight, fontWeight, and letterSpacing. NativeWind v4 supports the Tailwind CSS fontSize tuple syntax `[size, { lineHeight, fontWeight, letterSpacing }]`. This means `text-page-title` applies size, weight, height, AND spacing in one class. HIGH confidence -- verified on NativeWind docs.
 
-Expo SDK 55 requires Node.js `^20.19.4`, `^22.13.0`, `^24.3.0`, or `^25.0.0`. Use Node 22 LTS for the most stable experience.
+4. **`member` colors** are included for programmatic access via `resolveConfig` but avatars use `expo-linear-gradient` directly with hex values since gradients cannot be expressed in Tailwind classes.
 
-## Stack Patterns by Variant
+### What the Config Does NOT Need
 
-**If you need offline-first (future consideration):**
-- Add expo-sqlite or PowerSync for local-first data with Supabase sync
-- This is not needed for v1 (personal use, always on home wifi) but is the upgrade path
+- **CSS variables / `vars()` function**: The design spec has one theme (light mode only, no dark mode). CSS variable indirection adds complexity without benefit. Use static hex values.
+- **`platformColor()` / `platformSelect()`**: No platform-specific colors in the design spec. All colors are identical on iOS and Android.
+- **Custom `boxShadow` theme values**: NativeWind v4 shadow classes (`shadow-sm`, `shadow`, `shadow-md`, `shadow-lg`) use legacy shadow props. For the design spec's exact shadow tokens, use inline `style` props with the `boxShadow` property (React Native 0.81 supports this natively on New Architecture). See Shadows section below.
 
-**If you outgrow Supabase free tier:**
-- Supabase is open source -- self-host on a $5/mo VPS
-- Or upgrade to Supabase Pro ($25/mo) which is generous for a small household app
+---
 
-**If NativeWind v5 preview proves unstable:**
-- Fall back to NativeWind v4.2.2 (stable) with known Reanimated v4 patch
-- Or use vanilla StyleSheet.create as a last resort
-- Monitor https://github.com/nativewind/nativewind/releases for stable v5
+## Shadows Strategy
+
+The design spec defines two shadow tokens:
+
+| Token | Value |
+|-------|-------|
+| `shadow` | `0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)` |
+| `shadowMd` | `0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)` |
+
+Plus colored shadows on avatars: `0 2px 8px {memberColor}33` and on brand buttons: `0 4px 16px {brand}55`.
+
+### Approach: Hybrid (NativeWind classes + inline boxShadow)
+
+**For standard shadows:** Use NativeWind's built-in `shadow-sm` and `shadow-md` classes. They are close enough to the spec tokens and work cross-platform. NativeWind v4 maps these to the legacy shadow* props which produce visually similar results. Always pair with a background color (`bg-card`, `bg-white`) -- shadows are invisible without one on native.
+
+**For colored shadows (avatars, brand buttons):** Use React Native 0.81's `boxShadow` style property directly. This is the only way to get colored shadows cross-platform. Example:
+
+```tsx
+// Avatar with colored shadow
+<View
+  className="rounded-full bg-white"
+  style={{
+    boxShadow: "0 2px 8px #E76F5133",
+  }}
+>
+  {/* avatar content */}
+</View>
+
+// Brand button with colored shadow
+<Pressable
+  className="bg-brand rounded-[14px]"
+  style={{
+    boxShadow: "0 4px 16px #2D6A4F55",
+  }}
+>
+  {/* button content */}
+</Pressable>
+```
+
+**Why not put custom shadows in Tailwind theme?** NativeWind v4 converts shadow classes to legacy `shadowColor`/`shadowOffset`/`shadowOpacity`/`shadowRadius` props. It does NOT use the `boxShadow` property. Custom multi-layer shadows or colored shadows defined in the theme would be converted to legacy props, losing the multi-layer aspect and color precision. Using `style={{ boxShadow }}` directly bypasses this limitation.
+
+---
+
+## Gradients Strategy
+
+React Native has no CSS gradient support. Every gradient in the design spec requires the `LinearGradient` component.
+
+### Gradient Usage Map
+
+| Location | Colors | Direction | Component |
+|----------|--------|-----------|-----------|
+| Avatar circles | Per-member (see spec) | 135deg (diagonal) | `expo-linear-gradient` or `react-native-svg` |
+| Carousel hero bg | Per-slide (3 variants) | Top-to-bottom | `expo-linear-gradient` |
+| Balance summary card | `#2D6A4F` to `#1B4332` | Top-to-bottom | `expo-linear-gradient` |
+| Setup choice icon containers | Brand gradient + purple gradient | 135deg | `expo-linear-gradient` |
+| House icon (name household) | Brand gradient | 135deg | `expo-linear-gradient` |
+
+### Implementation Pattern
+
+```tsx
+import { LinearGradient } from "expo-linear-gradient";
+
+// 135-degree diagonal gradient (design spec default)
+<LinearGradient
+  colors={["#E76F51", "#F4A261"]}
+  start={{ x: 0, y: 0 }}
+  end={{ x: 1, y: 1 }}
+  style={{ width: 36, height: 36, borderRadius: 18 }}
+>
+  <Text className="text-white text-center">E</Text>
+</LinearGradient>
+```
+
+**expo-linear-gradient vs react-native-svg for avatars:** Use `expo-linear-gradient` with `borderRadius` and `overflow: hidden` for the standard round avatars. It is simpler and performs better. Only reach for `react-native-svg` if you need complex clipping paths or masking that `borderRadius` cannot achieve. For this design spec, `expo-linear-gradient` is sufficient for all gradient needs.
+
+---
+
+## Glass-Morphism Strategy
+
+The design spec uses glass-morphism in exactly two places on the welcome carousel:
+1. Logo container (80px, rounded 24px)
+2. Feature emoji badge (72px rounded container)
+
+Both use: `background: rgba(255,255,255,0.15)`, `border: 1px solid rgba(255,255,255,0.2)`, `backdrop-filter: blur(12px)`.
+
+### Implementation
+
+```tsx
+import { BlurView } from "expo-blur";
+
+<BlurView
+  intensity={30}
+  tint="light"
+  style={{
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  <Text style={{ fontSize: 40 }}>house emoji</Text>
+</BlurView>
+```
+
+**intensity mapping:** The design spec says `blur(12px)`. `expo-blur`'s `intensity` is 1-100, not px. An `intensity` of 25-35 produces a visual effect comparable to `blur(12px)`. This requires visual tuning during implementation.
+
+**Android behavior:** On Android SDK 31+, `expo-blur` uses the native `BlurView` (dimezisBlurViewSdk31Plus method). On older Android, it falls back to a semi-transparent overlay (no actual blur). This is acceptable -- the glass-morphism is decorative, not functional.
+
+---
+
+## Animation Strategy
+
+The design spec requires these animations:
+1. **Carousel swipe** (welcome screen) -- horizontal paging
+2. **Calendar collapse/expand** -- height transition between week strip and month grid
+3. **Toggle switches** -- knob slide + background color transition
+4. **Avatar preview** -- real-time update as user types display name
+
+### Already Installed: react-native-reanimated 4.1.1
+
+No new animation library needed. Reanimated 4 provides:
+
+- **Layout animations** for the calendar collapse/expand (`LinearTransition.duration(300)`)
+- **`useSharedValue` + `useAnimatedStyle`** for toggle switch knob position
+- **`withTiming` / `withSpring`** for smooth easing
+
+### Carousel: Use ScrollView, Not a Library
+
+The welcome carousel is 3 static slides with paging. Use React Native's built-in `ScrollView` with `pagingEnabled` and `horizontal` props. Track the active page index with `onMomentumScrollEnd`. No carousel library needed -- adding one for 3 slides is unnecessary dependency weight.
+
+```tsx
+<ScrollView
+  horizontal
+  pagingEnabled
+  showsHorizontalScrollIndicator={false}
+  onMomentumScrollEnd={(e) => {
+    const page = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+    setActivePage(page);
+  }}
+>
+  {slides.map((slide) => (
+    <View key={slide.id} style={{ width: screenWidth }}>
+      {/* slide content */}
+    </View>
+  ))}
+</ScrollView>
+```
+
+### Calendar Collapse/Expand
+
+Use Reanimated's layout transitions on the `Animated.View` wrapper:
+
+```tsx
+import Animated, { LinearTransition } from "react-native-reanimated";
+
+<Animated.View layout={LinearTransition.duration(300)}>
+  {isExpanded ? <MonthGrid /> : <WeekStrip />}
+</Animated.View>
+```
+
+### NativeWind Animation Classes
+
+NativeWind v4 has **experimental** support for Tailwind animation classes (`animate-spin`, `animate-bounce`, etc.) powered by Reanimated. These are fine for simple looping animations but are not suitable for the gesture-driven or state-driven animations in this design spec. Use Reanimated's imperative API directly for all animations in this project.
+
+---
+
+## Typography Strategy
+
+The design spec uses system fonts with specific weights and letter-spacing values.
+
+### System Font Stack
+
+React Native uses the platform system font by default (`-apple-system` on iOS, `Roboto` on Android). No custom fonts need to be loaded. The `expo-font` package is already installed but is not needed for this redesign.
+
+### Letter-Spacing Support
+
+NativeWind v4 supports all tracking classes (`tracking-tighter` through `tracking-widest`) plus arbitrary values (`tracking-[0.06em]`). HIGH confidence -- verified on NativeWind docs.
+
+The design spec's letter-spacing values map to:
+
+| Spec Value | NativeWind Class | Usage |
+|------------|-----------------|-------|
+| `-0.02em` | `tracking-tight` (close enough at -0.025em) or `tracking-[-0.02em]` | Page titles, key numbers |
+| `-0.01em` | `tracking-[-0.01em]` | Section headings |
+| `0` | `tracking-normal` | Card titles, body text |
+| `0.02em` | `tracking-[0.02em]` | Badge text |
+| `0.06em` | `tracking-[0.06em]` | Overline labels |
+
+### Font Weight Support
+
+NativeWind supports `font-medium` (500), `font-semibold` (600), `font-bold` (700), `font-extrabold` (800). All weights in the design spec are covered.
+
+---
+
+## Emoji Rendering
+
+The design spec uses emoji extensively (chore icons, onboarding elements, carousel badges). React Native renders emoji natively via the platform's emoji font. No library needed.
+
+For emoji in icon containers (40x40px box with background), use a simple `View` + `Text`:
+
+```tsx
+<View className="w-10 h-10 rounded-xl bg-warning-light items-center justify-center">
+  <Text style={{ fontSize: 20 }}>plate emoji</Text>
+</View>
+```
+
+The `fontSize` on the emoji `Text` controls the emoji size. Use `style` prop rather than NativeWind `text-*` class because emoji sizing is more predictable with explicit pixel values.
+
+---
+
+## What NOT to Install
+
+| Library | Why It Seems Needed | Why It Is Not |
+|---------|--------------------|--------------|
+| `react-native-linear-gradient` (non-Expo) | Gradients | Use `expo-linear-gradient` instead. The non-Expo version requires native linking and a dev build. The Expo version works in Expo Go. |
+| `react-native-shadow-2` | Custom shadows | React Native 0.81 (New Architecture) supports `boxShadow` style natively. No third-party shadow library needed. |
+| `@gorhom/bottom-sheet` | Modals/sheets | Not in the design spec. No bottom sheets in the UI redesign. |
+| `react-native-pager-view` or `react-native-snap-carousel` | Welcome carousel | 3-slide carousel does not need a library. `ScrollView` with `pagingEnabled` is sufficient. |
+| `expo-font` / custom fonts | Typography | Already installed but unused. Design spec uses system fonts only. |
+| `react-native-skia` | Advanced graphics/blur | Massively over-powered for this use case. `expo-blur` handles the two glass-morphism containers. Skia adds ~3MB to bundle size. |
+| `tailwindcss-animate` | Tailwind animation utilities | NativeWind v4 has its own experimental animation support. But we are using Reanimated directly for all animations, so neither is needed. |
+| `nativewind@preview` (v5) | Latest NativeWind | The app runs NativeWind v4.2.2 on Tailwind CSS 3.4.19. Upgrading to v5 mid-project is a breaking change (v5 requires Tailwind CSS v4.1+ and `react-native-css`). The existing v4 setup handles everything in this design spec. Do not upgrade. |
+| CSS variables / `vars()` | Design tokens | The app has one theme (light mode only). Static hex values in `tailwind.config.js` are simpler and sufficient. CSS variables add indirection without benefit. |
+
+---
+
+## Version Compatibility Matrix (New Dependencies Only)
+
+| Package | SDK 54 Compatible Version | In Expo Go? | New Architecture Required? |
+|---------|--------------------------|-------------|---------------------------|
+| expo-linear-gradient | ~15.0.8 | Yes | No |
+| expo-blur | ~15.0.8 | Yes | No |
+| react-native-svg | 15.12.1 | Yes | No |
+
+All versions verified from `bundledNativeModules.json` in the installed `expo@54` package. HIGH confidence.
+
+---
+
+## Integration Points with Existing Setup
+
+### babel.config.js -- NO CHANGES
+The existing config with `nativewind/babel` preset and `jsxImportSource: "nativewind"` is correct.
+
+### metro.config.js -- NO CHANGES
+The existing `withNativeWind(config, { input: "./global.css" })` wrapper is correct.
+
+### global.css -- NO CHANGES
+The existing `@tailwind base/components/utilities` directives are correct.
+
+### app.json -- NO CHANGES
+No new config plugins needed. `expo-linear-gradient`, `expo-blur`, and `react-native-svg` do not require Expo config plugins.
+
+### tailwind.config.js -- FULL REPLACEMENT
+Replace the existing orange color palette with the green-based design token system (see NativeWind Theme Configuration section above). The `content` paths and `presets` stay the same.
+
+---
 
 ## Confidence Assessment
 
 | Decision | Confidence | Reasoning |
 |----------|------------|-----------|
-| Expo SDK 55 | HIGH | Official release, verified on expo.dev changelog. SDK 55 released Feb 25, 2026. |
-| Supabase as BaaS | HIGH | Official Expo integration guide exists. Relational model matches domain perfectly. Verified on docs.expo.dev and supabase.com. |
-| Expo Router v7 | HIGH | Bundled with SDK 55. File-based routing is the official Expo recommendation. |
-| TanStack Query v5 | HIGH | 5.90.x verified on npm. Standard server-state solution for React/RN. DevTools for Expo available. |
-| Zustand v5 | HIGH | 5.0.11 verified on npm. Dominant lightweight state manager in 2026 RN ecosystem. |
-| NativeWind v5 | MEDIUM | Still in preview (not stable release). v5 is the forward path for RN 0.81+ but may have edge cases. Fallback plan documented. |
-| Zod v4 | HIGH | 4.3.6 verified on npm. Stable release, TypeScript-first. |
-| React Hook Form v7 | HIGH | 7.71.2 verified on npm. Long-standing, well-maintained. |
-| day.js | HIGH | Stable, lightweight, widely used. No version concerns. |
-| Venmo deep links | MEDIUM | URL scheme documented by community (not official Venmo API docs). Parameters verified across multiple independent sources. Venmo could change scheme without notice. |
+| expo-linear-gradient ~15.0.8 | HIGH | Version from bundledNativeModules.json, Expo Go compatible, first-party package |
+| expo-blur ~15.0.8 | HIGH | Version from bundledNativeModules.json, Expo Go compatible, verified on Expo docs |
+| react-native-svg 15.12.1 | HIGH | Version from bundledNativeModules.json, widely used with Expo |
+| NativeWind v4 color token config | HIGH | Standard tailwind.config.js extend pattern, verified on NativeWind docs |
+| NativeWind v4 fontSize tuples | MEDIUM | Tailwind CSS 3 supports this syntax; NativeWind v4 docs confirm typography support but exact tuple behavior not individually verified. Test during implementation. |
+| boxShadow style on RN 0.81 | HIGH | React Native 0.81 docs confirm boxShadow property on New Architecture. SDK 54 uses New Architecture by default. |
+| NativeWind shadow-* classes for standard shadows | HIGH | Verified on NativeWind docs. Requires background color on native. |
+| Colored shadows via style prop | MEDIUM | boxShadow with color values confirmed in RN 0.81 docs. Exact color string format (hex with alpha like `#2D6A4F55`) needs testing -- may need `rgba()` format instead. |
+| expo-blur intensity mapping | LOW | The mapping between `blur(12px)` CSS and `intensity={30}` is an estimate. Requires visual tuning. |
+| ScrollView carousel approach | HIGH | Standard React Native pattern for fixed-count horizontal paging. |
+| Reanimated layout transitions | HIGH | Layout transitions verified in Reanimated 4 docs. `LinearTransition.duration()` confirmed. |
+| No NativeWind upgrade needed | HIGH | v4.2.2 on TW3 handles all required features (colors, shadows, typography, letter-spacing). v5 upgrade would be a breaking change with no benefit for this scope. |
+
+---
 
 ## Sources
 
-- [Expo SDK 55 Changelog](https://expo.dev/changelog/sdk-55) -- SDK 55 features, React Native 0.83, Node requirements (HIGH confidence)
-- [Expo SDK 55 Beta Announcement](https://expo.dev/changelog/sdk-55-beta) -- Early feature list, architecture changes (HIGH confidence)
-- [Expo Router v55 Blog Post](https://expo.dev/blog/expo-router-v55-more-native-navigation-more-powerful-web) -- Router v7 features, native tabs, Colors API (HIGH confidence)
-- [Expo Documentation: Using Supabase](https://docs.expo.dev/guides/using-supabase/) -- Official integration guide (HIGH confidence)
-- [Supabase Docs: Expo React Native Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native) -- Auth + client setup (HIGH confidence)
-- [Supabase Docs: Native Mobile Deep Linking](https://supabase.com/docs/guides/auth/native-mobile-deep-linking) -- Auth deep link setup (HIGH confidence)
-- [NativeWind v5 Installation](https://www.nativewind.dev/v5/getting-started/installation) -- v5 preview install steps (HIGH confidence)
-- [NativeWind v5 Migration Guide](https://www.nativewind.dev/v5/guides/migrate-from-v4) -- v4 to v5 changes (HIGH confidence)
-- [TanStack Query React Native Docs](https://tanstack.com/query/v5/docs/react/react-native) -- RN-specific setup (HIGH confidence)
-- [Expo Documentation: Unit Testing](https://docs.expo.dev/develop/unit-testing/) -- jest-expo setup (HIGH confidence)
-- [Expo Documentation: Push Notifications](https://docs.expo.dev/push-notifications/push-notifications-setup/) -- Notification requirements (HIGH confidence)
-- [Expo Documentation: SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/) -- Encrypted storage API (HIGH confidence)
-- [Venmo Deep Linking](https://blog.alexbeals.com/posts/venmo-deeplinking) -- URL scheme documentation (MEDIUM confidence, community source)
-- [Venmo Payment Links](https://venmo.com/paymentlinks/) -- Official web link format (MEDIUM confidence)
-- [Galaxies.dev: React Native Tech Stack 2025](https://galaxies.dev/article/react-native-tech-stack-2025) -- Ecosystem overview (MEDIUM confidence)
-- [Zustand npm](https://www.npmjs.com/package/zustand) -- Version 5.0.11 verified (HIGH confidence)
-- [TanStack React Query npm](https://www.npmjs.com/package/@tanstack/react-query) -- Version 5.90.21 verified (HIGH confidence)
-- [Supabase JS npm](https://www.npmjs.com/package/@supabase/supabase-js) -- Version 2.99.0 verified (HIGH confidence)
-- [React Hook Form npm](https://www.npmjs.com/package/react-hook-form) -- Version 7.71.2 verified (HIGH confidence)
-- [Zod Release Notes v4](https://zod.dev/v4) -- v4 stable, performance improvements (HIGH confidence)
+- [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54) -- SDK features, React Native 0.81, New Architecture default (HIGH)
+- [Expo LinearGradient Docs](https://docs.expo.dev/versions/latest/sdk/linear-gradient/) -- API, installation, props (HIGH)
+- [Expo BlurView Docs](https://docs.expo.dev/versions/latest/sdk/blur-view/) -- API, intensity, tint, Expo Go support (HIGH)
+- [NativeWind Box Shadow Docs](https://www.nativewind.dev/docs/tailwind/effects/box-shadow) -- shadow class support, background color requirement (HIGH)
+- [NativeWind Box Shadow Color Docs](https://www.nativewind.dev/docs/tailwind/effects/box-shadow-color) -- arbitrary color shadow support (HIGH)
+- [NativeWind Colors Docs](https://www.nativewind.dev/docs/customization/colors) -- custom color config pattern (HIGH)
+- [NativeWind Themes Guide](https://www.nativewind.dev/docs/guides/themes) -- CSS variables, vars() function, dynamic theming (HIGH)
+- [NativeWind Letter Spacing Docs](https://www.nativewind.dev/docs/tailwind/typography/letter-spacing) -- tracking class support (HIGH)
+- [NativeWind Animation Docs](https://www.nativewind.dev/docs/tailwind/transitions-animation/animation) -- experimental animation class support (HIGH)
+- [React Native 0.81 View Style Props](https://reactnative.dev/docs/0.81/view-style-props) -- boxShadow property documentation (HIGH)
+- [Reanimated Layout Transitions Docs](https://docs.swmansion.com/react-native-reanimated/docs/layout-animations/layout-transitions/) -- LinearTransition, CurvedTransition API (HIGH)
+- [NativeWind v4 to v5 Migration](https://www.nativewind.dev/v5/guides/migrate-from-v4) -- breaking changes, why NOT to upgrade mid-project (HIGH)
+- `bundledNativeModules.json` in local `node_modules/expo/` -- exact compatible version numbers (HIGH)
+- [NativeWind GitHub #1442](https://github.com/nativewind/nativewind/issues/1442) -- boxShadow vs legacy shadow props discussion (MEDIUM)
 
 ---
-*Stack research for: RoomY -- Roommate household management app*
-*Researched: 2026-03-10*
+*Stack research for: RoomY v1.1 UI Redesign*
+*Researched: 2026-03-11*

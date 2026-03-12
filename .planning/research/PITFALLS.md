@@ -1,281 +1,307 @@
 # Pitfalls Research
 
-**Domain:** Roommate household management app (expense splitting, chores, grocery lists)
-**Researched:** 2026-03-10
-**Confidence:** MEDIUM-HIGH (domain pitfalls well-documented via competitor user feedback and system design literature; Venmo deep link specifics are LOW confidence due to undocumented API)
+**Domain:** UI/UX redesign of an existing Expo React Native app (NativeWind v4, Tailwind 3, Expo SDK 54)
+**Researched:** 2026-03-11
+**Confidence:** HIGH (pitfalls verified through NativeWind official docs, React Native official docs, expo documentation, and codebase analysis of 30 existing screen files with 74 hardcoded color references and 76 inline style objects)
 
 ## Critical Pitfalls
 
-### Pitfall 1: Venmo Deep Links Are Undocumented and Fragile
+### Pitfall 1: Hardcoded Color Values Scattered Across 25+ Files
 
 **What goes wrong:**
-Venmo has no official public deep link API. The `venmo://paycharge?txn=pay&recipients=...&amount=...&note=...` scheme was reverse-engineered from the mobile app. Venmo has broken these links before without warning (reported broken in late 2024). There is no callback or webhook to confirm whether the user actually completed the payment. The app will open Venmo but has zero visibility into what happens next.
+The existing codebase has 74 instances of the old orange primary color (`#f9a825`, `#f59b20`, etc.) hardcoded directly in JSX -- in `color=` props on Ionicons, in `style={{ backgroundColor: }}` objects, in NativeWind arbitrary values like `bg-[#3b82f6]`, and in third-party component theme configs (react-native-calendars). Changing the tailwind.config.js color tokens only updates NativeWind className references (`bg-primary-500`). It does NOT touch any of these hardcoded values. The result: a half-migrated app where some elements are green and others are still orange, creating visual incoherence that is worse than not redesigning at all.
 
 **Why it happens:**
-After PayPal acquired Venmo, they stopped onboarding new API customers. Deep links are an undocumented internal feature, not a supported integration point. Developers treat them as a stable API when they are not.
+During v1.0 development, inline `color=` props were used liberally because Ionicons and other components require string color values, not className props. The Calendar component theme object uses hardcoded hex strings. These bypass the NativeWind theme system entirely.
 
 **How to avoid:**
-- Design the payment flow as "fire and forget" from day one. The deep link is a convenience shortcut, not a source of truth.
-- Never mark a debt as "paid" automatically when the deep link is tapped. Instead, require manual confirmation ("I paid this" / "I received this") from both parties.
-- Store the Venmo username per user, but validate the format client-side only (no server-side Venmo API to call).
-- Build a fallback for when deep links break: show the amount owed and recipient username so the user can manually open Venmo. Display a "copy payment details" button.
-- Abstract the payment link behind an interface so you can swap Venmo for another provider later (Zelle, Cash App) without rewriting the settlement flow.
+- Create a `lib/colors.ts` constants file exporting the new design token values FIRST, before touching any screen.
+- Use grep/search to identify every hardcoded color reference: `#f9a825`, `#f59b20`, `#ef8a19`, `#e97a13`, `#66bb6a`, `#9ca3af`, `#374151`, `#d1d5db`, and gray-* references.
+- Replace Ionicons `color=` props with references to the constants file: `color={colors.brand}` instead of `color="#f9a825"`.
+- Replace the Calendar theme object to reference the same constants.
+- Do the color constants file as the VERY FIRST task before any screen redesign begins.
 
 **Warning signs:**
-- Users report "Venmo opens but the amount/note is empty" -- the URL format changed.
-- iOS and Android behave differently with the same deep link.
-- Linking works in development but fails in production builds (Expo Linking configuration issue).
+- Any screen showing a mix of orange and green elements.
+- Calendar still showing orange highlights after other screens are green.
+- Loading spinners still orange (`ActivityIndicator color="#f9a825"`).
 
 **Phase to address:**
-Phase 1 (Foundation) -- define the payment abstraction layer. Phase 2 (Expense splitting) -- implement with manual confirmation as the default flow.
+Phase 1 (Design System Foundation) -- create color constants and update tailwind.config.js. Must be complete before ANY screen work begins.
 
 ---
 
-### Pitfall 2: Balance Calculations Become Inconsistent Without Transactional Integrity
+### Pitfall 2: NativeWind className and Inline style Specificity Conflicts
 
 **What goes wrong:**
-Two roommates add expenses at the same time. Both read the current balance, compute their update, and write back. One update overwrites the other. Over time, running totals drift from the sum of individual transactions. Users see different balances on different devices. Trust in the app evaporates -- the core value proposition ("see exactly who owes what") is destroyed.
+NativeWind v4 has a defined specificity order: (1) `!important` styles, (2) inline `style={}` props, (3) `className` props. When you add new NativeWind classes to a component that already has an inline `style` prop, the inline style WINS for any overlapping properties. The redesign adds `className="bg-card rounded-2xl shadow"` to a View that already has `style={{ backgroundColor: '#fff', borderRadius: 16 }}` -- the inline style silently overrides the className, and the developer does not realize the NativeWind values are being ignored.
+
+The existing codebase has 76 `style={` occurrences across 19 files. Each is a potential conflict during the redesign.
 
 **Why it happens:**
-Developers compute balances client-side or use non-transactional database writes. With Supabase (likely backend), using individual `update` calls instead of database-level transactions or computed views leaves a window for race conditions. The "last write wins" default in most real-time databases is incompatible with financial data.
+In standard CSS, later declarations override earlier ones. NativeWind v4 reverses this intuition: inline styles have HIGHER specificity than className. Developers accustomed to web Tailwind expect className to be the primary styling mechanism, but inline styles silently win.
 
 **How to avoid:**
-- Never store running balances as a mutable field. Instead, derive balances by summing the immutable expense/payment ledger. Use a PostgreSQL view or function: `SELECT SUM(amount) FROM transactions WHERE ...`
-- Treat the expense ledger as append-only. Edits create a new reversal + correction entry, not an in-place mutation. This is the double-entry bookkeeping principle.
-- If you must cache balances for performance, use database triggers or materialized views that recompute from the ledger, never client-side aggregation as the source of truth.
-- Use Supabase RPC (database functions) for any operation that touches balances, so the computation happens atomically inside PostgreSQL.
+- When redesigning a component, REMOVE all inline `style` props that set visual properties (colors, borders, padding, margins, borderRadius).
+- Keep inline styles ONLY for values that cannot be expressed in NativeWind (dynamic values computed at runtime, like `style={{ width: calculatedWidth }}`).
+- Never mix `className` and `style` for the same property on the same element.
+- If you must override a className from a style prop, use the `!important` modifier: `className="!text-red-500"`.
 
 **Warning signs:**
-- Two users adding expenses simultaneously produces incorrect totals.
-- Balance displayed differs from manually summing the transaction list.
-- "Settle up" leaves a non-zero residual balance.
+- Styles not updating despite correct className values.
+- Different visual results on iOS vs Android for the same component.
+- Border radius appearing wrong despite correct `rounded-*` classes.
 
 **Phase to address:**
-Phase 1 (Foundation) -- design the ledger-based data model. This is the most important architectural decision in the entire project. Getting this wrong means a rewrite.
+Every phase -- but establish the rule in Phase 1 (Design System Foundation) and enforce it as each screen is redesigned.
 
 ---
 
-### Pitfall 3: Row-Level Security Disabled or Misconfigured on Supabase
+### Pitfall 3: Shadow Rendering Differences Between iOS and Android
 
 **What goes wrong:**
-RLS is disabled by default on new Supabase tables. Without it, any authenticated user can read and modify any household's data. In January 2025, 170+ apps built with AI tools were found to have fully exposed Supabase databases (CVE-2025-48757) because RLS was never enabled. Even when enabled, policy misconfigurations can leak data across households or block legitimate operations with cryptic "new row violates row-level security policy" errors.
+The design spec calls for `shadow` and `shadowMd` elevation tokens with CSS-style box-shadow values (`0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)`). In NativeWind v4, shadow classes (`shadow`, `shadow-sm`, `shadow-md`) are compiled to iOS `shadowOffset`/`shadowOpacity`/`shadowRadius` properties AND Android `elevation`. These produce visually different results: iOS shadows are soft and directional, Android elevation shadows are uniform and baked into the system. The card designs from the mockup will look different on each platform. Additionally, shadows on Android will NOT render at all if the component has no `backgroundColor` set.
 
 **Why it happens:**
-RLS is opt-in, not opt-out. During rapid development, tables get created, the app works in testing (because the dev is the only user), and nobody notices that every user can see every household's expenses. The `service_role` key gets accidentally used in client code, bypassing RLS entirely.
+React Native does not have a unified shadow model. iOS and Android use fundamentally different rendering approaches. NativeWind v4 translates Tailwind shadow classes into the platform-specific equivalents, but the visual output differs. The design spec was created in a web context (JSX/HTML mockup) where `box-shadow` renders identically across browsers.
 
 **How to avoid:**
-- Enable RLS on every table immediately upon creation. No exceptions.
-- Use a household membership check in every policy: `auth.uid() IN (SELECT user_id FROM household_members WHERE household_id = target.household_id)`.
-- Never use the `service_role` key in React Native client code. Use the `anon` key with RLS policies.
-- Write RLS policy tests before writing application code. Test that User A cannot read User B's household data.
-- Create a pre-deployment checklist item: "Run `SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND NOT rowsecurity;`" to find tables without RLS.
+- Always set `backgroundColor` on any element that needs a shadow (use `bg-card` or `bg-white`).
+- Accept that shadows will look slightly different on iOS vs Android. Do NOT try to make them pixel-identical.
+- Use only the built-in NativeWind shadow scale (`shadow-sm`, `shadow`, `shadow-md`, `shadow-lg`) rather than arbitrary shadow values (`shadow-[...]`), since arbitrary values are web-only in NativeWind v4.
+- Test every shadow on both iOS and Android physical devices. Shadows can look fine in iOS Simulator but wrong on Android emulator.
+- For the colored shadow on the FAB button (`0 4px 16px {brand}55`), this is NOT achievable with NativeWind shadow classes. Use an inline style with `Platform.select()` to set `shadowColor` on iOS and accept that Android elevation shadows are always dark gray.
 
 **Warning signs:**
-- App works perfectly in single-user testing but shows other households' data when a second test user is added.
-- Supabase dashboard shows RLS as "Disabled" on any table.
-- Using `supabase.from('expenses').select('*')` returns data from all households, not just the current user's.
+- Cards appearing "flat" on Android (no visible shadow) despite correct className.
+- Colored shadows rendering on iOS but showing as default dark gray on Android.
+- Shadow clipping or being cut off by parent container `overflow: hidden`.
 
 **Phase to address:**
-Phase 1 (Foundation) -- RLS policies must be the first thing built after the schema. Every subsequent phase must maintain RLS as a hard invariant.
+Phase 1 (Design System Foundation) -- define shadow utility approach. Phase 2+ (screen rebuilds) -- verify per-screen on both platforms.
 
 ---
 
-### Pitfall 4: Debt Simplification Algorithm Surprises Users
+### Pitfall 4: Glassmorphism / backdrop-filter Does Not Exist in React Native
 
 **What goes wrong:**
-In a 3+ person household, naive pairwise splitting creates unnecessary transactions. The "optimal" solution (minimize total number of transactions via graph-based debt simplification) creates payments between people who never directly transacted, confusing users. "Why do I owe Sarah $30? I never bought anything with her." Finding the true minimum number of transactions is NP-complete, meaning naive brute-force solutions will not scale and approximations may not match user expectations.
+The design spec explicitly calls for a "glass-morphism container" on the onboarding welcome carousel with `backdrop-filter: blur(12px)`, `rgba(255,255,255,0.15)` background, and translucent borders. The CSS `backdrop-filter` property does not exist in React Native. There is no equivalent style prop. The design as specified is impossible to implement with standard React Native components.
 
 **Why it happens:**
-Developers either skip simplification entirely (leading to a tangled web of micro-debts) or implement maximum-flow simplification without explaining it to users. The mathematical optimum and the socially intuitive result are different things.
+The design spec was created as a web mockup (JSX/HTML) where `backdrop-filter` is a standard CSS property. The designer/spec author did not account for React Native rendering limitations.
 
 **How to avoid:**
-- For a small household (2-4 people), use the simple net-balance approach: compute each person's net balance (total credits minus total debts), then match the biggest debtor to the biggest creditor iteratively. This is O(n log n) and produces near-optimal results for small groups.
-- Show users both views: "detailed" (every individual debt) and "simplified" (net balances). Let them toggle.
-- Always show the derivation: "You owe Sarah $30 because: you owe the household $50 total, and Sarah is owed $30 by the household."
-- Do NOT introduce debt simplification in MVP. Start with simple pairwise tracking. Add simplification as a later enhancement when users have more than 2 roommates and request it.
+- Use `expo-blur` (`BlurView`) to approximate the effect. It supports `intensity` and `tint` props. On Expo SDK 54, `expo-blur` is included in Expo Go, so no custom dev build is needed.
+- Wrap the content area in a `BlurView` positioned absolutely over the gradient background.
+- Accept visual differences: `expo-blur` produces a system-level blur that varies between iOS (very smooth, gaussian) and Android (less refined, especially below API 31).
+- Alternative approach: skip true blur entirely and use a semi-transparent white overlay (`rgba(255,255,255,0.2)`) with a subtle border. This is visually "close enough" on mobile screens where the effect is subtle, and avoids platform inconsistency and performance overhead.
+- Do NOT use `react-native-skia` for this single effect -- it is a heavy dependency (adds ~2MB to bundle) and is overkill for one decorative element.
 
 **Warning signs:**
-- Users ask "why do I owe X to someone I didn't share an expense with?"
-- The settle-up flow shows a confusing web of arrows between all members.
-- Edge cases: what happens when simplification produces a $0.01 rounding discrepancy?
+- `backdrop-filter` appearing in any style prop (it will be silently ignored).
+- Onboarding hero section looking flat/opaque instead of translucent on either platform.
+- Performance issues (dropped frames) when blurring animated content beneath the overlay.
 
 **Phase to address:**
-Phase 2 (Expense splitting) -- implement simple net-balance only. Phase 3+ -- add optional simplification view with clear explanations.
+Phase 3 or whichever phase handles onboarding carousel rebuild -- decide the blur approach BEFORE building the carousel.
 
 ---
 
-### Pitfall 5: Roommate Departure Corrupts Historical Data
+### Pitfall 5: Breaking Existing Functionality During Visual-Only Changes
 
 **What goes wrong:**
-A roommate moves out. The app either: (a) deletes their account and orphans all their expense records, breaking balance calculations; (b) keeps them as a full member, cluttering active views; or (c) was never designed to handle this, causing crashes or undefined behavior when a household member reference points to a deleted user.
+The project scope explicitly says "presentation layer only, all data models and APIs stay untouched." But visual redesigns routinely break functionality in subtle ways: restructuring a `Pressable` wrapper changes the touch target, moving elements inside a `ScrollView` breaks scroll behavior, changing a `View` hierarchy around a form input breaks keyboard avoidance, and renaming or restructuring components breaks expo-router navigation. The most dangerous pattern is when a screen "looks correct" in a static screenshot but interactive behaviors (pull-to-refresh, swipe-to-delete, keyboard dismiss, deep link navigation) are broken.
 
 **Why it happens:**
-Developers model households as a static list of members and never plan for membership changes. Foreign key constraints on `user_id` in expense tables cause cascading deletes or constraint violations. The data model conflates "current member" with "historical participant."
+Visual redesigns feel "safe" because no business logic is changing. But in React Native, layout structure IS behavior -- the component tree determines touch handling, scroll behavior, keyboard interaction, and accessibility. Restructuring JSX for visual purposes silently changes all of these.
 
 **How to avoid:**
-- Use a `household_members` junction table with `joined_at` and `left_at` timestamps. A member with `left_at IS NOT NULL` is a former member.
-- Never hard-delete users from a household. Soft-delete (set `left_at`) preserves referential integrity.
-- Before allowing departure, enforce balance settlement: the leaving member's net balance must be zero, or the app must prompt a final settlement.
-- Historical views (past expenses) show the departed member's name. Active views (current balances, chore rotation) exclude them.
-- Foreign keys in expense records point to the user record (which is never deleted), not the household_members record.
+- Follow a strict verification checklist after EVERY screen redesign (the design spec already includes one -- use it).
+- Test each screen's interactive behaviors, not just its visual appearance: add an expense, complete a chore, check off a grocery item, pull-to-refresh, navigate via tab bar, navigate via deep link.
+- Keep the screen's functional JSX structure intact when possible. Wrap existing components in new styled containers rather than rewriting the component tree.
+- Do NOT combine visual redesign with functional changes or refactors. If a screen needs a bug fix AND a redesign, commit the bug fix first, then redesign.
+- Redesign one screen at a time. Never redesign multiple screens in a single commit.
 
 **Warning signs:**
-- No `left_at` or `status` field on the household membership table.
-- Deleting a test user causes foreign key errors in the expense table.
-- The chore rotation crashes or assigns tasks to departed members.
+- "It looks right" but no one has actually tapped the buttons.
+- Pull-to-refresh stops working after wrapping content in a new parent View.
+- Keyboard covers input fields after changing the scroll container.
+- Tab bar icons stop navigating after changing the layout hierarchy.
 
 **Phase to address:**
-Phase 1 (Foundation) -- the data model must support membership changes from day one. This is not a "nice to have later" feature.
+Every phase -- include the verification checklist as a gate for each screen delivery. Never skip it.
 
 ---
 
-### Pitfall 6: Chore Fairness Perceived as Unfair Despite Being Mathematically Correct
+### Pitfall 6: Gradient Avatars Require LinearGradient, Not CSS
 
 **What goes wrong:**
-A round-robin chore rotation assigns "clean the bathroom" to the same person every other week, while another person always gets "take out the trash" (a 2-minute task). The rotation is technically fair (equal number of assignments) but perceived as deeply unfair because chore difficulty and time vary wildly. Users stop using the chore feature, and then stop using the app entirely.
+The design spec defines member avatars with `linear-gradient(135deg, #E76F51, #F4A261)` backgrounds. In React Native, `View` does not support `background: linear-gradient(...)` as a style prop. The gradient is silently ignored, producing an avatar with no background color -- a blank circle with white text on a white card, invisible to the user. Every avatar on every screen breaks.
 
 **Why it happens:**
-Fairness in scheduling is a longitudinal property -- it cannot be captured by a single rotation instance. Developers implement simple round-robin or random assignment without weighting chores by effort. Academic research confirms that treating each scheduling decision in isolation leads to "persistent unfairness" over time.
+CSS gradients do not exist in React Native. React Native's style system only supports solid color `backgroundColor` values. Gradients require a dedicated `<LinearGradient>` component from `expo-linear-gradient`.
 
 **How to avoid:**
-- Assign effort weights to chores (e.g., "clean bathroom" = 3 points, "take out trash" = 1 point). Rotate to equalize total effort points over time, not just task count.
-- Let the household customize weights during onboarding. What feels "hard" is subjective and varies by household.
-- Show a fairness dashboard: "This week: Alice 7 points, Bob 5 points. This month: Alice 22, Bob 24." Transparency defuses complaints.
-- Allow chore swaps and trades. The system proposes, the humans dispose. Rigid automation breeds resentment.
-- Keep chore history so that when someone says "I always clean the bathroom," the app can show the actual data.
+- Install `expo-linear-gradient` (it is included in Expo Go SDK 54, no custom dev build needed).
+- Build the Avatar component using `<LinearGradient colors={[startColor, endColor]} start={{x:0, y:0}} end={{x:1, y:1}}>` as the background.
+- Define member gradient color pairs in the design token constants.
+- The balance summary card also uses a gradient background (`#2D6A4F` to `#1B4332`) -- use `LinearGradient` there too.
+- Each carousel slide uses a different gradient background -- same approach.
 
 **Warning signs:**
-- Users manually reassigning chores outside the app.
-- Chore completion rates dropping over time.
-- Complaints that the system "isn't fair" despite equal assignment counts.
+- Avatars appearing as solid color circles instead of gradients.
+- Attempting to set `background` or `backgroundImage` style props (these do not exist in React Native).
 
 **Phase to address:**
-Phase 3 (Chores) -- build with effort weighting from the start. Do not ship simple round-robin and plan to "add weights later" because users will form negative opinions of the feature before the fix ships.
+Phase 1 (Design System Foundation) -- build the Avatar component with LinearGradient. It is used on nearly every screen, so it must exist before screen rebuilds begin.
+
+---
+
+### Pitfall 7: Carousel Swipe Gestures Conflicting with Tab Navigation
+
+**What goes wrong:**
+The onboarding welcome screen has a horizontal swipe carousel. The main app has a tab bar navigator. If the carousel is built inside a screen that also has horizontal swipe gesture handling (e.g., swipe-to-go-back on iOS stack navigator, or swipe between tabs), the gestures conflict. The user tries to swipe the carousel but triggers a navigation gesture instead, or vice versa. The current welcome screen uses a basic `ScrollView` with `horizontal pagingEnabled`, which mostly works but can conflict with stack navigator gestures.
+
+**Why it happens:**
+React Native Gesture Handler routes touch events through a gesture system that can only handle one gesture responder at a time. When multiple components (carousel `ScrollView`, stack navigator, tab navigator) all want horizontal swipe ownership, the first one to claim the gesture wins. The others are blocked.
+
+**How to avoid:**
+- The welcome carousel is inside the `(auth)` route group, which uses a stack navigator without tabs. This is inherently safer than putting a carousel inside a tabbed screen.
+- Use `ScrollView` with `pagingEnabled` (the current approach) rather than introducing a third-party carousel library with custom gesture handling.
+- On iOS, disable the stack navigator's `gestureEnabled` on the welcome screen specifically, since there is no screen to swipe back to.
+- Do NOT use `react-native-snap-carousel` -- it is unmaintained and has known gesture conflicts. If a more advanced carousel is needed, use `react-native-reanimated-carousel`, which is built on Reanimated and works with the gesture handler system.
+- Keep the home screen's week-strip calendar as a non-swipeable row, NOT a horizontal `ScrollView`, to avoid conflict with tab swipe gestures.
+
+**Warning signs:**
+- Carousel swipe only works on one platform but not the other.
+- Swiping the carousel triggers a navigation back gesture on iOS.
+- Carousel "sticks" and does not snap to pages cleanly.
+
+**Phase to address:**
+Onboarding phase (carousel rebuild) -- test gesture isolation carefully. Home screen phase (calendar strip) -- avoid horizontal scroll for the week strip.
+
+---
+
+### Pitfall 8: NativeWind Tailwind Content Paths Missing New Component Directories
+
+**What goes wrong:**
+The current `tailwind.config.js` has `content` paths for `./app/**`, `./components/**`, and `./lib/**`. If the redesign creates shared components in a new directory (e.g., `./ui/**`, `./design-system/**`, or `./shared/**`), NativeWind will not scan those files for class names. Tailwind's purge step will strip out any classes that are only used in the unscanned directory. The result: components render with zero styling in production, but may appear to work in development due to caching.
+
+**Why it happens:**
+Tailwind CSS tree-shakes unused classes based on what it finds in the `content` paths. If a file using `bg-brand` is not in a scanned directory, that class gets purged from the output. NativeWind inherits this behavior. Developers create a new folder, use classes, and never update the config.
+
+**How to avoid:**
+- If creating a new shared component directory, immediately add it to `content` in `tailwind.config.js`.
+- Better yet: put all shared UI components in the existing `./components/` directory (already in the content paths) rather than creating a new top-level folder.
+- After any directory structure changes, clear the Metro cache (`npx expo start --clear`) and verify styles apply.
+
+**Warning signs:**
+- Components render unstyled (no colors, no padding, no borders) in production but work in dev.
+- After a `--clear` restart, previously-working styles vanish.
+- New custom Tailwind classes (e.g., `bg-brand`) not applying.
+
+**Phase to address:**
+Phase 1 (Design System Foundation) -- decide the component directory structure and update tailwind.config.js content paths before creating any components.
 
 ---
 
 ## Technical Debt Patterns
 
-Shortcuts that seem reasonable but create long-term problems.
-
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Storing computed balances as a mutable DB field | Faster reads, simpler queries | Balance drift, race conditions, audit impossibility | Never for financial data |
-| Hard-coding Venmo as the only payment option | Faster to ship | Locked in to undocumented API; can't support Zelle/Cash App users | MVP only, if behind an abstraction interface |
-| Skipping RLS during prototyping | Faster iteration, fewer "policy violation" errors | Security vulnerability; retrofitting RLS onto existing tables is painful | Never -- enable from day one, even in development |
-| Client-side balance computation | Works fine for 1 user testing | Inconsistent balances between devices, no single source of truth | Never |
-| Single "household" without multi-household support | Simpler data model | Rewrite needed when any user wants to be in 2 households (common: home + vacation) | MVP only, but design the schema to support it |
-| Skipping push notification setup | Avoids iOS/Android config complexity | Chore reminders and expense notifications are table stakes; app feels dead without them | Acceptable in Phase 1, but must be Phase 2 |
+| Keeping some inline `style={}` instead of converting to className | Faster per-screen migration | Mixed styling approaches make future changes harder; NativeWind v5 may break mixed styles entirely | Acceptable for truly dynamic runtime-computed values (animation interpolations, calculated widths), never for static visual properties |
+| Using arbitrary NativeWind values like `text-[13px]` instead of extending the theme | Avoids touching tailwind.config.js | Arbitrary values bypass the design token system and cannot be centrally updated | Never -- extend the theme instead with custom values like `text-meta` |
+| Hardcoding member gradient colors in each screen | Works for the current 3 members | Adding a 4th member requires updating every screen | Never -- define colors in a single constants file or database |
+| Skipping the iOS-specific `Platform.select()` for shadows | Less code, shadows "work" on iOS | Android shadows look wrong or invisible | Never -- always test both platforms |
+| Using `expo-blur` BlurView on Android SDK 54 for glassmorphism | Visual parity with iOS | Android blur performance is inconsistent below API 31; may cause dropped frames on older devices | Acceptable only if you add a `Platform.OS === 'android'` fallback to a solid semi-transparent background |
 
 ## Integration Gotchas
 
-Common mistakes when connecting to external services.
-
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| Venmo deep links | Assuming the link format is stable; marking debts as paid on link tap | Treat as a convenience shortcut only; require manual payment confirmation from both parties; build a fallback "copy details" flow |
-| Supabase Realtime | Subscribing to entire tables instead of filtered channels | Subscribe to `household_id`-filtered channels; use RLS to enforce server-side filtering; unsubscribe on component unmount to avoid memory leaks |
-| Expo Push Notifications | Testing in Expo Go (notifications do not work there); using simulator | Test on physical devices with development builds; handle token rotation; set up foreground notification handler explicitly |
-| Supabase Auth | Storing session tokens insecurely; not handling token refresh | Use `supabase-js` built-in session management with `expo-secure-store`; handle auth state changes reactively |
-| Expo Linking (for Venmo) | Not configuring `app.json` scheme properly | Register a custom URL scheme; test deep links in both development and production builds; handle the case where Venmo is not installed |
+| react-native-calendars theme | Setting the Calendar `theme` prop once and forgetting to update it when the color system changes | Create a shared `calendarTheme` object that references the color constants file; import it in every screen that renders a Calendar |
+| expo-linear-gradient with NativeWind | Trying to use `className` on `LinearGradient` -- it does not support className natively | Use `cssInterop` or `remapProps` from NativeWind to map `className` to `style`, OR just use inline `style` on LinearGradient components (since the gradient props like `colors` and `start`/`end` cannot be expressed in Tailwind anyway) |
+| Ionicons color prop | Using className `text-brand` on the Ionicons component and expecting it to change the icon color | Ionicons requires a `color` prop (string). Use `color={colors.brand}` from the constants file. NativeWind className does NOT affect Ionicons color |
+| Tab bar styling | Setting tab bar colors via NativeWind className on the Tabs component | Tab bar styling uses `tabBarStyle` and `tabBarActiveTintColor` props (React Navigation API), not NativeWind className. These must be updated with color constant references |
+| expo-blur inside ScrollView | Wrapping content in BlurView inside a ScrollView and expecting it to blur the content behind it | BlurView blurs what is BEHIND the BlurView in the z-axis (the view beneath it), not the content inside it. Position BlurView absolutely over the gradient background, not around the content |
 
 ## Performance Traps
 
-Patterns that work at small scale but fail as usage grows.
-
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Loading all household expenses on app launch | Slow startup, high memory use | Paginate expenses; load current month by default, lazy-load history | 200+ expenses (a few months of active use) |
-| Real-time subscriptions without cleanup | Memory leaks, phantom updates, battery drain | Unsubscribe in useEffect cleanup; use a subscription manager | After navigating between screens 10+ times |
-| Recomputing balances on every render | UI jank, wasted CPU | Use `useMemo` or derive balances in a database view/function; cache results | 50+ transactions with 3+ members |
-| Fetching full user profiles for every expense item | N+1 query pattern; slow list rendering | Eager-load household member profiles once; reference from cache | 20+ expenses on screen |
-| Unoptimized FlatList for expense/chore lists | Stuttering scroll, high memory | Use `keyExtractor`, `getItemLayout`, `windowSize` tuning; avoid inline arrow functions in `renderItem` | 100+ list items |
-
-## Security Mistakes
-
-Domain-specific security issues beyond general web security.
-
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| RLS disabled on Supabase tables | Any authenticated user can read/modify any household's financial data | Enable RLS on every table; test with multiple test users in different households |
-| Service role key in client bundle | Full database access to anyone who decompiles the app | Only use `anon` key in client code; service role key stays server-side only |
-| No validation on expense amounts | Users can input negative amounts to manipulate balances | Validate amounts > 0 server-side in a database function or edge function; client validation alone is insufficient |
-| Household invite links without expiry | Old links allow unauthorized people to join a household | Expire invite tokens after 48 hours and single use; require existing member approval for joins |
-| Storing Venmo usernames as "payment accounts" | If leaked, enables targeted payment requests from strangers | Venmo usernames are semi-public anyway, but minimize storage; never store Venmo passwords or tokens (you won't have them, but be explicit about this) |
+| Animating shadows on every frame | Frame drops visible during scroll, especially on Android | Apply shadows as static styles. Never animate shadow values. Use opacity animation on a pre-shadowed component instead | Immediately on mid-range Android devices |
+| Re-rendering entire lists on color theme change | Noticeable jank when the screen first loads after a style change | Memoize list items with `React.memo()`. Use `useMemo()` for computed style objects that reference constants | When list exceeds ~20 items |
+| Gradient components inside FlatList items | Each `LinearGradient` creates a native view; 50+ in a list causes memory pressure | Pre-render avatar components with `React.memo()`. For long lists, use a solid color fallback and only render gradients for visible items | Lists with 30+ gradient-containing items |
+| BlurView in an animated carousel | Each carousel slide with a BlurView re-computes the blur effect during swipe animation | Apply BlurView only to the active/visible slide. Disable blur on off-screen slides. Or use a static semi-transparent overlay instead | Immediately on Android, noticeable on older iPhones |
+| Using JS-thread Animated API for carousel transitions | Swipe animation stutters when JS thread is busy (e.g., fetching data) | Use `react-native-reanimated` for any user-facing gesture-driven animation. The built-in Animated API runs on the JS thread and competes with data fetching and rendering | Noticeable when network requests fire during animation |
 
 ## UX Pitfalls
 
-Common user experience mistakes in this domain.
-
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Requiring all roommates to sign up before the first user can do anything | Adoption dies -- one roommate creates an account, can't use the app, gives up before the others join | Let a single user start tracking expenses immediately; add roommates later; show value before requiring group participation |
-| Onboarding quiz is too long or confusing | Users abandon before reaching the main app; 120-second onboarding threshold | Keep quiz to 3-4 questions max; allow skipping with sensible defaults; let users change settings later |
-| No empty states -- blank screens when no expenses/chores exist | New users feel lost, don't know what to do next | Show contextual prompts: "Add your first shared expense" with a prominent button; use illustrations to make empty states feel intentional |
-| Notification spam for every minor event | Users disable all notifications, then miss important ones (rent is due) | Categorize notifications (urgent: bills due; normal: new expense added; low: chore reminder); let users configure per-category |
-| Settlement flow requires exact amounts | Roommates often settle with round numbers ("just give me $20"); app shows $19.73 as unsettled | Allow partial settlements and "forgive remaining balance" option; handle rounding gracefully |
-| Showing cents when users think in whole dollars | "$47.33" split 3 ways is "$15.78 each" with a penny left over -- who pays it? | Always round in a deterministic way (e.g., first person listed pays the extra penny); document the rounding rule; consider a "round up to nearest dollar" option |
+| Redesigning all screens at once, shipping a "big bang" update | Users lose their mental model of where things are; everything looks unfamiliar at once | Redesign screen-by-screen. Ship the design system and shared components first, then migrate one screen at a time so the visual language converges gradually |
+| Over-designing empty states | Empty states with elaborate illustrations distract from the action the user needs to take (add first expense, invite roommate) | Keep empty states simple: one emoji or icon, one headline, one subtitle, one action button. The design spec already follows this pattern -- do not over-elaborate |
+| Changing touch targets during visual redesign | Buttons or tappable areas become smaller or shift position; users miss taps | Maintain minimum 44x44pt touch targets on all interactive elements. When restructuring a card layout, ensure the Pressable wrapper covers the same area |
+| Custom toggle switches that feel non-native | Toggles that do not have the right "snap" feel; users are unsure if the toggle registered | Use `react-native` `Switch` for native feel, or build custom toggles with Reanimated for smooth spring animation. Never use `Animated` from React Native core for toggle animations -- it is too slow |
+| Calendar week strip that is hard to read | Tiny date numbers, no clear "today" indicator, event dots too small | Ensure today has a filled background (brand color) that is at least 32px diameter. Event dots must be at least 4px diameter. Past dates should be visually dimmed but still readable |
 
 ## "Looks Done But Isn't" Checklist
 
-Things that appear complete but are missing critical pieces.
-
-- [ ] **Expense splitting:** Often missing handling for unequal splits (one person had a larger share) -- verify the app supports both equal and custom percentage/amount splits
-- [ ] **Recurring expenses:** Often missing handling for amount changes (rent increases) -- verify recurring expenses can be edited without affecting past entries
-- [ ] **Chore rotation:** Often missing skip/swap functionality (person is traveling) -- verify a member can skip a turn and the rotation adjusts
-- [ ] **Balance display:** Often missing the distinction between "what I owe total" vs "what I owe each person" -- verify both views exist
-- [ ] **Household invites:** Often missing the "what if they don't have the app" flow -- verify the invite works via SMS/link for new users
-- [ ] **Settlement:** Often missing partial payment support -- verify a user can pay part of what they owe without marking the full debt as settled
-- [ ] **Offline behavior:** Often missing graceful degradation -- verify the app shows cached data and queues actions when offline, not just a blank screen or crash
-- [ ] **Push notifications:** Often missing foreground handling -- verify notifications display correctly when the app is open, not just when backgrounded
-- [ ] **Roommate departure:** Often missing entirely -- verify a member can leave a household and historical data remains intact
+- [ ] **Color migration:** Search for `#f9a825`, `#f59b20`, `#66bb6a`, `#9ca3af`, `#374151` across all files -- any remaining instances mean the migration is incomplete
+- [ ] **Tab bar colors:** Verify `tabBarActiveTintColor`, `tabBarInactiveTintColor`, `tabBarStyle.backgroundColor`, and `tabBarStyle.borderTopColor` in `_layout.tsx` are updated to the new palette
+- [ ] **ActivityIndicator colors:** Search for `<ActivityIndicator` and verify every instance uses the new brand color, not hardcoded orange
+- [ ] **StatusBar style:** Verify `app.json` splash `backgroundColor` and any `<StatusBar>` components use the new `bg` color (`#FAFAF8`)
+- [ ] **Shadows on Android:** Load every card-containing screen on a physical Android device and verify shadows are visible (not invisible due to missing background color)
+- [ ] **Calendar theme:** Open the home screen calendar and verify selected day color, today text color, and arrow colors all match the new brand green
+- [ ] **Ionicons color props:** Spot-check at least 5 screens that use Ionicons and verify icon colors match the new design system (not old orange or hardcoded gray)
+- [ ] **Pull-to-refresh:** Test pull-to-refresh on home, expenses, groceries, and chores screens -- verify it still works after layout restructuring
+- [ ] **Keyboard avoidance:** Open the add-expense, add-chore, and sign-up screens and verify the keyboard does not cover input fields
+- [ ] **Navigation:** Tap every tab, navigate to every settings sub-screen, and verify no navigation regressions
+- [ ] **Avatar gradients:** Verify member avatars show gradient backgrounds (not solid colors or blank circles) on both iOS and Android
+- [ ] **Safe area:** Verify content does not overlap the notch/status bar or home indicator on iPhone and Android devices with cutouts
 
 ## Recovery Strategies
 
-When pitfalls occur despite prevention, how to recover.
-
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Balance inconsistency (mutable balances drifted) | HIGH | Freeze the app, audit all transactions, recompute balances from the ledger, migrate to derived-balance architecture; communicate to users that balances were corrected |
-| RLS not enabled (data exposed) | MEDIUM | Enable RLS immediately; audit access logs; notify affected users; write policies for all tables; run penetration test |
-| Venmo deep links break | LOW | Show manual fallback UI (copy username + amount); swap to alternative payment deep link if available; update the URL format |
-| Chore unfairness complaints | LOW | Add effort weights retroactively; show historical fairness data to prove or disprove claims; allow manual rebalancing |
-| Roommate departure crashes app | MEDIUM | Add soft-delete migration; backfill `left_at` timestamps; fix foreign key references; deploy hotfix |
-| Onboarding abandonment (quiz too long) | LOW | A/B test shorter quiz; add "skip for now" option; track completion funnel in analytics |
+| Half-migrated colors (orange + green mix) | LOW | Run a project-wide search-and-replace for old hex values. Takes 1-2 hours with the color constants file as the source of truth |
+| Inline style overriding className | LOW | Remove the conflicting inline style prop from the element. Takes minutes per component once identified |
+| Broken shadows on Android | LOW | Add `bg-white` or `bg-card` className to every shadowed element. Batch fix across all screens |
+| Glassmorphism not rendering | MEDIUM | Replace `backdrop-filter` approach with `expo-blur` BlurView or a semi-transparent overlay. Requires restructuring the component tree |
+| Carousel gesture conflict | MEDIUM | Disable stack navigator gesture on the carousel screen. If carousel library conflicts, replace with ScrollView + pagingEnabled (the current working approach) |
+| Broken pull-to-refresh or keyboard avoidance | LOW-MEDIUM | Undo the JSX restructuring that broke it. Keep the outer ScrollView/KeyboardAvoidingView structure from the working v1.0 screen |
+| NativeWind styles not applying (content path issue) | LOW | Add the missing directory to `tailwind.config.js` content array. Clear Metro cache. Restart |
+| LinearGradient not rendering (component not imported) | LOW | Install expo-linear-gradient, import the component, replace the View with LinearGradient |
 
 ## Pitfall-to-Phase Mapping
 
-How roadmap phases should address these pitfalls.
-
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Balance inconsistency | Phase 1 (Data model) | Write a test: add 10 concurrent expenses, verify final balance equals sum of all amounts |
-| RLS misconfiguration | Phase 1 (Auth + schema) | Test with 2 users in different households; User A must not see User B's data |
-| Venmo deep link fragility | Phase 2 (Expense settlement) | Test on both iOS and Android physical devices; test with Venmo uninstalled; verify fallback UI appears |
-| Debt simplification confusion | Phase 2+ (Expense splitting) | User test with 3+ people; verify explanations appear alongside simplified debts |
-| Roommate departure | Phase 1 (Data model) | Remove a test user from a household; verify historical expenses still display correctly and balances recompute |
-| Chore unfairness | Phase 3 (Chores) | Run a 4-week simulation; verify effort points are within 10% across all members |
-| Onboarding abandonment | Phase 1 (Onboarding) | Track quiz completion rate; verify app is usable if quiz is skipped entirely |
-| Push notification failures | Phase 2 (Notifications) | Test on physical device in foreground, background, and killed states; verify token refresh handling |
-| Concurrent expense entry | Phase 2 (Expense splitting) | Two devices add expenses simultaneously; verify no data loss or balance drift |
-| Invite link security | Phase 1 (Household creation) | Verify expired/used invite links are rejected; verify non-members cannot access household data via old links |
+| Hardcoded color values (#1) | Phase 1: Design System Foundation | Grep for old hex values returns zero results |
+| className vs style conflicts (#2) | Phase 1 + every subsequent phase | No inline `style` props for static visual properties in redesigned components |
+| Shadow rendering differences (#3) | Phase 1: define approach; Phase 2+: verify per screen | Load each screen on both iOS simulator and Android device/emulator |
+| Glassmorphism impossibility (#4) | Onboarding phase (carousel build) | BlurView or semi-transparent overlay renders correctly on both platforms |
+| Breaking existing functionality (#5) | Every phase | Run the 12-point verification checklist from the design spec after every screen |
+| Gradient avatars (#6) | Phase 1: build Avatar component | Avatars render with gradient backgrounds on both platforms |
+| Carousel gesture conflicts (#7) | Onboarding phase | Carousel swipes cleanly without triggering navigation gestures on both platforms |
+| Content path configuration (#8) | Phase 1: finalize directory structure | All components in new directories render with correct NativeWind styles |
 
 ## Sources
 
-- [Venmo Deeplinking - Vox Silva (Alex Beals)](https://blog.alexbeals.com/posts/venmo-deeplinking) -- PRIMARY source for Venmo deep link format and known breakage (LOW confidence due to undocumented API)
-- [Venmo Deeplinking - Gabe O'Leary](https://gabeoleary.com/posts/venmo-deeplinking-including-from-web-apps) -- Confirms web vs native deep link differences
-- [Algorithm Behind Splitwise's Debt Simplification - Mithun Mohan K (Medium)](https://medium.com/@mithunmk93/algorithm-behind-splitwises-debt-simplification-feature-8ac485e97688) -- Debt simplification is NP-complete; net-balance approach is sufficient for small groups
-- [Splitwise App Feedback Report - Kimola](https://kimola.com/reports/splitwise-app-feedback-report-uncover-user-insights-google-play-en-144452) -- Real user complaints about UI confusion, unclear balances
-- [Explore Why Splitwise Users are Drifting Away - Kimola](https://kimola.com/reports/explore-why-splitwise-users-are-drifting-away-get-insights-now-app-store-in-155789) -- Monetization backlash, feature gating drove user abandonment
-- [Supabase Row Level Security Docs](https://supabase.com/docs/guides/database/postgres/row-level-security) -- RLS is disabled by default; CVE-2025-48757 affected 170+ apps (HIGH confidence)
-- [Supabase Security 2025 Retro](https://supabase.com/blog/supabase-security-2025-retro) -- Confirms safer defaults and tooling improvements
-- [Expo Push Notifications Setup Docs](https://docs.expo.dev/push-notifications/push-notifications-setup/) -- Notifications do not work in Expo Go; physical device required (HIGH confidence)
-- [Local-first Architecture with Expo](https://docs.expo.dev/guides/local-first/) -- Expo's official guide to offline-first patterns
-- [Offline vs Real-Time Sync - Adalo](https://www.adalo.com/posts/offline-vs-real-time-sync-managing-data-conflicts) -- Last-write-wins is insufficient for financial data
-- [Schedules Need to be Fair Over Time - Springer](https://link.springer.com/chapter/10.1007/978-3-032-11108-1_3) -- Academic source: fairness is a longitudinal property, cannot be captured per-instance
-- [Mobile App Churn Rate Benchmarks 2025 - UXCam](https://uxcam.com/blog/mobile-app-churn-rate/) -- 25% app abandonment after single use; 120-second onboarding threshold
-- [System Design of Splitwise Backend - GeeksforGeeks](https://www.geeksforgeeks.org/system-design/system-design-of-backend-for-expense-sharing-apps-like-splitwise/) -- Concurrent balance updates must be thread-safe
+- [NativeWind Style Specificity](https://www.nativewind.dev/docs/core-concepts/style-specificity) -- className vs inline style precedence rules (HIGH confidence)
+- [NativeWind Box Shadow](https://www.nativewind.dev/docs/tailwind/effects/box-shadow) -- shadow class support and Android background requirement (HIGH confidence)
+- [NativeWind Third-Party Components](https://www.nativewind.dev/docs/guides/third-party-components) -- cssInterop and remapProps for non-className components (HIGH confidence)
+- [NativeWind Troubleshooting](https://www.nativewind.dev/docs/getting-started/troubleshooting) -- content path and caching issues (HIGH confidence)
+- [NativeWind v4 + Expo SDK 54 compatibility](https://medium.com/@matthitachi/nativewind-styling-not-working-with-expo-sdk-54-54488c07c20d) -- NativeWind v4.2.0+ required for SDK 54 (MEDIUM confidence)
+- [React Native Shadow Props](https://reactnative.dev/docs/shadow-props) -- platform differences in shadow rendering (HIGH confidence)
+- [BlurView - Expo Documentation](https://docs.expo.dev/versions/latest/sdk/blur-view/) -- expo-blur API and platform support (HIGH confidence)
+- [LinearGradient - Expo Documentation](https://docs.expo.dev/versions/latest/sdk/linear-gradient/) -- gradient component for React Native (HIGH confidence)
+- [React Native Reanimated Performance Guide](https://docs.swmansion.com/react-native-reanimated/docs/guides/performance/) -- UI thread vs JS thread animation (HIGH confidence)
+- [NativeWind className and style conflict Issue #665](https://github.com/nativewind/nativewind/issues/665) -- inconsistent style merging reports (MEDIUM confidence)
+- [NativeWind className and style conflict Issue #1018](https://github.com/nativewind/nativewind/issues/1018) -- styles not working in className but working in style prop (MEDIUM confidence)
+- [Expo Fonts Documentation](https://docs.expo.dev/develop/user-interface/fonts/) -- font loading and cross-platform differences (HIGH confidence)
+- Codebase analysis: 74 hardcoded primary color references across 25 files, 76 inline style objects across 19 files, 158 inline color prop references across 30 files (direct observation, HIGH confidence)
 
 ---
-*Pitfalls research for: RoomY -- Roommate household management app*
-*Researched: 2026-03-10*
+*Pitfalls research for: RoomY v1.1 UI Redesign (Expo/NativeWind/React Native)*
+*Researched: 2026-03-11*
