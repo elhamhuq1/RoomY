@@ -399,37 +399,50 @@ export default function DashboardScreen() {
         {/* Day detail list */}
         <View className="mt-3 overflow-hidden rounded-2xl bg-white shadow-sm">
           {selectedDateEvents.length > 0 ? (
-            selectedDateEvents.map((event) => (
-              <Pressable
-                key={`${event.type}-${event.id}`}
-                className="flex-row items-center border-b border-surface-100 px-4 py-3 active:bg-surface-50"
-                onPress={() => router.push(event.deepLink as never)}
-              >
-                <Ionicons
-                  name={event.icon as keyof typeof Ionicons.glyphMap}
-                  size={22}
-                  color={event.color}
-                  style={{ marginRight: 12 }}
-                />
-                <View className="flex-1">
-                  <Text className="text-base font-medium text-gray-800">
-                    {event.title}
-                  </Text>
-                  <Text className="text-sm text-gray-400">
-                    {event.detail}
-                  </Text>
-                </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={16}
-                  color="#d1d5db"
-                />
-              </Pressable>
-            ))
+            <ScrollView
+              style={{ maxHeight: 280 }}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={true}
+            >
+              {selectedDateEvents.map((event) => (
+                <Pressable
+                  key={`${event.type}-${event.id}`}
+                  className="flex-row items-center border-b border-surface-100 px-4 py-3 active:bg-surface-50"
+                  onPress={() => router.push(event.deepLink as never)}
+                >
+                  <Ionicons
+                    name={event.icon as keyof typeof Ionicons.glyphMap}
+                    size={22}
+                    color={event.color}
+                    style={{ marginRight: 12 }}
+                  />
+                  <View className="flex-1">
+                    <Text className="text-base font-medium text-gray-800">
+                      {event.title}
+                    </Text>
+                    <Text className="text-sm text-gray-400">
+                      {event.detail}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color="#d1d5db"
+                  />
+                </Pressable>
+              ))}
+            </ScrollView>
           ) : (
             <View className="items-center py-6">
               <Text className="text-sm text-gray-400">
                 No events on this day
+              </Text>
+            </View>
+          )}
+          {selectedDateEvents.length > 5 && (
+            <View className="items-center border-t border-surface-100 py-1.5">
+              <Text className="text-xs text-gray-400">
+                Scroll for more ({selectedDateEvents.length} events)
               </Text>
             </View>
           )}
