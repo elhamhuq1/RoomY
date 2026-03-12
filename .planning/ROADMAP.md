@@ -63,7 +63,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Shared components (Avatar, Card, Badge, Button, IconContainer, Toggle) render correctly in isolation and accept their documented props
   4. Tab bar shows green active icons, tertiary inactive icons, white background with top border, and 84px height
   5. FAB renders as a 52px rounded square with brand background and colored shadow
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 06-01-PLAN.md — Design tokens (colors, typography, elevation) and full orange-to-green palette migration
@@ -131,7 +131,7 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 3.1. Chores | v1.0 | 2/2 | Complete | - |
 | 4. Engagement | v1.0 | 4/4 | Complete | - |
 | 5. (Reserved) | v1.0 | - | Skipped | - |
-| 6. Design System + Components | v1.1 | 4/4 | Complete | 2026-03-12 |
+| 6. Design System + Components | v1.1 | Complete    | 2026-03-12 | 2026-03-12 |
 | 7. Home Screen | v1.1 | 0/TBD | Not started | - |
 | 8. Expenses Screen | v1.1 | 0/TBD | Not started | - |
 | 9. Groceries + Chores | v1.1 | 0/TBD | Not started | - |
