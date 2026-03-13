@@ -84,7 +84,7 @@ function buildAttentionItems(props: AttentionFeedProps): AttentionItem[] {
       metadata: 'Pending resolution',
       icon: 'flag',
       variant: 'error',
-      route: '/(app)/(tabs)/chores',
+      route: `/(app)/chores/dispute?completionId=${dispute.id}`,
     });
   }
 

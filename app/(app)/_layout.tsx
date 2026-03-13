@@ -147,6 +147,17 @@ export default function AppLayout() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="chores/dispute"
+        options={{
+          headerShown: true,
+          title: "Dispute",
+          headerBackTitle: "Chores",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }

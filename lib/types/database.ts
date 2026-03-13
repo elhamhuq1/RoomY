@@ -112,6 +112,7 @@ export interface ChoreCompletion {
   is_disputed: boolean;
   disputed_by: string | null;
   disputed_at: string | null;
+  dispute_reason: string | null;
   is_reverted: boolean;
   reverted_at: string | null;
 }
@@ -242,6 +243,7 @@ export interface Database {
           is_disputed?: boolean;
           disputed_by?: string | null;
           disputed_at?: string | null;
+          dispute_reason?: string | null;
           is_reverted?: boolean;
           reverted_at?: string | null;
         };
@@ -285,6 +287,10 @@ export interface Database {
         Args: { p_household_id: string };
         Returns: { user_id: string; net_amount: number }[];
       };
+      get_balances_for_user: {
+        Args: { p_household_id: string; p_user_id: string };
+        Returns: { user_id: string; net_amount: number }[];
+      };
       complete_grocery_trip: {
         Args: {
           p_household_id: string;
@@ -308,7 +314,11 @@ export interface Database {
         Returns: void;
       };
       dispute_completion: {
-        Args: { p_completion_id: string; p_disputed_by: string };
+        Args: { p_completion_id: string; p_disputed_by: string; p_reason?: string };
+        Returns: void;
+      };
+      resolve_dispute: {
+        Args: { p_completion_id: string; p_resolved_by: string; p_action: string };
         Returns: void;
       };
       resolve_swap_request: {
