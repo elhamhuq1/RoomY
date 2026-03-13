@@ -60,9 +60,9 @@ export default function WelcomeScreen() {
           intensity={25}
           tint="light"
           style={{
-            width: 80,
-            height: 80,
-            borderRadius: 20,
+            width: 100,
+            height: 100,
+            borderRadius: 24,
             overflow: 'hidden',
             alignItems: 'center',
             justifyContent: 'center',
@@ -82,7 +82,7 @@ export default function WelcomeScreen() {
           >
             <Image
               source={require('@/assets/android-icon-foreground.png')}
-              style={{ width: 56, height: 56 }}
+              style={{ width: 72, height: 72 }}
               resizeMode="contain"
             />
           </View>
