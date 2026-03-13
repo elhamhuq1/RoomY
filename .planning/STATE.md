@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 8 of 10 (Expenses Screen)
-Plan: 2 of 2 in current phase -- PHASE COMPLETE
+Plan: 3 of 3 in current phase -- PHASE COMPLETE
 Status: Phase Complete
-Last activity: 2026-03-12 - Completed quick task 1: Add RoomY logo as app icon and splash screen
+Last activity: 2026-03-12 - Completed 08-03 UX gap closure (chevron + RoommateSection)
 
-Progress: [####################] 100% (v1.1 Phase 8: 2/2 plans)
+Progress: [####################] 100% (v1.1 Phase 8: 3/3 plans)
 
 ## Performance Metrics
 
@@ -33,8 +33,8 @@ Progress: [####################] 100% (v1.1 Phase 8: 2/2 plans)
 | 04 Engagement | 4 | 13min | 3.3min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2min, 2min, 20min, 4min
-- Trend: Gap closure plan fast (4min, all code changes pre-diagnosed)
+- Last 5 plans: 2min, 2min, 20min, 4min, 2min
+- Trend: Gap closure plans consistently fast (2-4min, pre-diagnosed changes)
 
 **By Phase (v1.1):**
 
@@ -42,7 +42,7 @@ Progress: [####################] 100% (v1.1 Phase 8: 2/2 plans)
 |-------|-------|-------|----------|
 | 06 Design System | 4 | 31min | 7.8min |
 | 07 Home Screen | 4 | 17min | 4.3min |
-| 08 Expenses Screen | 2/2 | 6min | 3.0min |
+| 08 Expenses Screen | 3/3 | 8min | 2.7min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
@@ -51,6 +51,7 @@ Progress: [####################] 100% (v1.1 Phase 8: 2/2 plans)
 | Phase 07 P04 | 4min | 2 tasks | 5 files |
 | Phase 08 P01 | 3min | 2 tasks | 8 files |
 | Phase 08 P02 | 3min | 2 tasks | 1 file |
+| Phase 08 P03 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [08-02]: Reused ExpenseRow/SettlementRow from Plan 01 barrel export for member-history screen consistency
 - [08-02]: All Phase 8 requirements (XPUI-01, XPUI-02, XPUI-03) visually verified via 10-point UAT checklist
 - [Phase quick]: Floodfill from 7 seed points for logo background removal (4 corners + 3 interior trapped regions)
+- [08-03]: Chevron affordance 16px Ionicons neutral.secondary, dynamically toggled by isExpanded
+- [08-03]: RoommateSection member fetch runs after critical Promise.all to avoid slowing initial load
+- [08-03]: Guard for empty memberUserIds avoids unnecessary profile query for solo members
 
 ### Pending Todos
 
@@ -114,5 +118,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed quick-1-PLAN.md -- RoomY logo icons replacing default Expo placeholders
+Stopped at: Completed 08-03-PLAN.md -- UX gap closure (chevron affordance + RoommateSection)
 Resume file: None
