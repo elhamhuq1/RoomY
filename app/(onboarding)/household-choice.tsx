@@ -62,6 +62,8 @@ export default function HouseholdChoiceScreen() {
               paddingVertical: 16,
               paddingHorizontal: 16,
               borderRadius: 16,
+              borderWidth: 1,
+              borderColor: "#E2E8F0",
               backgroundColor: pressed ? "rgba(0,0,0,0.04)" : "transparent",
             })}
           >
@@ -102,6 +104,8 @@ export default function HouseholdChoiceScreen() {
               paddingVertical: 16,
               paddingHorizontal: 16,
               borderRadius: 16,
+              borderWidth: 1,
+              borderColor: "#E2E8F0",
               backgroundColor: pressed ? "rgba(0,0,0,0.04)" : "transparent",
             })}
           >
