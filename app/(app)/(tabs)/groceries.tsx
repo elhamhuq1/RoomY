@@ -9,15 +9,20 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
   Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
+import { Card } from "@/components/ui/Card";
+import {
+  QuickAddInput,
+  GroceryItemRow,
+  SectionHeader,
+  EmptyState,
+} from "@/components/groceries";
 import type { GroceryItem } from "@/lib/types/database";
 
 // ---------------------------------------------------------------------------
@@ -26,54 +31,6 @@ import type { GroceryItem } from "@/lib/types/database";
 
 function generateTempId(): string {
   return Date.now().toString() + Math.random().toString(36).slice(2);
-}
-
-// ---------------------------------------------------------------------------
-// Quantity Stepper
-// ---------------------------------------------------------------------------
-
-function QuantityStepper({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <View className="flex-row items-center rounded-lg bg-neutral-surface">
-      <Pressable
-        className="px-3 py-2 active:bg-neutral-surface"
-        onPress={() => onChange(Math.max(1, value - 1))}
-      >
-        <Ionicons name="remove" size={16} color={colors.neutral.tertiary} />
-      </Pressable>
-      <Text className="min-w-[20px] text-center text-sm font-semibold text-gray-800">
-        {value}
-      </Text>
-      <Pressable
-        className="px-3 py-2 active:bg-neutral-surface"
-        onPress={() => onChange(value + 1)}
-      >
-        <Ionicons name="add" size={16} color={colors.neutral.tertiary} />
-      </Pressable>
-    </View>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Swipe Delete Action
-// ---------------------------------------------------------------------------
-
-function RightSwipeAction({ onDelete }: { onDelete: () => void }) {
-  return (
-    <Pressable
-      className="w-20 items-center justify-center bg-red-500"
-      onPress={onDelete}
-    >
-      <Ionicons name="trash" size={22} color="#fff" />
-      <Text className="mt-1 text-xs font-medium text-white">Delete</Text>
-    </Pressable>
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -93,8 +50,42 @@ export default function GroceriesScreen() {
     quantity: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [doneExpanded, setDoneExpanded] = useState(false);
+  const [creatorProfiles, setCreatorProfiles] = useState<
+    Record<string, { id: string; display_name: string }>
+  >({});
 
   const inputRef = useRef<TextInput>(null);
+
+  // -------------------------------------------------------------------------
+  // Profile batch fetch for creator avatars
+  // -------------------------------------------------------------------------
+
+  const fetchCreatorProfiles = useCallback(
+    async (groceryItems: GroceryItem[]) => {
+      const creatorIds = [
+        ...new Set(groceryItems.map((i: GroceryItem) => i.created_by)),
+      ];
+      if (creatorIds.length === 0) return;
+
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", creatorIds);
+
+      if (profiles) {
+        const profileMap: Record<
+          string,
+          { id: string; display_name: string }
+        > = {};
+        profiles.forEach((p) => {
+          profileMap[p.id] = p;
+        });
+        setCreatorProfiles(profileMap);
+      }
+    },
+    []
+  );
 
   // -------------------------------------------------------------------------
   // Data fetching
@@ -111,10 +102,12 @@ export default function GroceriesScreen() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setItems(data as GroceryItem[]);
+      const typedData = data as GroceryItem[];
+      setItems(typedData);
+      fetchCreatorProfiles(typedData);
     }
     setLoading(false);
-  }, [household?.id]);
+  }, [household?.id, fetchCreatorProfiles]);
 
   useEffect(() => {
     fetchItems();
@@ -148,6 +141,22 @@ export default function GroceriesScreen() {
                 ? prev.map((i) => (i.id === newItem.id ? newItem : i))
                 : [newItem, ...prev]
             );
+            // Fetch profile for unknown creator
+            if (!creatorProfiles[newItem.created_by]) {
+              supabase
+                .from("profiles")
+                .select("id, display_name")
+                .eq("id", newItem.created_by)
+                .single()
+                .then(({ data }) => {
+                  if (data) {
+                    setCreatorProfiles((prev) => ({
+                      ...prev,
+                      [data.id]: data,
+                    }));
+                  }
+                });
+            }
           } else if (payload.eventType === "UPDATE") {
             const updated = payload.new as GroceryItem;
             // If archived, remove from active list
@@ -170,7 +179,7 @@ export default function GroceriesScreen() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [household?.id]);
+  }, [household?.id, creatorProfiles]);
 
   // -------------------------------------------------------------------------
   // Refetch on screen focus (in case realtime events were missed)
@@ -205,7 +214,6 @@ export default function GroceriesScreen() {
 
     setItems((prev) => [optimistic, ...prev]);
     setNewItemName("");
-    Keyboard.dismiss();
 
     const { data, error } = await supabase
       .from("grocery_items")
@@ -262,23 +270,26 @@ export default function GroceriesScreen() {
   // Delete item (optimistic)
   // -------------------------------------------------------------------------
 
-  const deleteItem = useCallback(async (itemId: string) => {
-    const deleted = items.find((i) => i.id === itemId);
-    setItems((prev) => prev.filter((i) => i.id !== itemId));
+  const deleteItem = useCallback(
+    async (itemId: string) => {
+      const deleted = items.find((i) => i.id === itemId);
+      setItems((prev) => prev.filter((i) => i.id !== itemId));
 
-    const { error } = await supabase
-      .from("grocery_items")
-      .delete()
-      .eq("id", itemId);
+      const { error } = await supabase
+        .from("grocery_items")
+        .delete()
+        .eq("id", itemId);
 
-    if (error && deleted) {
-      // Re-add on error
-      setItems((prev) => [...prev, deleted]);
-    }
-  }, [items]);
+      if (error && deleted) {
+        // Re-add on error
+        setItems((prev) => [...prev, deleted]);
+      }
+    },
+    [items]
+  );
 
   // -------------------------------------------------------------------------
-  // Update quantity (optimistic)
+  // Update quantity (optimistic) -- used by edit modal
   // -------------------------------------------------------------------------
 
   const updateQuantity = useCallback(
@@ -369,87 +380,6 @@ export default function GroceriesScreen() {
   const isEmpty = items.length === 0 && !loading;
 
   // -------------------------------------------------------------------------
-  // Render helpers
-  // -------------------------------------------------------------------------
-
-  function renderItemRow(item: GroceryItem, isChecked: boolean) {
-    return (
-      <ReanimatedSwipeable
-        key={item.id}
-        renderRightActions={(_progress, _translation, swipeableMethods) => (
-          <RightSwipeAction
-            onDelete={() => {
-              swipeableMethods.close();
-              deleteItem(item.id);
-            }}
-          />
-        )}
-        overshootRight={false}
-        rightThreshold={80}
-      >
-        <Pressable
-          className={`flex-row items-center bg-white px-4 py-3 ${
-            isChecked ? "opacity-50" : ""
-          }`}
-          onPress={() =>
-            setEditingItem({
-              id: item.id,
-              name: item.name,
-              quantity: item.quantity,
-            })
-          }
-        >
-          {/* Checkbox */}
-          <Pressable
-            className="mr-3"
-            onPress={() => toggleCheck(item)}
-            hitSlop={8}
-          >
-            <Ionicons
-              name={isChecked ? "checkbox" : "square-outline"}
-              size={24}
-              color={isChecked ? colors.neutral.tertiary : colors.brand.DEFAULT}
-            />
-          </Pressable>
-
-          {/* Name */}
-          <Text
-            className={`flex-1 text-base ${
-              isChecked
-                ? "text-gray-400 line-through"
-                : "text-gray-800"
-            }`}
-            numberOfLines={1}
-          >
-            {item.name}
-          </Text>
-
-          {/* Quantity stepper (only for unchecked items) */}
-          {!isChecked && (
-            <QuantityStepper
-              value={item.quantity}
-              onChange={(v) => updateQuantity(item, v)}
-            />
-          )}
-
-          {/* Quantity badge for checked items */}
-          {isChecked && item.quantity > 1 && (
-            <Text className="ml-2 text-sm text-gray-400">x{item.quantity}</Text>
-          )}
-
-          {/* Tap-to-edit affordance */}
-          <Ionicons
-            name="pencil-outline"
-            size={16}
-            color="#d1d5db"
-            style={{ marginLeft: 8 }}
-          />
-        </Pressable>
-      </ReanimatedSwipeable>
-    );
-  }
-
-  // -------------------------------------------------------------------------
   // Loading
   // -------------------------------------------------------------------------
 
@@ -470,45 +400,15 @@ export default function GroceriesScreen() {
       className="flex-1 bg-neutral-bg"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* Add item input */}
-      <View className="flex-row items-center border-b border-gray-100 bg-white px-4 py-3">
-        <TextInput
-          ref={inputRef}
-          className="flex-1 rounded-xl border border-gray-200 bg-neutral-bg px-4 py-2.5 text-base text-gray-800"
-          placeholder="Add an item..."
-          placeholderTextColor={colors.neutral.tertiary}
-          value={newItemName}
-          onChangeText={setNewItemName}
-          onSubmitEditing={addItem}
-          returnKeyType="done"
-        />
-        <Pressable
-          className="ml-3 active:opacity-70"
-          onPress={addItem}
-          disabled={!newItemName.trim()}
-        >
-          <Ionicons
-            name="add-circle"
-            size={36}
-            color={newItemName.trim() ? colors.brand.DEFAULT : "#d1d5db"}
-          />
-        </Pressable>
-      </View>
+      {/* Quick-add input */}
+      <QuickAddInput
+        value={newItemName}
+        onChangeText={setNewItemName}
+        onSubmit={addItem}
+      />
 
       {/* Empty state */}
-      {isEmpty && (
-        <View className="flex-1 items-center justify-center px-8">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
-            <Ionicons name="cart" size={48} color={colors.brand.DEFAULT} />
-          </View>
-          <Text className="text-2xl font-bold text-gray-800">
-            Your grocery list is empty
-          </Text>
-          <Text className="mt-3 text-center text-base leading-6 text-gray-500">
-            Add items to get started
-          </Text>
-        </View>
-      )}
+      {isEmpty && <EmptyState />}
 
       {/* Item list */}
       {!isEmpty && (
@@ -519,49 +419,85 @@ export default function GroceriesScreen() {
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
         >
-          {/* Unchecked items */}
+          {/* TO GET section */}
           {uncheckedItems.length > 0 && (
             <View className="mt-3">
-              <Text className="mb-2 px-4 text-sm font-medium uppercase tracking-wide text-gray-400">
-                To Buy
-              </Text>
-              <View className="mx-4 overflow-hidden rounded-xl">
+              <SectionHeader label="TO GET" count={uncheckedItems.length} />
+              <Card className="mx-4 p-0 overflow-hidden">
                 {uncheckedItems.map((item, index) => (
                   <View
                     key={item.id}
                     className={
                       index < uncheckedItems.length - 1
-                        ? "border-b border-gray-100"
+                        ? "border-b border-neutral-border"
                         : ""
                     }
                   >
-                    {renderItemRow(item, false)}
+                    <GroceryItemRow
+                      item={item}
+                      isChecked={false}
+                      creatorName={
+                        creatorProfiles[item.created_by]?.display_name ?? "?"
+                      }
+                      creatorId={item.created_by}
+                      onToggle={() => toggleCheck(item)}
+                      onEdit={() =>
+                        setEditingItem({
+                          id: item.id,
+                          name: item.name,
+                          quantity: item.quantity,
+                        })
+                      }
+                      onDelete={() => deleteItem(item.id)}
+                    />
                   </View>
                 ))}
-              </View>
+              </Card>
             </View>
           )}
 
-          {/* Checked items (Completed section) */}
+          {/* DONE section (collapsible) */}
           {hasCheckedItems && (
             <View className="mt-6">
-              <Text className="mb-2 px-4 text-sm font-medium uppercase tracking-wide text-gray-400">
-                Completed
-              </Text>
-              <View className="mx-4 overflow-hidden rounded-xl">
-                {checkedItems.map((item, index) => (
-                  <View
-                    key={item.id}
-                    className={
-                      index < checkedItems.length - 1
-                        ? "border-b border-gray-100"
-                        : ""
-                    }
-                  >
-                    {renderItemRow(item, true)}
-                  </View>
-                ))}
-              </View>
+              <SectionHeader
+                label="DONE"
+                count={checkedItems.length}
+                collapsible
+                expanded={doneExpanded}
+                onToggle={() => setDoneExpanded((prev) => !prev)}
+              />
+              {doneExpanded && (
+                <Card className="mx-4 p-0 overflow-hidden">
+                  {checkedItems.map((item, index) => (
+                    <View
+                      key={item.id}
+                      className={
+                        index < checkedItems.length - 1
+                          ? "border-b border-neutral-border"
+                          : ""
+                      }
+                    >
+                      <GroceryItemRow
+                        item={item}
+                        isChecked={true}
+                        creatorName={
+                          creatorProfiles[item.created_by]?.display_name ?? "?"
+                        }
+                        creatorId={item.created_by}
+                        onToggle={() => toggleCheck(item)}
+                        onEdit={() =>
+                          setEditingItem({
+                            id: item.id,
+                            name: item.name,
+                            quantity: item.quantity,
+                          })
+                        }
+                        onDelete={() => deleteItem(item.id)}
+                      />
+                    </View>
+                  ))}
+                </Card>
+              )}
             </View>
           )}
         </ScrollView>
@@ -569,7 +505,7 @@ export default function GroceriesScreen() {
 
       {/* Complete Trip button -- sticky bottom */}
       {hasCheckedItems && (
-        <View className="border-t border-gray-100 bg-white px-4 pb-6 pt-3">
+        <View className="border-t border-neutral-border bg-white px-4 pb-6 pt-3">
           <Pressable
             className="flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
             onPress={() => router.push("/(app)/groceries/complete-trip")}
@@ -604,16 +540,16 @@ export default function GroceriesScreen() {
               className="mx-8 w-full max-w-sm rounded-2xl bg-white p-6"
               onPress={() => {}}
             >
-              <Text className="mb-4 text-lg font-bold text-gray-800">
+              <Text className="mb-4 text-lg font-bold text-neutral-text">
                 Edit Item
               </Text>
 
               {/* Name */}
-              <Text className="mb-1 text-sm font-medium text-gray-500">
+              <Text className="mb-1 text-sm font-medium text-neutral-secondary">
                 Name
               </Text>
               <TextInput
-                className="mb-4 rounded-xl border border-gray-200 bg-neutral-bg px-4 py-2.5 text-base text-gray-800"
+                className="mb-4 rounded-xl border border-neutral-border bg-neutral-bg px-4 py-2.5 text-base text-neutral-text"
                 value={editingItem?.name ?? ""}
                 onChangeText={(text) =>
                   setEditingItem((prev) =>
@@ -626,12 +562,12 @@ export default function GroceriesScreen() {
               />
 
               {/* Quantity */}
-              <Text className="mb-2 text-sm font-medium text-gray-500">
+              <Text className="mb-2 text-sm font-medium text-neutral-secondary">
                 Quantity
               </Text>
               <View className="mb-6 flex-row items-center">
                 <Pressable
-                  className="h-10 w-10 items-center justify-center rounded-l-xl border border-gray-200 bg-neutral-bg active:bg-neutral-surface"
+                  className="h-10 w-10 items-center justify-center rounded-l-xl border border-neutral-border bg-neutral-bg active:bg-neutral-surface"
                   onPress={() =>
                     setEditingItem((prev) =>
                       prev
@@ -640,32 +576,32 @@ export default function GroceriesScreen() {
                     )
                   }
                 >
-                  <Ionicons name="remove" size={20} color="#6b7280" />
+                  <Ionicons name="remove" size={20} color={colors.neutral.secondary} />
                 </Pressable>
-                <View className="h-10 items-center justify-center border-y border-gray-200 bg-white px-6">
-                  <Text className="text-lg font-semibold text-gray-800">
+                <View className="h-10 items-center justify-center border-y border-neutral-border bg-white px-6">
+                  <Text className="text-lg font-semibold text-neutral-text">
                     {editingItem?.quantity ?? 1}
                   </Text>
                 </View>
                 <Pressable
-                  className="h-10 w-10 items-center justify-center rounded-r-xl border border-gray-200 bg-neutral-bg active:bg-neutral-surface"
+                  className="h-10 w-10 items-center justify-center rounded-r-xl border border-neutral-border bg-neutral-bg active:bg-neutral-surface"
                   onPress={() =>
                     setEditingItem((prev) =>
                       prev ? { ...prev, quantity: prev.quantity + 1 } : prev
                     )
                   }
                 >
-                  <Ionicons name="add" size={20} color="#6b7280" />
+                  <Ionicons name="add" size={20} color={colors.neutral.secondary} />
                 </Pressable>
               </View>
 
               {/* Buttons */}
               <View className="flex-row gap-3">
                 <Pressable
-                  className="flex-1 items-center rounded-xl border border-gray-200 py-3 active:bg-gray-50"
+                  className="flex-1 items-center rounded-xl border border-neutral-border py-3 active:bg-neutral-bg"
                   onPress={() => setEditingItem(null)}
                 >
-                  <Text className="text-base font-medium text-gray-600">
+                  <Text className="text-base font-medium text-neutral-secondary">
                     Cancel
                   </Text>
                 </Pressable>
