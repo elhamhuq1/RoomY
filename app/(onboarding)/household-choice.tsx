@@ -1,5 +1,4 @@
 import { View, Text, Pressable, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StepProgressBar } from "@/components/ui";
@@ -56,85 +55,63 @@ export default function HouseholdChoiceScreen() {
           {/* Create Household */}
           <Pressable
             onPress={() => router.push("/(onboarding)/create-household")}
-            style={({ pressed }) => ({
-              flexDirection: "row",
-              alignItems: "center",
-              paddingVertical: 16,
-              paddingHorizontal: 16,
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: "#E2E8F0",
-              backgroundColor: pressed ? "rgba(0,0,0,0.04)" : "transparent",
-            })}
+            style={{ alignItems: "center" }}
           >
             <Image
               source={ONBOARDING_IMAGES.createHouseholdIcon}
-              style={{ width: 56, height: 56, marginRight: 16 }}
+              style={{ width: 64, height: 64, marginBottom: 10 }}
               resizeMode="contain"
             />
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontWeight: "700",
-                  color: colors.neutral.text,
-                  marginBottom: 2,
-                }}
-              >
-                Create Household
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: colors.neutral.secondary,
-                }}
-              >
-                Start a new home and invite roommates
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.neutral.tertiary} />
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "700",
+                color: colors.neutral.text,
+                marginBottom: 4,
+              }}
+            >
+              Create Household
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: colors.neutral.secondary,
+                textAlign: "center",
+              }}
+            >
+              Start a new home and invite roommates
+            </Text>
           </Pressable>
 
           {/* Join Household */}
           <Pressable
             onPress={() => router.push("/(onboarding)/join-household")}
-            style={({ pressed }) => ({
-              flexDirection: "row",
-              alignItems: "center",
-              paddingVertical: 16,
-              paddingHorizontal: 16,
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: "#E2E8F0",
-              backgroundColor: pressed ? "rgba(0,0,0,0.04)" : "transparent",
-            })}
+            style={{ alignItems: "center" }}
           >
             <Image
               source={ONBOARDING_IMAGES.joinHouseholdIcon}
-              style={{ width: 56, height: 56, marginRight: 16 }}
+              style={{ width: 64, height: 64, marginBottom: 10 }}
               resizeMode="contain"
             />
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontWeight: "700",
-                  color: colors.neutral.text,
-                  marginBottom: 2,
-                }}
-              >
-                Join Household
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: colors.neutral.secondary,
-                }}
-              >
-                Enter an invite code from your roommate
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.neutral.tertiary} />
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "700",
+                color: colors.neutral.text,
+                marginBottom: 4,
+              }}
+            >
+              Join Household
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: colors.neutral.secondary,
+                textAlign: "center",
+              }}
+            >
+              Enter an invite code from your roommate
+            </Text>
           </Pressable>
         </View>
       </View>
