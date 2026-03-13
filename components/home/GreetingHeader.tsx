@@ -16,7 +16,7 @@ function getGreeting(): string {
 export function GreetingHeader({ userName }: GreetingHeaderProps) {
   return (
     <View className="px-5 pt-4">
-      <Text className="text-page-title text-neutral-text">
+      <Text className="text-page-title font-heading text-neutral-text">
         {getGreeting()}, {userName}
       </Text>
       <Text className="text-metadata text-neutral-secondary mt-1">

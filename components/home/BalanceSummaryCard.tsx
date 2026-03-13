@@ -62,7 +62,7 @@ export function BalanceSummaryCard({
             />
           )}
           <Text
-            className="text-key-number"
+            className="text-key-number font-heading"
             style={{ color: amountColor }}
           >
             {amountText}

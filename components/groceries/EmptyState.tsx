@@ -9,7 +9,7 @@ export function EmptyState() {
       <View className="h-24 w-24 rounded-full bg-brand-light items-center justify-center mb-6">
         <Ionicons name="cart" size={48} color={colors.brand.DEFAULT} />
       </View>
-      <Text className="text-section-heading text-neutral-text">
+      <Text className="text-section-heading font-heading text-neutral-text">
         Your grocery list is empty
       </Text>
       <Text className="text-body text-neutral-secondary mt-3 text-center">

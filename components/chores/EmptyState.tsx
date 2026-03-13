@@ -33,7 +33,7 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
         <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-light">
           <Ionicons name="checkbox" size={40} color={colors.brand.DEFAULT} />
         </View>
-        <Text className="text-section-heading text-neutral-text">
+        <Text className="text-section-heading font-heading text-neutral-text">
           No chores yet!
         </Text>
         <Text className="mt-2 text-center text-body text-neutral-secondary leading-6">

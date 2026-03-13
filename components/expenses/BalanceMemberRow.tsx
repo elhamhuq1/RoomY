@@ -29,7 +29,7 @@ export function BalanceMemberRow({
       <View className="flex-row items-center flex-1 mr-2">
         <Avatar userId={userId} name={displayName} size="md" />
         <View className="ml-3 flex-1">
-          <Text className="text-card-title text-neutral-text">
+          <Text className="text-card-title font-heading text-neutral-text">
             {displayName}
           </Text>
           <Text

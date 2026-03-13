@@ -114,7 +114,7 @@ export function AttentionFeed(props: AttentionFeedProps) {
 
   return (
     <View className="mt-4 px-5">
-      <Text className="text-section-heading text-neutral-text mb-3">
+      <Text className="text-section-heading font-heading text-neutral-text mb-3">
         Needs Your Attention
       </Text>
 
@@ -125,7 +125,7 @@ export function AttentionFeed(props: AttentionFeedProps) {
             size={48}
             color={colors.brand.DEFAULT}
           />
-          <Text className="text-section-heading text-neutral-text mt-3">
+          <Text className="text-section-heading font-heading text-neutral-text mt-3">
             All caught up!
           </Text>
           <Text className="text-body text-neutral-secondary mt-1">
@@ -143,7 +143,7 @@ export function AttentionFeed(props: AttentionFeedProps) {
                 <IconContainer name={item.icon} variant={item.variant} />
                 <View className="flex-1 mx-3">
                   <Text
-                    className="text-card-title text-neutral-text"
+                    className="text-card-title font-heading text-neutral-text"
                     numberOfLines={1}
                   >
                     {item.title}

@@ -66,7 +66,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
 
   return (
     <View className="mt-4 px-5 pb-8">
-      <Text className="text-section-heading text-neutral-text mb-3">
+      <Text className="text-section-heading font-heading text-neutral-text mb-3">
         This Week
       </Text>
 
@@ -122,7 +122,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
 
                     {/* Content */}
                     <View className="flex-1 pb-1">
-                      <Text className="text-card-title text-neutral-text">
+                      <Text className="text-card-title font-heading text-neutral-text">
                         {item.name}
                       </Text>
                       <View className="flex-row items-center mt-1">

@@ -32,7 +32,7 @@ export function BalanceSection({
 
   return (
     <Card className="mb-4">
-      <Text className="text-section-heading text-neutral-text mb-3">
+      <Text className="text-section-heading font-heading text-neutral-text mb-3">
         Balances
       </Text>
 

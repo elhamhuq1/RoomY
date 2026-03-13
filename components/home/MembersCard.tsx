@@ -78,7 +78,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
               </Text>
             </View>
             <Text
-              className="text-section-heading text-neutral-text tracking-widest my-2"
+              className="text-section-heading font-heading text-neutral-text tracking-widest my-2"
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {formattedCode}

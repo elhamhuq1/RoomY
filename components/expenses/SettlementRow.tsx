@@ -32,7 +32,7 @@ export function SettlementRow({
         <IconContainer name="checkmark-circle" variant="success" />
       </View>
       <View className="flex-1 mr-2">
-        <Text className="text-card-title text-neutral-secondary">
+        <Text className="text-card-title font-heading text-neutral-secondary">
           {paidByName} paid {paidToName}
         </Text>
       </View>
