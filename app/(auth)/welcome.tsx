@@ -156,7 +156,6 @@ export default function WelcomeScreen() {
                   lineHeight: 22,
                   maxWidth: 300,
                 }}
-                numberOfLines={2}
               >
                 {prop.description}
               </Text>
