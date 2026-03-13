@@ -19,11 +19,15 @@ export type SplitWithProfile = {
   profile: { display_name: string } | null;
 };
 
+/** Net balance between the payer and each split member (from payer's perspective). */
+export type PayerBalanceMap = Record<string, number>;
+
 interface ExpenseRowProps {
   expense: Expense;
   payerName: string;
   isExpanded: boolean;
   splits: SplitWithProfile[] | null;
+  payerBalances: PayerBalanceMap | null;
   onPress: () => void;
   isLast: boolean;
 }
@@ -33,6 +37,7 @@ export function ExpenseRow({
   payerName,
   isExpanded,
   splits,
+  payerBalances,
   onPress,
   isLast,
 }: ExpenseRowProps) {
@@ -78,9 +83,6 @@ export function ExpenseRow({
             !isLast ? 'border-b border-neutral-border' : ''
           }`}
         >
-          <Text className="text-metadata text-neutral-secondary mb-1">
-            Split breakdown
-          </Text>
           {splits === null ? (
             <View className="items-center py-3">
               <ActivityIndicator size="small" />
@@ -88,6 +90,33 @@ export function ExpenseRow({
           ) : (
             splits.map((split) => {
               const isPayer = split.user_id === expense.paid_by;
+
+              // Determine payment status for non-payer members
+              let statusLabel: string | null = null;
+              let statusColor: string = colors.semantic.success;
+              let statusIcon: 'checkmark-circle' | 'time-outline' = 'checkmark-circle';
+
+              if (isPayer) {
+                statusLabel = 'Paid';
+                statusColor = colors.semantic.success;
+                statusIcon = 'checkmark-circle';
+              } else if (payerBalances) {
+                // payerBalances[user_id] = net balance from payer's perspective
+                // positive = this member still owes the payer overall
+                // zero or absent = settled overall
+                // negative = payer owes them (overpaid)
+                const netOwed = payerBalances[split.user_id] ?? 0;
+                if (netOwed > 0) {
+                  statusLabel = `Owes ${formatCurrency(netOwed)}`;
+                  statusColor = colors.semantic.warning;
+                  statusIcon = 'time-outline';
+                } else {
+                  statusLabel = 'Settled';
+                  statusColor = colors.semantic.success;
+                  statusIcon = 'checkmark-circle';
+                }
+              }
+
               return (
                 <View
                   key={split.id}
@@ -104,15 +133,18 @@ export function ExpenseRow({
                   <Text className="text-metadata font-semibold text-neutral-text">
                     {formatCurrency(Number(split.share_amount))}
                   </Text>
-                  {isPayer && (
+                  {statusLabel && (
                     <View className="flex-row items-center ml-2">
                       <Ionicons
-                        name="checkmark-circle"
+                        name={statusIcon}
                         size={14}
-                        color={colors.semantic.success}
+                        color={statusColor}
                       />
-                      <Text className="ml-1 text-metadata font-semibold text-semantic-success">
-                        Paid
+                      <Text
+                        className="ml-1 text-metadata font-semibold"
+                        style={{ color: statusColor }}
+                      >
+                        {statusLabel}
                       </Text>
                     </View>
                   )}
