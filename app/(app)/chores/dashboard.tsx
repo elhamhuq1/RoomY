@@ -8,8 +8,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSession } from "@/lib/auth-context";
+import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
 import type { ChoreCompletion, Profile } from "@/lib/types/database";
 
@@ -229,11 +229,15 @@ export default function DashboardScreen() {
     [household?.id]
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchData(period);
-    }, [fetchData, period])
-  );
+  // Wrap fetchData to bind current period
+  const fetchCurrentPeriod = useCallback(async () => {
+    await fetchData(period);
+  }, [fetchData, period]);
+
+  useCachedFetch(fetchCurrentPeriod, {
+    staleTime: 30_000,
+    deps: [household?.id, period],
+  });
 
   // -------------------------------------------------------------------------
   // Period toggle

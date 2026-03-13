@@ -9,11 +9,11 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { useSession } from '@/lib/auth-context';
+import { useCachedFetch } from '@/lib/use-cached-fetch';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme/colors';
-import type { Profile, Expense, Settlement } from '@/lib/types/database';
+import type { Profile, Expense } from '@/lib/types/database';
 import {
   BalanceSection,
   HistorySection,
@@ -25,6 +25,7 @@ import type {
   HistoryItem,
   GroupedHistory,
   SplitWithProfile,
+  PayerBalanceMap,
   RoommateMember,
 } from '@/components/expenses';
 
@@ -81,12 +82,14 @@ export default function ExpensesScreen() {
   const [groupedHistory, setGroupedHistory] = useState<GroupedHistory[]>([]);
   const [members, setMembers] = useState<RoommateMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
   // Inline expand state
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [splitsCache, setSplitsCache] = useState<
     Record<string, SplitWithProfile[]>
+  >({});
+  const [payerBalancesCache, setPayerBalancesCache] = useState<
+    Record<string, PayerBalanceMap>
   >({});
 
   // Pagination state
@@ -100,20 +103,14 @@ export default function ExpensesScreen() {
     if (!household?.id) return;
 
     try {
-      // Fetch balances, expenses, and settlements in parallel
-      const [balanceResult, expenseResult, settlementResult] =
+      // Fetch balances and expenses in parallel
+      const [balanceResult, expenseResult] =
         await Promise.all([
           supabase.rpc('get_household_balances', {
             p_household_id: household.id,
           }),
           supabase
             .from('expenses')
-            .select('*')
-            .eq('household_id', household.id)
-            .order('created_at', { ascending: false })
-            .range(0, BATCH_SIZE - 1),
-          supabase
-            .from('settlements')
             .select('*')
             .eq('household_id', household.id)
             .order('created_at', { ascending: false })
@@ -145,15 +142,10 @@ export default function ExpensesScreen() {
 
       // Collect all user IDs that need profiles
       const expenses = (expenseResult.data as Expense[]) ?? [];
-      const settlements = (settlementResult.data as Settlement[]) ?? [];
 
       const profileIdSet = new Set<string>();
       for (const e of expenses) {
         profileIdSet.add(e.paid_by);
-      }
-      for (const s of settlements) {
-        profileIdSet.add(s.paid_by);
-        profileIdSet.add(s.paid_to);
       }
       const profileIds = Array.from(profileIdSet);
 
@@ -181,15 +173,6 @@ export default function ExpensesScreen() {
         });
       }
 
-      for (const s of settlements) {
-        items.push({
-          type: 'settlement',
-          data: s,
-          paidByName: profileMap[s.paid_by]?.display_name ?? 'Unknown',
-          paidToName: profileMap[s.paid_to]?.display_name ?? 'Unknown',
-        });
-      }
-
       // Sort by created_at descending
       items.sort(
         (a, b) =>
@@ -202,9 +185,7 @@ export default function ExpensesScreen() {
 
       // Reset pagination
       setOffset(BATCH_SIZE);
-      setHasMore(
-        expenses.length === BATCH_SIZE || settlements.length === BATCH_SIZE
-      );
+      setHasMore(expenses.length === BATCH_SIZE);
 
       // Fetch all household members for roommate section
       const { data: membersData } = await supabase
@@ -233,9 +214,10 @@ export default function ExpensesScreen() {
         setMembers([]);
       }
 
-      // Clear expanded state and splits cache on refresh
+      // Clear expanded state and caches on refresh
       setExpandedId(null);
       setSplitsCache({});
+      setPayerBalancesCache({});
     } catch (err) {
       console.error('Error fetching expense data:', err);
       setBalances([]);
@@ -250,25 +232,16 @@ export default function ExpensesScreen() {
 
     setLoadingMore(true);
     try {
-      const [expenseResult, settlementResult] = await Promise.all([
-        supabase
-          .from('expenses')
-          .select('*')
-          .eq('household_id', household.id)
-          .order('created_at', { ascending: false })
-          .range(offset, offset + BATCH_SIZE - 1),
-        supabase
-          .from('settlements')
-          .select('*')
-          .eq('household_id', household.id)
-          .order('created_at', { ascending: false })
-          .range(offset, offset + BATCH_SIZE - 1),
-      ]);
+      const { data: expenseData } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('household_id', household.id)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + BATCH_SIZE - 1);
 
-      const expenses = (expenseResult.data as Expense[]) ?? [];
-      const settlements = (settlementResult.data as Settlement[]) ?? [];
+      const expenses = (expenseData as Expense[]) ?? [];
 
-      if (expenses.length === 0 && settlements.length === 0) {
+      if (expenses.length === 0) {
         setHasMore(false);
         setLoadingMore(false);
         return;
@@ -277,10 +250,6 @@ export default function ExpensesScreen() {
       // Fetch profiles for new items
       const profileIdSet = new Set<string>();
       for (const e of expenses) profileIdSet.add(e.paid_by);
-      for (const s of settlements) {
-        profileIdSet.add(s.paid_by);
-        profileIdSet.add(s.paid_to);
-      }
       const profileIds = Array.from(profileIdSet);
 
       let profileMap: Record<string, Profile> = {};
@@ -304,15 +273,6 @@ export default function ExpensesScreen() {
           payerName: profileMap[e.paid_by]?.display_name ?? 'Unknown',
         });
       }
-      for (const s of settlements) {
-        newItems.push({
-          type: 'settlement',
-          data: s,
-          paidByName: profileMap[s.paid_by]?.display_name ?? 'Unknown',
-          paidToName: profileMap[s.paid_to]?.display_name ?? 'Unknown',
-        });
-      }
-
       // Merge with existing, re-sort, re-group
       const merged = [...historyItems, ...newItems].sort(
         (a, b) =>
@@ -323,9 +283,7 @@ export default function ExpensesScreen() {
       setHistoryItems(merged);
       setGroupedHistory(buildGroups(merged));
       setOffset((prev) => prev + BATCH_SIZE);
-      setHasMore(
-        expenses.length === BATCH_SIZE || settlements.length === BATCH_SIZE
-      );
+      setHasMore(expenses.length === BATCH_SIZE);
     } catch (err) {
       console.error('Error loading more expenses:', err);
     } finally {
@@ -333,19 +291,20 @@ export default function ExpensesScreen() {
     }
   }, [hasMore, loadingMore, household?.id, offset, historyItems]);
 
-  // Refetch on screen focus
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      fetchData().finally(() => setLoading(false));
-    }, [fetchData])
-  );
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchData();
-    setRefreshing(false);
+  // Refetch on screen focus (cached - skips if data is < 30s old)
+  const fetchWithLoading = useCallback(async () => {
+    setLoading(true);
+    try {
+      await fetchData();
+    } finally {
+      setLoading(false);
+    }
   }, [fetchData]);
+
+  const { onRefresh, refreshing } = useCachedFetch(fetchWithLoading, {
+    staleTime: 30_000,
+    deps: [household?.id],
+  });
 
   // ---------- Inline expand for expense splits ----------
 
@@ -357,8 +316,13 @@ export default function ExpensesScreen() {
       }
       setExpandedId(expenseId);
 
-      if (!splitsCache[expenseId]) {
-        try {
+      // Find the expense to get the payer ID
+      const expense = historyItems.find((item) => item.data.id === expenseId);
+      const payerId = expense?.data.paid_by;
+
+      try {
+        // Fetch splits if not cached
+        if (!splitsCache[expenseId]) {
           const { data: splitsData } = await supabase
             .from('expense_splits')
             .select('*')
@@ -397,8 +361,33 @@ export default function ExpensesScreen() {
               [expenseId]: [],
             }));
           }
-        } catch (err) {
-          console.error('Error fetching splits:', err);
+        }
+
+        // Fetch payer balances if not cached for this payer
+        if (payerId && household?.id && !payerBalancesCache[payerId]) {
+          const { data: balanceData } = await supabase.rpc(
+            'get_balances_for_user',
+            {
+              p_household_id: household.id,
+              p_user_id: payerId,
+            }
+          );
+
+          const balanceMap: PayerBalanceMap = {};
+          if (balanceData) {
+            for (const row of balanceData) {
+              balanceMap[row.user_id] = Number(row.net_amount);
+            }
+          }
+
+          setPayerBalancesCache((prev) => ({
+            ...prev,
+            [payerId]: balanceMap,
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching splits/balances:', err);
+        if (!splitsCache[expenseId]) {
           setSplitsCache((prev) => ({
             ...prev,
             [expenseId]: [],
@@ -406,7 +395,7 @@ export default function ExpensesScreen() {
         }
       }
     },
-    [expandedId, splitsCache]
+    [expandedId, splitsCache, payerBalancesCache, historyItems, household?.id]
   );
 
   // ---------- Action handlers ----------
@@ -507,6 +496,7 @@ export default function ExpensesScreen() {
             groups={groupedHistory}
             expandedId={expandedId}
             splitsCache={splitsCache}
+            payerBalancesCache={payerBalancesCache}
             onExpensePress={handleExpensePress}
             currentUserId={user?.id ?? ''}
           />

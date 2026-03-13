@@ -6,7 +6,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   format,
   startOfMonth,
@@ -19,6 +18,7 @@ import {
   isWithinInterval,
 } from 'date-fns';
 import { useSession } from '@/lib/auth-context';
+import { useCachedFetch } from '@/lib/use-cached-fetch';
 import { projectChoreDates } from '@/lib/calendar-utils';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme/colors';
@@ -59,7 +59,6 @@ export default function DashboardScreen() {
   const [disputes, setDisputes] = useState<DisputeRow[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
     format(new Date(), 'yyyy-MM-dd')
   );
@@ -142,18 +141,11 @@ export default function DashboardScreen() {
     setLoading(false);
   }, [household?.id, selectedDate]);
 
-  // Refresh on screen focus
-  useFocusEffect(
-    useCallback(() => {
-      fetchAllData();
-    }, [fetchAllData])
-  );
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchAllData();
-    setRefreshing(false);
-  }, [fetchAllData]);
+  // Refresh on screen focus (cached - skips if data is < 30s old)
+  const { onRefresh, refreshing: isRefreshing } = useCachedFetch(fetchAllData, {
+    staleTime: 30_000,
+    deps: [household?.id, selectedDate],
+  });
 
   // ---------- Derived data ----------
 
@@ -340,7 +332,7 @@ export default function DashboardScreen() {
         contentContainerClassName="pb-12"
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
         }
       >
         <GreetingHeader userName={firstName} />
@@ -361,7 +353,7 @@ export default function DashboardScreen() {
       contentContainerClassName="pb-12"
       showsVerticalScrollIndicator={false}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
     >
       <GreetingHeader userName={firstName} />

@@ -9,8 +9,8 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSession } from "@/lib/auth-context";
+import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
 import type {
   Chore,
@@ -147,11 +147,10 @@ export default function SwapRequestScreen() {
     setLoading(false);
   }, [household?.id, user?.id]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [fetchData])
-  );
+  const { refresh: refreshSwaps } = useCachedFetch(fetchData, {
+    staleTime: 30_000,
+    deps: [household?.id, user?.id],
+  });
 
   // -------------------------------------------------------------------------
   // Actions
@@ -170,10 +169,10 @@ export default function SwapRequestScreen() {
         console.error("[SwapRequest] resolve_swap_request error:", error);
         Alert.alert("Error", `Failed to ${status === "accepted" ? "accept" : "decline"} swap request.`);
       } else {
-        fetchData();
+        refreshSwaps();
       }
     },
-    [fetchData]
+    [refreshSwaps]
   );
 
   // -------------------------------------------------------------------------

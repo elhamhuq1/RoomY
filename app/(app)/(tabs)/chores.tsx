@@ -14,8 +14,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSession } from "@/lib/auth-context";
+import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
 import { Avatar } from "@/components/ui";
 import { Card } from "@/components/ui";
@@ -233,11 +233,11 @@ export default function ChoresScreen() {
     setLoading(false);
   }, [household?.id, user?.id]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [fetchData])
-  );
+  // Refetch on screen focus (cached - skips if data is < 30s old)
+  const { refresh: refreshChores } = useCachedFetch(fetchData, {
+    staleTime: 30_000,
+    deps: [household?.id, user?.id],
+  });
 
   // -------------------------------------------------------------------------
   // Actions
@@ -262,14 +262,14 @@ export default function ChoresScreen() {
               });
               setCompletingId(null);
               if (!error) {
-                setTimeout(() => fetchData(), 400);
+                setTimeout(() => refreshChores(), 400);
               }
             },
           },
         ]
       );
     },
-    [user?.id, fetchData]
+    [user?.id, refreshChores]
   );
 
   const handleClaim = useCallback(
@@ -282,10 +282,10 @@ export default function ChoresScreen() {
       });
       setClaimingId(null);
       if (!error) {
-        fetchData();
+        refreshChores();
       }
     },
-    [user?.id, fetchData]
+    [user?.id, refreshChores]
   );
 
   const handleDispute = useCallback(
@@ -346,9 +346,9 @@ export default function ChoresScreen() {
     } else {
       setDisputeReasonModal({ visible: false, choreId: null, completionId: null });
       setDisputeReason("");
-      fetchData();
+      refreshChores();
     }
-  }, [user?.id, disputeReasonModal, disputeReason, fetchData]);
+  }, [user?.id, disputeReasonModal, disputeReason, refreshChores]);
 
   const handleViewDispute = useCallback(
     (choreId: string) => {
@@ -379,10 +379,10 @@ export default function ChoresScreen() {
       } else {
         Alert.alert("Swap Requested", "Your swap request has been sent.");
         setSwapModalChoreId(null);
-        fetchData();
+        refreshChores();
       }
     },
-    [user?.id, swapModalChoreId, fetchData]
+    [user?.id, swapModalChoreId, refreshChores]
   );
 
   // -------------------------------------------------------------------------

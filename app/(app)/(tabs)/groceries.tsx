@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSession } from "@/lib/auth-context";
+import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
 import { Card } from "@/components/ui/Card";
 import {
@@ -185,13 +185,13 @@ export default function GroceriesScreen() {
 
   // -------------------------------------------------------------------------
   // Refetch on screen focus (in case realtime events were missed)
+  // Longer stale time (2 min) since realtime handles most updates
   // -------------------------------------------------------------------------
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchItems();
-    }, [fetchItems])
-  );
+  useCachedFetch(fetchItems, {
+    staleTime: 120_000,
+    deps: [household?.id],
+  });
 
   // -------------------------------------------------------------------------
   // Add item (optimistic)
