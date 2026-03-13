@@ -14,36 +14,15 @@ import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
+import { Avatar } from "@/components/ui";
+import { Card } from "@/components/ui";
+import { StatsRow, ChoreRow, EmptyState } from "@/components/chores";
 import type {
   Chore,
   ChoreCompletion,
   ChoreSwapRequest,
   Profile,
 } from "@/lib/types/database";
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const SUGGESTED_CHORES = [
-  { name: "Dishes", icon: "restaurant-outline" as const, frequency: "daily" as const },
-  { name: "Take out trash", icon: "trash-outline" as const, frequency: "weekly" as const },
-  { name: "Vacuum", icon: "home-outline" as const, frequency: "weekly" as const },
-  { name: "Clean bathroom", icon: "water-outline" as const, frequency: "weekly" as const },
-  { name: "Mop floors", icon: "grid-outline" as const, frequency: "weekly" as const },
-  { name: "Wipe counters", icon: "hand-left-outline" as const, frequency: "daily" as const },
-];
-
-const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -91,6 +70,20 @@ function calculateStreak(completions: ChoreCompletion[]): number {
     streak++;
   }
   return streak;
+}
+
+function calculatePersonalBest(completions: ChoreCompletion[]): number {
+  let current = 0;
+  let best = 0;
+  for (const c of completions) {
+    if (c.is_reverted) {
+      current = 0;
+    } else {
+      current++;
+      best = Math.max(best, current);
+    }
+  }
+  return best;
 }
 
 // ---------------------------------------------------------------------------
@@ -253,7 +246,7 @@ export default function ChoresScreen() {
               });
               setCompletingId(null);
               if (!error) {
-                fetchData();
+                setTimeout(() => fetchData(), 400);
               }
             },
           },
@@ -374,10 +367,8 @@ export default function ChoresScreen() {
     );
 
   const pendingCount = myChores.length;
-  const overdueCount = chores.filter(
-    (c) => c.current_assignee === user?.id && getOverdueDays(c.next_due_at) !== null
-  ).length;
   const streak = calculateStreak(completions);
+  const personalBest = calculatePersonalBest(completions);
 
   const isEmpty = chores.length === 0 && !loading;
 
@@ -385,155 +376,6 @@ export default function ChoresScreen() {
   const otherMembers = Object.values(profiles).filter(
     (p) => p.id !== user?.id
   );
-
-  // -------------------------------------------------------------------------
-  // Render helpers
-  // -------------------------------------------------------------------------
-
-  function renderChoreRow(chore: Chore) {
-    const overdueDays = getOverdueDays(chore.next_due_at);
-    const assigneeProfile = chore.current_assignee
-      ? profiles[chore.current_assignee]
-      : null;
-    const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
-    const isMyChore = chore.current_assignee === user?.id;
-    const isCompleting = completingId === chore.id;
-    const isClaiming = claimingId === chore.id;
-    const isDisputing = disputingId === chore.id;
-    const isDisputed = disputedChoreIds.has(chore.id);
-    const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
-    const hasLastCompletion = chore.last_completed_at !== null;
-
-    // Show dispute button if: has recent completion AND last completion was NOT by current user
-    // We determine this by checking if the chore has any completion at all
-    // and the current assignee has rotated (meaning someone else completed it)
-    const showDisputeButton =
-      hasLastCompletion && !isDisputed && !isMyChore;
-
-    return (
-      <View
-        key={chore.id}
-        className="flex-row items-center bg-white px-4 py-3.5"
-      >
-        {/* Assignee avatar */}
-        <View
-          className="mr-3 h-9 w-9 items-center justify-center rounded-full"
-          style={{
-            backgroundColor:
-              AVATAR_COLORS[
-                (chore.current_assignee?.charCodeAt(0) ?? 0) %
-                  AVATAR_COLORS.length
-              ],
-          }}
-        >
-          <Text className="text-xs font-bold text-white">
-            {getInitials(assigneeName)}
-          </Text>
-        </View>
-
-        {/* Chore info */}
-        <View className="flex-1">
-          <View className="flex-row items-center gap-2">
-            <Text className="text-base font-semibold text-gray-800" numberOfLines={1}>
-              {chore.name}
-            </Text>
-            {isDisputed && (
-              <View className="rounded-full bg-amber-100 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-amber-600">
-                  Disputed
-                </Text>
-              </View>
-            )}
-          </View>
-          <View className="mt-0.5 flex-row items-center gap-2">
-            <View className="rounded-full bg-brand-light px-2 py-0.5">
-              <Text className="text-xs font-medium text-brand-dark">
-                {getFrequencyLabel(chore.frequency)}
-              </Text>
-            </View>
-            <Text className="text-xs text-gray-400">
-              {isMyChore ? "You" : assigneeName}
-            </Text>
-            {overdueDays === null && (
-              <Text className="text-xs text-gray-400">
-                {formatDueDate(chore.next_due_at)}
-              </Text>
-            )}
-            {overdueDays !== null && (
-              <View className="rounded-full bg-red-100 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-red-600">
-                  {overdueDays}d overdue
-                </Text>
-              </View>
-            )}
-          </View>
-          {isDisputedByMe && (
-            <Text className="mt-1 text-xs text-amber-600">
-              Your completion was disputed
-            </Text>
-          )}
-        </View>
-
-        {/* Action buttons */}
-        <View className="flex-row items-center gap-1.5">
-          {/* Swap button -- only on my chores */}
-          {isMyChore && (
-            <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-purple-50 active:bg-purple-100"
-              onPress={() => setSwapModalChoreId(chore.id)}
-            >
-              <Ionicons name="swap-horizontal-outline" size={18} color="#9333ea" />
-            </Pressable>
-          )}
-
-          {/* Dispute button -- on chores with recent completions (not by current user) */}
-          {showDisputeButton && (
-            <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-amber-50 active:bg-amber-100"
-              onPress={() => handleDispute(chore.id)}
-              disabled={isDisputing}
-            >
-              {isDisputing ? (
-                <ActivityIndicator size="small" color="#d97706" />
-              ) : (
-                <Ionicons name="flag-outline" size={18} color="#d97706" />
-              )}
-            </Pressable>
-          )}
-
-          {/* Claim button -- only on others' chores */}
-          {!isMyChore && (
-            <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-blue-50 active:bg-blue-100"
-              onPress={() => handleClaim(chore.id)}
-              disabled={isClaiming}
-            >
-              {isClaiming ? (
-                <ActivityIndicator size="small" color="#3b82f6" />
-              ) : (
-                <Ionicons name="hand-left-outline" size={18} color="#3b82f6" />
-              )}
-            </Pressable>
-          )}
-
-          {/* Complete button — only on your own chores */}
-          {isMyChore && (
-            <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-green-50 active:bg-green-100"
-              onPress={() => handleComplete(chore.id)}
-              disabled={isCompleting}
-            >
-              {isCompleting ? (
-                <ActivityIndicator size="small" color="#22c55e" />
-              ) : (
-                <Ionicons name="checkmark" size={20} color="#22c55e" />
-              )}
-            </Pressable>
-          )}
-        </View>
-      </View>
-    );
-  }
 
   // -------------------------------------------------------------------------
   // Loading
@@ -553,66 +395,22 @@ export default function ChoresScreen() {
 
   if (isEmpty) {
     return (
-      <View className="flex-1 bg-neutral-bg">
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="items-center px-8 pt-12">
-            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-light">
-              <Ionicons name="checkbox" size={40} color={colors.brand.DEFAULT} />
-            </View>
-            <Text className="text-2xl font-bold text-gray-800">
-              No chores yet!
-            </Text>
-            <Text className="mt-2 text-center text-base leading-6 text-gray-500">
-              Add some chores to keep your home running smoothly
-            </Text>
-          </View>
-
-          {/* Suggested chores grid */}
-          <View className="mt-8 px-4">
-            <Text className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-400">
-              Suggested Chores
-            </Text>
-            <View className="flex-row flex-wrap gap-3">
-              {SUGGESTED_CHORES.map((suggestion) => (
-                <Pressable
-                  key={suggestion.name}
-                  className="w-[47%] flex-row items-center rounded-xl bg-white px-3 py-3.5 active:bg-gray-50"
-                  style={{ elevation: 1, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2 }}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/(app)/chores/add",
-                      params: { suggestedName: suggestion.name, suggestedFrequency: suggestion.frequency },
-                    } as never)
-                  }
-                >
-                  <View className="mr-2.5 h-8 w-8 items-center justify-center rounded-full bg-brand-light">
-                    <Ionicons name={suggestion.icon} size={16} color={colors.brand.DEFAULT} />
-                  </View>
-                  <Text className="flex-1 text-sm font-medium text-gray-700" numberOfLines={1}>
-                    {suggestion.name}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-
-            {/* Custom chore button */}
-            <Pressable
-              className="mt-4 flex-row items-center justify-center rounded-xl border border-dashed border-gray-300 py-3.5 active:bg-gray-50"
-              onPress={() => router.push("/(app)/chores/add" as never)}
-            >
-              <Ionicons name="add" size={20} color={colors.neutral.tertiary} />
-              <Text className="ml-2 text-sm font-medium text-gray-500">
-                Create custom chore
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-
-      </View>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+        className="bg-neutral-bg"
+      >
+        <EmptyState
+          onSelectSuggestion={(name, freq) =>
+            router.push({
+              pathname: "/(app)/chores/add",
+              params: { suggestedName: name, suggestedFrequency: freq },
+            } as never)
+          }
+          onCreateCustom={() => router.push("/(app)/chores/add" as never)}
+        />
+      </ScrollView>
     );
   }
 
@@ -627,25 +425,13 @@ export default function ChoresScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Summary header */}
-        <View className="flex-row gap-3 px-4 pt-4 pb-2">
-          <View className="flex-1 items-center rounded-xl bg-brand-light py-3">
-            <Text className="text-xl font-bold text-brand-dark">
-              {pendingCount}
-            </Text>
-            <Text className="text-xs text-brand-dark">Pending</Text>
-          </View>
-          <View className="flex-1 items-center rounded-xl bg-red-100 py-3">
-            <Text className="text-xl font-bold text-red-600">
-              {overdueCount}
-            </Text>
-            <Text className="text-xs text-red-500">Overdue</Text>
-          </View>
-          <View className="flex-1 items-center rounded-xl bg-green-100 py-3">
-            <Text className="text-xl font-bold text-green-600">{streak}</Text>
-            <Text className="text-xs text-green-500">Streak</Text>
-          </View>
-        </View>
+        {/* Stats row */}
+        <StatsRow
+          pendingCount={pendingCount}
+          disputedCount={disputedChoreIds.size}
+          streak={streak}
+          personalBest={personalBest}
+        />
 
         {/* Swap requests banner */}
         {pendingSwapCount > 0 && (
@@ -661,53 +447,108 @@ export default function ChoresScreen() {
           </Pressable>
         )}
 
-        {/* My Chores section */}
+        {/* YOUR CHORES section */}
         {myChores.length > 0 && (
           <View className="mt-4">
-            <Text className="mb-2 px-4 text-sm font-medium uppercase tracking-wide text-gray-400">
-              My Chores
+            <Text className="text-overline text-neutral-secondary uppercase mb-2 px-4">
+              YOUR CHORES
             </Text>
-            <View className="mx-4 overflow-hidden rounded-xl">
-              {myChores.map((chore, index) => (
-                <View
-                  key={chore.id}
-                  className={
-                    index < myChores.length - 1
-                      ? "border-b border-gray-100"
-                      : ""
-                  }
-                >
-                  {renderChoreRow(chore)}
-                </View>
-              ))}
-            </View>
+            <Card className="mx-4 p-0 overflow-hidden">
+              {myChores.map((chore, index) => {
+                const overdueDays = getOverdueDays(chore.next_due_at);
+                const assigneeProfile = chore.current_assignee
+                  ? profiles[chore.current_assignee]
+                  : null;
+                const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
+                const isDisputed = disputedChoreIds.has(chore.id);
+                const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
+                const hasLastCompletion = chore.last_completed_at !== null;
+                const showDisputeButton = hasLastCompletion && !isDisputed && !true; // isMyChore is always true here
+
+                return (
+                  <View
+                    key={chore.id}
+                    className={
+                      index < myChores.length - 1 && !isDisputed
+                        ? "border-b border-gray-100"
+                        : ""
+                    }
+                  >
+                    <ChoreRow
+                      chore={chore}
+                      assigneeName={assigneeName}
+                      assigneeId={chore.current_assignee}
+                      isMyChore={true}
+                      isDisputed={isDisputed}
+                      isDisputedByMe={isDisputedByMe}
+                      overdueDays={overdueDays}
+                      isCompleting={completingId === chore.id}
+                      isClaiming={claimingId === chore.id}
+                      isDisputing={disputingId === chore.id}
+                      showDisputeButton={showDisputeButton}
+                      onComplete={() => handleComplete(chore.id)}
+                      onClaim={() => handleClaim(chore.id)}
+                      onDispute={() => handleDispute(chore.id)}
+                      onSwap={() => setSwapModalChoreId(chore.id)}
+                    />
+                  </View>
+                );
+              })}
+            </Card>
           </View>
         )}
 
-        {/* Household Chores section */}
+        {/* HOUSEHOLD section */}
         {othersChores.length > 0 && (
           <View className="mt-6">
-            <Text className="mb-2 px-4 text-sm font-medium uppercase tracking-wide text-gray-400">
-              Household Chores
+            <Text className="text-overline text-neutral-secondary uppercase mb-2 px-4">
+              HOUSEHOLD
             </Text>
-            <View className="mx-4 overflow-hidden rounded-xl">
-              {othersChores.map((chore, index) => (
-                <View
-                  key={chore.id}
-                  className={
-                    index < othersChores.length - 1
-                      ? "border-b border-gray-100"
-                      : ""
-                  }
-                >
-                  {renderChoreRow(chore)}
-                </View>
-              ))}
-            </View>
+            <Card className="mx-4 p-0 overflow-hidden">
+              {othersChores.map((chore, index) => {
+                const overdueDays = getOverdueDays(chore.next_due_at);
+                const assigneeProfile = chore.current_assignee
+                  ? profiles[chore.current_assignee]
+                  : null;
+                const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
+                const isDisputed = disputedChoreIds.has(chore.id);
+                const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
+                const hasLastCompletion = chore.last_completed_at !== null;
+                const showDisputeButton = hasLastCompletion && !isDisputed && !false; // isMyChore is always false here
+
+                return (
+                  <View
+                    key={chore.id}
+                    className={
+                      index < othersChores.length - 1 && !isDisputed
+                        ? "border-b border-gray-100"
+                        : ""
+                    }
+                  >
+                    <ChoreRow
+                      chore={chore}
+                      assigneeName={assigneeName}
+                      assigneeId={chore.current_assignee}
+                      isMyChore={false}
+                      isDisputed={isDisputed}
+                      isDisputedByMe={isDisputedByMe}
+                      overdueDays={overdueDays}
+                      isCompleting={completingId === chore.id}
+                      isClaiming={claimingId === chore.id}
+                      isDisputing={disputingId === chore.id}
+                      showDisputeButton={showDisputeButton}
+                      onComplete={() => handleComplete(chore.id)}
+                      onClaim={() => handleClaim(chore.id)}
+                      onDispute={() => handleDispute(chore.id)}
+                      onSwap={() => setSwapModalChoreId(chore.id)}
+                    />
+                  </View>
+                );
+              })}
+            </Card>
           </View>
         )}
       </ScrollView>
-
 
       {/* Swap member picker modal */}
       <Modal
@@ -742,16 +583,8 @@ export default function ChoresScreen() {
                   onPress={() => handleSwapRequest(member.id)}
                   disabled={swapSubmitting}
                 >
-                  <View
-                    className="mr-3 h-10 w-10 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor:
-                        AVATAR_COLORS[member.id.charCodeAt(0) % AVATAR_COLORS.length],
-                    }}
-                  >
-                    <Text className="text-sm font-bold text-white">
-                      {getInitials(member.display_name)}
-                    </Text>
+                  <View className="mr-3">
+                    <Avatar userId={member.id} name={member.display_name} size="sm" />
                   </View>
                   <Text className="flex-1 text-base text-gray-800">
                     {member.display_name}
