@@ -55,7 +55,14 @@ export default function HouseholdChoiceScreen() {
           {/* Create Household */}
           <Pressable
             onPress={() => router.push("/(onboarding)/create-household")}
-            style={{ alignItems: "center" }}
+            style={{
+              alignItems: "center",
+              borderWidth: 1,
+              borderColor: "#D1D5DB",
+              borderRadius: 16,
+              paddingVertical: 20,
+              paddingHorizontal: 16,
+            }}
           >
             <Image
               source={ONBOARDING_IMAGES.createHouseholdIcon}
@@ -86,7 +93,14 @@ export default function HouseholdChoiceScreen() {
           {/* Join Household */}
           <Pressable
             onPress={() => router.push("/(onboarding)/join-household")}
-            style={{ alignItems: "center" }}
+            style={{
+              alignItems: "center",
+              borderWidth: 1,
+              borderColor: "#D1D5DB",
+              borderRadius: 16,
+              paddingVertical: 20,
+              paddingHorizontal: 16,
+            }}
           >
             <Image
               source={ONBOARDING_IMAGES.joinHouseholdIcon}
