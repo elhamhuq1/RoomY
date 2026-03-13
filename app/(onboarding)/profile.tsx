@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/lib/auth-context";
-import { Avatar, StepProgressBar } from "@/components/ui";
+import { StepProgressBar } from "@/components/ui";
 import { ONBOARDING_CREAM, ONBOARDING_IMAGES } from "@/lib/onboarding-images";
 
 export default function ProfileSetupScreen() {
@@ -89,15 +89,6 @@ export default function ProfileSetupScreen() {
               source={ONBOARDING_IMAGES.displayName}
               style={{ width: "100%", height: 240 }}
               resizeMode="contain"
-            />
-          </View>
-
-          {/* Live Avatar preview */}
-          <View style={{ alignItems: "center", marginTop: 16, marginBottom: 12 }}>
-            <Avatar
-              userId={user?.id ?? "preview"}
-              name={trimmedName || "?"}
-              size="2xl"
             />
           </View>
 
