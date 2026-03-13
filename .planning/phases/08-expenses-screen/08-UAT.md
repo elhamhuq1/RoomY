@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 08-expenses-screen
 source: [08-01-SUMMARY.md, 08-02 checkpoint]
 started: 2026-03-12T22:00:00Z
-updated: 2026-03-12T22:15:00Z
+updated: 2026-03-13T00:00:00Z
 ---
 
 ## Current Test
@@ -65,7 +65,7 @@ skipped: 0
 ## Gaps
 
 - truth: "Expandable expense rows should have a visual affordance indicating they can be tapped to expand"
-  status: failed
+  status: resolved
   reason: "User reported: not clear to the user that they can expand rows. Should add a small arrow/chevron indicator."
   severity: cosmetic
   test: 7
@@ -77,7 +77,7 @@ skipped: 0
     - "Add a small chevron-down icon that rotates to chevron-up when expanded"
 
 - truth: "All roommates should be accessible for per-member expense breakdown, not just those with non-zero balances"
-  status: failed
+  status: resolved
   reason: "User reported: per-member navigation should be a dedicated section listing ALL roommates, since balance section hides zero-balance members making them unreachable."
   severity: minor
   test: 9
