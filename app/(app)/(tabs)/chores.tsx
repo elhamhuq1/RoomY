@@ -8,6 +8,9 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -100,6 +103,8 @@ export default function ChoresScreen() {
   const [completions, setCompletions] = useState<ChoreCompletion[]>([]);
   const [disputedChoreIds, setDisputedChoreIds] = useState<Set<string>>(new Set());
   const [disputedByMeChoreIds, setDisputedByMeChoreIds] = useState<Set<string>>(new Set());
+  // Map chore_id -> completion details for disputed completions
+  const [disputeDetails, setDisputeDetails] = useState<Record<string, ChoreCompletion>>({});
   const [pendingSwapCount, setPendingSwapCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [completingId, setCompletingId] = useState<string | null>(null);
@@ -107,6 +112,14 @@ export default function ChoresScreen() {
   const [disputingId, setDisputingId] = useState<string | null>(null);
   const [swapModalChoreId, setSwapModalChoreId] = useState<string | null>(null);
   const [swapSubmitting, setSwapSubmitting] = useState(false);
+  // Dispute reason modal
+  const [disputeReasonModal, setDisputeReasonModal] = useState<{
+    visible: boolean;
+    choreId: string | null;
+    completionId: string | null;
+  }>({ visible: false, choreId: null, completionId: null });
+  const [disputeReason, setDisputeReason] = useState("");
+  const [disputeSubmitting, setDisputeSubmitting] = useState(false);
 
   // -------------------------------------------------------------------------
   // Data fetching
@@ -174,14 +187,17 @@ export default function ChoresScreen() {
       if (disputedData) {
         const disputedSet = new Set<string>();
         const disputedByMeSet = new Set<string>();
+        const detailsMap: Record<string, ChoreCompletion> = {};
         (disputedData as ChoreCompletion[]).forEach((d) => {
           disputedSet.add(d.chore_id);
+          detailsMap[d.chore_id] = d;
           if (d.completed_by === user.id) {
             disputedByMeSet.add(d.chore_id);
           }
         });
         setDisputedChoreIds(disputedSet);
         setDisputedByMeChoreIds(disputedByMeSet);
+        setDisputeDetails(detailsMap);
       }
     }
 
@@ -297,32 +313,53 @@ export default function ChoresScreen() {
         return;
       }
 
-      Alert.alert(
-        "Dispute Completion?",
-        "Flag the last completion as not actually done. If unresolved within 24 hours, it will be automatically reverted.",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Dispute",
-            style: "destructive",
-            onPress: async () => {
-              setDisputingId(choreId);
-              const { error } = await supabase.rpc("dispute_completion", {
-                p_completion_id: completion.id,
-                p_disputed_by: user.id,
-              });
-              setDisputingId(null);
-              if (error) {
-                Alert.alert("Error", "Failed to dispute completion.");
-              } else {
-                fetchData();
-              }
-            },
-          },
-        ]
-      );
+      // Show the dispute reason modal
+      setDisputeReason("");
+      setDisputeReasonModal({
+        visible: true,
+        choreId,
+        completionId: completion.id,
+      });
     },
-    [user?.id, fetchData]
+    [user?.id]
+  );
+
+  const handleDisputeSubmit = useCallback(async () => {
+    if (!user?.id || !disputeReasonModal.completionId || !disputeReasonModal.choreId) return;
+
+    const reason = disputeReason.trim();
+    if (!reason) {
+      Alert.alert("Reason required", "Please explain why you are disputing this completion.");
+      return;
+    }
+
+    setDisputeSubmitting(true);
+    const { error } = await supabase.rpc("dispute_completion", {
+      p_completion_id: disputeReasonModal.completionId,
+      p_disputed_by: user.id,
+      p_reason: reason,
+    });
+    setDisputeSubmitting(false);
+
+    if (error) {
+      Alert.alert("Error", "Failed to dispute completion.");
+    } else {
+      setDisputeReasonModal({ visible: false, choreId: null, completionId: null });
+      setDisputeReason("");
+      fetchData();
+    }
+  }, [user?.id, disputeReasonModal, disputeReason, fetchData]);
+
+  const handleViewDispute = useCallback(
+    (choreId: string) => {
+      const detail = disputeDetails[choreId];
+      if (!detail) return;
+      router.push({
+        pathname: "/(app)/chores/dispute",
+        params: { completionId: detail.id },
+      } as never);
+    },
+    [disputeDetails, router]
   );
 
   const handleSwapRequest = useCallback(
@@ -372,9 +409,12 @@ export default function ChoresScreen() {
 
   const isEmpty = chores.length === 0 && !loading;
 
-  // Other household members for swap modal
-  const otherMembers = Object.values(profiles).filter(
-    (p) => p.id !== user?.id
+  // Other members eligible for swap: must be in the chore's rotation_order
+  const swapChore = chores.find((c) => c.id === swapModalChoreId);
+  const swapEligibleMembers = Object.values(profiles).filter(
+    (p) =>
+      p.id !== user?.id &&
+      (swapChore ? swapChore.rotation_order.includes(p.id) : true)
   );
 
   // -------------------------------------------------------------------------
@@ -462,6 +502,7 @@ export default function ChoresScreen() {
                 const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
                 const isDisputed = disputedChoreIds.has(chore.id);
                 const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
+                const detail = disputeDetails[chore.id];
                 const hasLastCompletion = chore.last_completed_at !== null;
                 const showDisputeButton = hasLastCompletion && !isDisputed && !true; // isMyChore is always true here
 
@@ -481,6 +522,7 @@ export default function ChoresScreen() {
                       isMyChore={true}
                       isDisputed={isDisputed}
                       isDisputedByMe={isDisputedByMe}
+                      disputeReason={detail?.dispute_reason}
                       overdueDays={overdueDays}
                       isCompleting={completingId === chore.id}
                       isClaiming={claimingId === chore.id}
@@ -490,6 +532,7 @@ export default function ChoresScreen() {
                       onClaim={() => handleClaim(chore.id)}
                       onDispute={() => handleDispute(chore.id)}
                       onSwap={() => setSwapModalChoreId(chore.id)}
+                      onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
                     />
                   </View>
                 );
@@ -513,6 +556,7 @@ export default function ChoresScreen() {
                 const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
                 const isDisputed = disputedChoreIds.has(chore.id);
                 const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
+                const detail = disputeDetails[chore.id];
                 const hasLastCompletion = chore.last_completed_at !== null;
                 const showDisputeButton = hasLastCompletion && !isDisputed && !false; // isMyChore is always false here
 
@@ -532,6 +576,7 @@ export default function ChoresScreen() {
                       isMyChore={false}
                       isDisputed={isDisputed}
                       isDisputedByMe={isDisputedByMe}
+                      disputeReason={detail?.dispute_reason}
                       overdueDays={overdueDays}
                       isCompleting={completingId === chore.id}
                       isClaiming={claimingId === chore.id}
@@ -541,6 +586,7 @@ export default function ChoresScreen() {
                       onClaim={() => handleClaim(chore.id)}
                       onDispute={() => handleDispute(chore.id)}
                       onSwap={() => setSwapModalChoreId(chore.id)}
+                      onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
                     />
                   </View>
                 );
@@ -571,12 +617,12 @@ export default function ChoresScreen() {
             <Text className="mb-4 px-6 text-lg font-bold text-gray-800">
               Request Swap With
             </Text>
-            {otherMembers.length === 0 ? (
+            {swapEligibleMembers.length === 0 ? (
               <Text className="px-6 py-4 text-center text-gray-500">
-                No other members in household
+                No other members in this chore's rotation
               </Text>
             ) : (
-              otherMembers.map((member) => (
+              swapEligibleMembers.map((member) => (
                 <Pressable
                   key={member.id}
                   className="flex-row items-center px-6 py-3.5 active:bg-gray-50"
@@ -599,6 +645,93 @@ export default function ChoresScreen() {
             )}
           </Pressable>
         </Pressable>
+      </Modal>
+
+      {/* Dispute reason modal */}
+      <Modal
+        visible={disputeReasonModal.visible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => {
+          setDisputeReasonModal({ visible: false, choreId: null, completionId: null });
+          setDisputeReason("");
+        }}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1"
+        >
+          <Pressable
+            className="flex-1 justify-end bg-black/40"
+            onPress={() => {
+              setDisputeReasonModal({ visible: false, choreId: null, completionId: null });
+              setDisputeReason("");
+            }}
+          >
+            <Pressable
+              className="rounded-t-3xl bg-white pb-8 pt-4"
+              onPress={() => {}}
+            >
+              <View className="mb-4 items-center">
+                <View className="h-1 w-10 rounded-full bg-gray-300" />
+              </View>
+
+              <View className="px-6">
+                <View className="flex-row items-center mb-2">
+                  <View className="h-10 w-10 rounded-full bg-red-100 items-center justify-center mr-3">
+                    <Ionicons name="flag" size={20} color="#EF4444" />
+                  </View>
+                  <View>
+                    <Text className="text-lg font-bold text-gray-800">
+                      Dispute Completion
+                    </Text>
+                    <Text className="text-xs text-gray-400 mt-0.5">
+                      If unresolved within 24h, the completion is auto-reverted
+                    </Text>
+                  </View>
+                </View>
+
+                <Text className="text-sm font-medium text-gray-600 mt-4 mb-2">
+                  Why are you disputing this?
+                </Text>
+                <TextInput
+                  className="border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 min-h-[80px]"
+                  placeholder="e.g. The dishes were still dirty..."
+                  placeholderTextColor="#9CA3AF"
+                  multiline
+                  textAlignVertical="top"
+                  value={disputeReason}
+                  onChangeText={setDisputeReason}
+                  autoFocus
+                />
+
+                <View className="flex-row gap-3 mt-4">
+                  <Pressable
+                    className="flex-1 items-center rounded-xl bg-gray-100 py-3 active:bg-gray-200"
+                    onPress={() => {
+                      setDisputeReasonModal({ visible: false, choreId: null, completionId: null });
+                      setDisputeReason("");
+                    }}
+                  >
+                    <Text className="text-sm font-bold text-gray-600">Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    className="flex-1 items-center rounded-xl bg-red-500 py-3 active:bg-red-600"
+                    onPress={handleDisputeSubmit}
+                    disabled={disputeSubmitting || !disputeReason.trim()}
+                    style={{ opacity: !disputeReason.trim() ? 0.5 : 1 }}
+                  >
+                    {disputeSubmitting ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text className="text-sm font-bold text-white">Submit Dispute</Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

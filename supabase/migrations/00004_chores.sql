@@ -264,8 +264,14 @@ BEGIN
   IF p_status = 'accepted' THEN
     v_position := (SELECT array_position(rotation_order, v_request.requested_to)
                    FROM public.chores WHERE id = v_request.chore_id);
+
+    -- If accepter is not in rotation, add them
     IF v_position IS NULL THEN
-      RAISE EXCEPTION 'Accepter is not in the rotation order';
+      UPDATE public.chores SET
+        rotation_order = array_append(rotation_order, v_request.requested_to)
+      WHERE id = v_request.chore_id;
+      v_position := (SELECT array_length(rotation_order, 1)
+                     FROM public.chores WHERE id = v_request.chore_id);
     END IF;
 
     UPDATE public.chores SET

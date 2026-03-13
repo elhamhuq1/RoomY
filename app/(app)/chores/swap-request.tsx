@@ -167,6 +167,7 @@ export default function SwapRequestScreen() {
       setResolvingId(null);
 
       if (error) {
+        console.error("[SwapRequest] resolve_swap_request error:", error);
         Alert.alert("Error", `Failed to ${status === "accepted" ? "accept" : "decline"} swap request.`);
       } else {
         fetchData();
