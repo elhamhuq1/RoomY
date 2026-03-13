@@ -489,7 +489,6 @@ export default function ExpensesScreen() {
           currentUserId={user?.id ?? ''}
           onSettle={handleSettle}
           onRemind={handleRemind}
-          onMemberPress={handleMemberPress}
         />
 
         {members.length > 0 && (

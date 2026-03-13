@@ -36,6 +36,16 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="expenses/member-history"
+        options={{
+          headerShown: true,
+          title: "Member History",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="settings/index"
         options={{
           headerShown: true,

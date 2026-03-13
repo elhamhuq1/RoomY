@@ -17,7 +17,6 @@ interface BalanceSectionProps {
   currentUserId: string;
   onSettle: (userId: string, amount: number) => void;
   onRemind: (memberName: string, amount: number) => void;
-  onMemberPress: (userId: string) => void;
 }
 
 export function BalanceSection({
@@ -25,7 +24,6 @@ export function BalanceSection({
   currentUserId,
   onSettle,
   onRemind,
-  onMemberPress,
 }: BalanceSectionProps) {
   // Filter out current user and zero-balance members
   const visibleBalances = balances.filter(
@@ -75,7 +73,6 @@ export function BalanceSection({
                     onSettle(entry.user_id, amount);
                   }
                 }}
-                onMemberPress={() => onMemberPress(entry.user_id)}
               />
             );
           })}

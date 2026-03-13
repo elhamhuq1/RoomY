@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text } from 'react-native';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 
@@ -15,7 +15,6 @@ interface BalanceMemberRowProps {
   amount: number;
   isOwedToYou: boolean;
   onAction: () => void;
-  onMemberPress: () => void;
 }
 
 export function BalanceMemberRow({
@@ -24,14 +23,10 @@ export function BalanceMemberRow({
   amount,
   isOwedToYou,
   onAction,
-  onMemberPress,
 }: BalanceMemberRowProps) {
   return (
     <View className="flex-row items-center py-3">
-      <Pressable
-        className="flex-row items-center flex-1 mr-2"
-        onPress={onMemberPress}
-      >
+      <View className="flex-row items-center flex-1 mr-2">
         <Avatar userId={userId} name={displayName} size="md" />
         <View className="ml-3 flex-1">
           <Text className="text-card-title text-neutral-text">
@@ -47,7 +42,7 @@ export function BalanceMemberRow({
               : `you owe ${formatCurrency(amount)}`}
           </Text>
         </View>
-      </Pressable>
+      </View>
       <Button
         title={isOwedToYou ? 'Remind' : 'Settle'}
         variant={isOwedToYou ? 'outline' : 'primary'}

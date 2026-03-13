@@ -83,24 +83,40 @@ export function ExpenseRow({
               <ActivityIndicator size="small" />
             </View>
           ) : (
-            splits.map((split) => (
-              <View
-                key={split.id}
-                className="flex-row items-center py-2"
-              >
-                <Avatar
-                  userId={split.user_id}
-                  name={split.profile?.display_name ?? '?'}
-                  size="sm"
-                />
-                <Text className="ml-2 flex-1 text-metadata text-neutral-secondary">
-                  {split.profile?.display_name ?? 'Unknown'}
-                </Text>
-                <Text className="text-metadata font-semibold text-neutral-text">
-                  {formatCurrency(Number(split.share_amount))}
-                </Text>
-              </View>
-            ))
+            splits.map((split) => {
+              const isPayer = split.user_id === expense.paid_by;
+              return (
+                <View
+                  key={split.id}
+                  className="flex-row items-center py-2"
+                >
+                  <Avatar
+                    userId={split.user_id}
+                    name={split.profile?.display_name ?? '?'}
+                    size="sm"
+                  />
+                  <Text className="ml-2 flex-1 text-metadata text-neutral-secondary">
+                    {split.profile?.display_name ?? 'Unknown'}
+                  </Text>
+                  {isPayer ? (
+                    <View className="flex-row items-center">
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={14}
+                        color={colors.semantic.success}
+                      />
+                      <Text className="ml-1 text-metadata font-semibold text-semantic-success">
+                        Paid
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text className="text-metadata font-semibold text-semantic-error">
+                      Owes {formatCurrency(Number(split.share_amount))}
+                    </Text>
+                  )}
+                </View>
+              );
+            })
           )}
         </View>
       )}
