@@ -33,7 +33,24 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 
 ### Active
 
-(None — define new requirements with `/gsd:new-milestone`)
+<!-- v1.2 Polish & Identity -->
+- [ ] Cream background throughout entire app (post-login + onboarding)
+- [ ] Card component → gray outline style (transparent bg, no shadow)
+- [ ] Green palette shift to dark wintergreen matching logo (~#2D6A4F)
+- [ ] Google OAuth sign-in
+- [ ] Empty state illustrations for all modules
+- [ ] Profile picture upload (camera + gallery) in settings and onboarding
+
+## Current Milestone: v1.2 Polish & Identity
+
+**Goal:** Unify the app's visual identity around the logo's wintergreen palette and cream aesthetic, add Google OAuth, empty state illustrations, and profile picture uploads.
+
+**Target features:**
+- Cream background + outline cards for cohesive flat design
+- Wintergreen palette shift across entire app
+- Google OAuth setup
+- Empty state images for all modules
+- Profile picture upload (settings + onboarding)
 
 ### Out of Scope
 
@@ -51,7 +68,7 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - Expo chosen so both devs can test on their own phones via QR code regardless of OS
 - Personal project — solving their own problem first
 - Venmo is the existing payment method in their social circle
-- Shipped v1.0 MVP (2026-03-10) and v1.1 UI Redesign (2026-03-13)
+- Shipped v1.0 MVP (2026-03-10), v1.1 UI Redesign (2026-03-13), now working on v1.2 Polish & Identity
 - Codebase: 13,946 LOC TypeScript/TSX across app/, components/, lib/
 - Tech stack: Expo SDK 54, NativeWind v4 (TW3), Supabase (auth + DB + RLS), expo-router
 
@@ -78,4 +95,4 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 | Deterministic avatar colors via userId hash | charCodeAt hash % 8 gradient pairs — no DB storage, consistent across sessions | ✓ Good |
 
 ---
-*Last updated: 2026-03-13 after v1.1 milestone completion*
+*Last updated: 2026-03-13 after v1.2 milestone start*

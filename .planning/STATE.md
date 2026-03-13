@@ -9,9 +9,10 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 
 ## Current Position
 
-Milestone: v1.1 UI Redesign — SHIPPED 2026-03-13
-Status: Between milestones
-Last activity: 2026-03-13 - Completed v1.1 milestone
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-13 — Milestone v1.2 started
 
 Progress: v1.0 (18 plans) + v1.1 (17 plans) = 35 plans shipped
 
