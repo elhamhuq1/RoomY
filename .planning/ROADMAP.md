@@ -114,7 +114,11 @@ Plans:
   3. Quick-add input uses card-styled field with a branded square add button
   4. Chores screen shows a stats row with pending (warning), disputed (danger), and streak (brand + fire emoji) cards
   5. Chore rows display emoji icons in rounded icon containers, and disputed chores use danger-tinted backgrounds with red borders
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Grocery presentational components and parent screen rewrite with circle checkboxes, avatars, collapsible DONE section
+- [ ] 09-02-PLAN.md — Chore presentational components and parent screen rewrite with stats cards, emoji icons, dispute styling
 
 ### Phase 10: Onboarding Flow
 **Goal**: New users experience a polished, trustworthy first impression that guides them through account creation and household setup with clear visual progress
@@ -145,5 +149,5 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 6. Design System + Components | v1.1 | Complete    | 2026-03-12 | 2026-03-12 |
 | 7. Home Screen | v1.1 | 3/4 (gap closure) | In progress | - |
 | 8. Expenses Screen | v1.1 | 2/3 (gap closure) | In progress | - |
-| 9. Groceries + Chores | v1.1 | 0/TBD | Not started | - |
+| 9. Groceries + Chores | v1.1 | 0/2 | Planned | - |
 | 10. Onboarding Flow | v1.1 | 0/TBD | Not started | - |
