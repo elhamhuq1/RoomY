@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/lib/auth-context";
-import { IconContainer, StepProgressBar } from "@/components/ui";
+import { StepProgressBar } from "@/components/ui";
 import { ONBOARDING_CREAM, ONBOARDING_IMAGES } from "@/lib/onboarding-images";
 
 export default function CreateHouseholdScreen() {
@@ -297,11 +297,6 @@ export default function CreateHouseholdScreen() {
               style={{ width: "100%", height: 220 }}
               resizeMode="contain"
             />
-          </View>
-
-          {/* Branded house icon */}
-          <View style={{ alignItems: "center", marginTop: 16, marginBottom: 12 }}>
-            <IconContainer name="home" variant="brand" size={24} />
           </View>
 
           {/* Title + subtitle */}
