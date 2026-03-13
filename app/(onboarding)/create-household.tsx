@@ -13,6 +13,8 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import * as Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
@@ -80,65 +82,127 @@ export default function CreateHouseholdScreen() {
     }
   }
 
+  const [copied, setCopied] = useState(false);
+
   async function handleShare() {
     if (!inviteCode) return;
     try {
       await Share.share({
-        message: `Join my household on RoomY! Use code: ${inviteCode}`,
+        message: `Join my household on RoomY! Use invite code: ${inviteCode}`,
       });
     } catch {
       // User cancelled share or share failed -- no action needed
     }
   }
 
+  async function handleCopyCode() {
+    if (!inviteCode) return;
+    await Clipboard.setStringAsync(inviteCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   function handleContinue() {
     router.push("/(onboarding)/module-quiz");
   }
 
-  // ===== Invite code display after creation (UNCHANGED -- Plan 04 will restyle) =====
+  // ===== Invite code celebration after creation =====
   if (inviteCode) {
-    // Format code with spaces for readability (e.g., "ABCD EFGH")
     const formattedCode =
       inviteCode.slice(0, 4) + " " + inviteCode.slice(4);
 
     return (
-      <View className="flex-1 bg-neutral-bg px-8 pt-20">
+      <SafeAreaView style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+        {/* No StepProgressBar -- celebration moment */}
         <ScrollView
-          contentContainerClassName="flex-grow justify-center pb-12"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 32,
+            paddingBottom: 32,
+          }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Success icon */}
-          <View className="mb-6 items-center">
-            <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-semantic-success/20">
-              <Ionicons name="checkmark-circle" size={56} color={colors.semantic.success} />
-            </View>
-            <Text className="text-3xl font-bold text-gray-800">
-              {trimmedName} is ready!
+          {/* Illustration hero */}
+          <View style={{ alignItems: "center", marginTop: 16 }}>
+            <Image
+              source={ONBOARDING_IMAGES.inviteCode}
+              style={{ width: "100%", height: 240 }}
+              resizeMode="contain"
+            />
+          </View>
+
+          {/* Title + subtitle */}
+          <View style={{ alignItems: "center", marginTop: 20, marginBottom: 24 }}>
+            <Text
+              style={{
+                fontSize: 28,
+                fontWeight: "700",
+                color: colors.neutral.text,
+                textAlign: "center",
+              }}
+            >
+              You're All Set!
             </Text>
-            <Text className="mt-2 text-center text-base text-gray-500">
-              Share this code with your roommates so they can join
+            <Text
+              style={{
+                fontSize: 15,
+                color: colors.neutral.secondary,
+                textAlign: "center",
+                marginTop: 6,
+              }}
+            >
+              Share this code with your roommates
             </Text>
           </View>
 
-          {/* Invite code display */}
-          <View className="mb-6 items-center rounded-2xl bg-white p-8 shadow-sm">
-            <Text className="mb-2 text-sm font-medium text-gray-400">
+          {/* Dark gradient invite code card */}
+          <LinearGradient
+            colors={["#1E293B", "#0F172A"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              borderRadius: 16,
+              padding: 24,
+              alignItems: "center",
+              marginBottom: 24,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: "600",
+                letterSpacing: 1.1,
+                color: "#94A3B8",
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
               INVITE CODE
             </Text>
             <Text
-              className="text-4xl font-bold tracking-widest text-brand-dark"
-              style={{ fontVariant: ["tabular-nums"] }}
+              style={{
+                fontSize: 36,
+                fontWeight: "700",
+                letterSpacing: 4,
+                color: "#FFFFFF",
+                fontVariant: ["tabular-nums"],
+              }}
             >
               {formattedCode}
             </Text>
-            <Text className="mt-3 text-xs text-gray-400">
-              Code expires in 7 days. You can regenerate it in Settings.
-            </Text>
-          </View>
+          </LinearGradient>
 
-          {/* Share button */}
+          {/* Share with Roommates button */}
           <Pressable
-            className="mb-4 flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
+            style={{
+              backgroundColor: colors.brand.DEFAULT,
+              borderRadius: 16,
+              paddingVertical: 16,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 12,
+            }}
             onPress={handleShare}
           >
             <Ionicons
@@ -147,22 +211,60 @@ export default function CreateHouseholdScreen() {
               color="#fff"
               style={{ marginRight: 8 }}
             />
-            <Text className="text-lg font-bold text-white">
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "700",
+                color: "#FFFFFF",
+              }}
+            >
               Share with Roommates
             </Text>
           </Pressable>
 
-          {/* Continue button */}
+          {/* Copy code text link */}
           <Pressable
-            className="items-center rounded-2xl border-2 border-brand py-4 active:bg-brand-light"
+            style={{
+              alignItems: "center",
+              paddingVertical: 8,
+              marginBottom: 16,
+            }}
+            onPress={handleCopyCode}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "600",
+                color: colors.brand.DEFAULT,
+              }}
+            >
+              {copied ? "Copied!" : "Copy code"}
+            </Text>
+          </Pressable>
+
+          {/* Continue Setup button */}
+          <Pressable
+            style={{
+              borderWidth: 2,
+              borderColor: colors.brand.DEFAULT,
+              borderRadius: 16,
+              paddingVertical: 16,
+              alignItems: "center",
+            }}
             onPress={handleContinue}
           >
-            <Text className="text-lg font-bold text-brand-dark">
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "700",
+                color: colors.brand.dark,
+              }}
+            >
               Continue Setup
             </Text>
           </Pressable>
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 
