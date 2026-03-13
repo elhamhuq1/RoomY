@@ -116,12 +116,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
     // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
 
       if (newSession?.user) {
-        fetchProfileAndHousehold(newSession.user.id);
+        // Show loading spinner on sign-in to prevent onboarding screen flash
+        // while profile/household data is being fetched. Skip for token
+        // refreshes so the app doesn't flicker during normal use.
+        if (event === "SIGNED_IN") {
+          setLoading(true);
+        }
+        fetchProfileAndHousehold(newSession.user.id).finally(() => {
+          setLoading(false);
+        });
       } else {
         setProfile(null);
         setHousehold(null);
