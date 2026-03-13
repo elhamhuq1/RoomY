@@ -2,19 +2,18 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-11)
+See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 10 - Onboarding Flow
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 10 of 10 (Onboarding Flow)
-Plan: 4 of 4 in current phase
-Status: Phase Complete
-Last activity: 2026-03-13 - Completed quick task 2: SF Pro Rounded heading font
+Milestone: v1.1 UI Redesign — SHIPPED 2026-03-13
+Status: Between milestones
+Last activity: 2026-03-13 - Completed v1.1 milestone
 
-Progress: [####################] 100% (v1.1 Phase 10: 4/4 plans)
+Progress: v1.0 (18 plans) + v1.1 (17 plans) = 35 plans shipped
 
 ## Performance Metrics
 
@@ -65,65 +64,7 @@ Progress: [####################] 100% (v1.1 Phase 10: 4/4 plans)
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [Roadmap v1.1]: 5 phases (6-10) derived from 36 requirements across 8 categories
-- [Roadmap v1.1]: DSYS + COMP + NAVG combined into Phase 6 (foundation must come first)
-- [Roadmap v1.1]: GRUI + CHUI combined into Phase 9 (both low complexity, similar patterns)
-- [Roadmap v1.1]: Onboarding last (Phase 10) -- seen once per user, benefits from components tested on main screens
-- [Roadmap v1.1]: Phase 5 reserved for potential v1.0 gap closure
-- [Roadmap v1.1]: Presentation-layer only -- no backend changes in any phase
-- [06-01]: Brand green (#10B981) kept separate from semantic success (#22C55E)
-- [06-01]: headerTintColor uses neutral.text for readability over brand expression
-- [06-01]: AVATAR_COLORS temporary arrays until Avatar component in Plan 02
-- [06-02]: 8 gradient hue families for avatar differentiation (emerald, blue, violet, pink, amber, red, cyan, lime)
-- [06-02]: Card uses Platform.OS check for Android elevation alongside NativeWind shadow class
-- [06-02]: Toggle syncs animation via useEffect on value prop change for controlled component behavior
-- [06-02]: IconContainer hardcodes color-600 hex for Ionicons color prop (cannot use NativeWind classes)
-- [06-03]: Groceries tab excluded from FAB (has inline text input for adding items)
-- [06-03]: Existing in-screen FABs left in place; deduplication deferred to later phases
-- [06-04]: Old inline FABs removed from expenses/chores during UAT -- overlapping with layout FAB was a real UX bug, not deferrable
-- [07-01]: BalanceSummaryCard uses inline borderRadius style on LinearGradient for reliability over NativeWind className
-- [07-01]: MembersCard handles solo vs multi-member invite prominence inline via conditional rendering
-- [07-01]: Section components are presentational only -- accept typed props, no data fetching inside
-- [07-02]: Custom week-strip + Calendar toggle used instead of ExpandableCalendar to avoid ScrollView gesture conflicts
-- [07-02]: Expense dot color changed from blue (#3b82f6) to red/coral (#EF4444) per design spec
-- [07-03]: Unsettled balances shown from current user's perspective by inverting other members' net_amount
-- [07-03]: Solo creator state simplified to GreetingHeader + MembersCard only (no empty data sections)
-- [07-03]: Centralized data fetching pattern: parent screen fetches all data in Promise.all, passes to presentational children
-- [07-04]: Balance buttons hidden when settled (user override of original "visible but muted" CONTEXT.md decision)
-- [07-04]: myNetAmount via .reduce() summing all RPC pairwise rows (not .find() for own user_id which was always undefined)
-- [07-04]: weekChores uses projectChoreDates for recurring frequency projection instead of filtering single next_due_at
-- [07-04]: fetchAllData scoped to selectedDate month so pull-to-refresh preserves calendar context
-- [08-01]: Separated touch zones (left Pressable for row, right Button for action) to avoid RN event bubbling
-- [08-01]: Card p-0 override for HistorySection cards since items manage their own px-4 padding
-- [08-02]: Reused ExpenseRow/SettlementRow from Plan 01 barrel export for member-history screen consistency
-- [08-02]: All Phase 8 requirements (XPUI-01, XPUI-02, XPUI-03) visually verified via 10-point UAT checklist
-- [Phase quick]: Floodfill from 7 seed points for logo background removal (4 corners + 3 interior trapped regions)
-- [08-03]: Chevron affordance 16px Ionicons neutral.secondary, dynamically toggled by isExpanded
-- [08-03]: RoommateSection member fetch runs after critical Promise.all to avoid slowing initial load
-- [08-03]: Guard for empty memberUserIds avoids unnecessary profile query for solo members
-- [09-01]: Removed Keyboard.dismiss() from addItem for fast multi-item entry per CONTEXT.md
-- [09-01]: Circle checkbox inline in GroceryItemRow (grocery-specific, not extracted as separate component)
-- [09-01]: Profile batch fetch after fetchItems; realtime INSERT fetches single unknown profiles incrementally
-- [09-02]: Disputed count replaces Overdue count in stats row per CONTEXT.md
-- [09-02]: Personal best calculated by scanning all completions for longest consecutive non-reverted run
-- [09-02]: Emoji icon mapping uses case-insensitive keyword includes matching with clipboard fallback
-- [09-02]: 400ms setTimeout delay after completion RPC for visual feedback before refetch
-- [10-01]: ONBOARDING_CREAM set to #F5F0EB (closest match to illustration backgrounds)
-- [10-01]: Renamed 'Sign in' to 'Log in' on welcome screen per CONTEXT.md decision
-- [10-01]: Platform-aware glassmorphism: rgba(255,255,255,0.3) iOS, rgba(255,255,255,0.7) Android
-- [10-02]: Inset inputs use border-2 border-transparent default for consistent sizing across states
-- [10-02]: Confirm Password field added to sign-up for UX completeness
-- [10-02]: Removed input labels in favor of placeholder text for cleaner inset style
-- [10-02]: Success state on forgot-password also uses cream background for consistency
-- [10-03]: Profile Avatar uses user session ID (or 'preview' fallback) for deterministic gradient color
-- [10-03]: Gradient icon cards: green for create, violet for join -- matching Avatar GRADIENT_PAIRS palette
-- [10-03]: Invite code success state left visually unchanged for Plan 04
-- [10-04]: Dark gradient card #1E293B->#0F172A matching BalanceSummaryCard pattern for invite code
-- [10-04]: Celebration screens (invite code + member-welcome) skip StepProgressBar per CONTEXT.md
-- [10-04]: Module quiz uses Toggle from ui/ instead of native Switch for visual consistency
-- [10-04]: Copy code uses Clipboard.setStringAsync with 2-second "Copied!" text swap feedback
+v1.0 and v1.1 decisions archived — see milestones/v1.1-ROADMAP.md for full history.
 
 ### Pending Todos
 
@@ -138,14 +79,10 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Resolved 10-01]: expo-blur intensity mapping -- using intensity=25 with tint="light", Platform-aware inner bg opacity
-- [Resolved 06-03]: Colored shadow -- used iOS shadow props (shadowColor, shadowOffset, shadowOpacity, shadowRadius) directly in FAB.tsx
-- [Resolved 06-01]: NativeWind fontSize tuples work with fontWeight/letterSpacing in Tailwind config extend
-- [Resolved 06-02]: Deterministic member color via hashString(userId) % 8 gradient pairs -- simple charCodeAt hash, no DB storage needed
-- [Resolved 10-01]: Gradient interpolation scope -- static cream background per CONTEXT.md (no per-slide gradient needed)
+None — clean slate for next milestone.
 
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed quick task 2 -- SF Pro Rounded heading font across all components
+Stopped at: Completed v1.1 milestone archival
 Resume file: None

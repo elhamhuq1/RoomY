@@ -2,30 +2,11 @@
 
 ## What This Is
 
-A mobile app for roommates to manage shared household expenses, groceries, and chores without friction. Built with Expo (React Native), it lets roommates split utility bills, coordinate grocery shopping via shared lists, divvy up household tasks, and settle debts through Venmo deep links — all customized to each household's needs through an onboarding quiz.
+A mobile app for roommates to manage shared household expenses, groceries, and chores without friction. Built with Expo (React Native) with an intentional design system — green brand palette, consistent typography hierarchy, reusable UI components, and a polished onboarding flow that builds user confidence from first launch.
 
 ## Core Value
 
 Roommates can see exactly who owes what and settle up with one tap — no awkward conversations, no mental math, no forgotten debts.
-
-## Current Milestone: v1.1 UI Redesign
-
-**Goal:** Make the app look polished and trustworthy — replace the developer-prototype aesthetic with an intentional design system that builds user confidence.
-
-**Target features:**
-- Design token system (colors, typography, spacing, shadows)
-- Shared component library (Avatar, Badge, Card, Icon containers, buttons, toggles)
-- Onboarding flow rebuild (welcome carousel, sign up, display name, setup choice, household name, invite code, module selection)
-- Home screen rebuild (week-strip calendar, balance summary, attention feed)
-- Expenses screen rebuild (balance cards, differentiated history rows)
-- Groceries screen rebuild (to-get/done sections, member attribution)
-- Chores screen rebuild (emoji icons, stats row, dispute styling)
-- Tab bar and navigation polish
-
-**Design references:**
-- `docs/roomy-gsd-ui-redesign/gsd-ui-redesign/DESIGN_SPEC.md` — full specification
-- `docs/roomy-gsd-ui-redesign/gsd-ui-redesign/reference-mockup.jsx` — visual target (main screens)
-- `docs/roomy-gsd-ui-redesign/gsd-ui-redesign/onboarding-mockup.jsx` — visual target (onboarding flow)
 
 ## Requirements
 
@@ -41,18 +22,18 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - ✓ Chore assignment, rotation, and contribution tracking — v1.0
 - ✓ Push notifications (expenses, chores) — v1.0
 - ✓ Shared household calendar — v1.0
+- ✓ Design token system (colors, typography, elevation) with green brand palette — v1.1
+- ✓ Shared component library (Avatar, Card, Badge, Button, IconContainer, Toggle) — v1.1
+- ✓ Branded tab bar and FAB navigation — v1.1
+- ✓ Home screen with calendar, gradient balance card, attention feed, weekly timeline — v1.1
+- ✓ Expenses screen with differentiated history rows, per-member breakdown — v1.1
+- ✓ Groceries screen with circle checkboxes, avatars, to-get/done sections — v1.1
+- ✓ Chores screen with emoji icons, stats cards, dispute styling — v1.1
+- ✓ Onboarding flow with glassmorphism carousel, styled auth, gradient cards, step progress bar — v1.1
 
 ### Active
 
-- [ ] Intentional color system replacing default orange-everything palette
-- [ ] Typography hierarchy with clear visual weight
-- [ ] Shared component library (Avatar, Badge, Card, buttons, toggles)
-- [ ] Onboarding flow with gradient hero carousel, avatar preview, step progress bar, toggle cards
-- [ ] Home screen with calendar, balance summary, attention feed
-- [ ] Expenses screen with visual expense/settlement differentiation
-- [ ] Groceries screen with to-get/done sections and member attribution
-- [ ] Chores screen with emoji icons, stats, and dispute highlighting
-- [ ] Polished tab bar and navigation
+(None — define new requirements with `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -60,18 +41,19 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - Web version — mobile first, web can come later
 - Public app store release — v1 is for personal use
 - Social features beyond the household — this isn't a social network
-- Receipt scanning / OCR — manual entry is fine for v1
-- Backend changes — presentation layer only, all data models and APIs stay untouched
-- New features — this milestone is purely visual redesign
+- Receipt scanning / OCR — manual entry is fine for small households
+- Dark mode — doubles design surface area; tokens support it later but not implementing now
 
 ## Context
 
 - Two-person dev team: one on Linux, one on macOS
 - Both CS majors, post-college age, roommate experience firsthand
-- Expo chosen so both devs can test on their own phones (QR code scanning) regardless of OS
-- Friend on Mac handles iOS builds when needed
+- Expo chosen so both devs can test on their own phones via QR code regardless of OS
 - Personal project — solving their own problem first
 - Venmo is the existing payment method in their social circle
+- Shipped v1.0 MVP (2026-03-10) and v1.1 UI Redesign (2026-03-13)
+- Codebase: 13,946 LOC TypeScript/TSX across app/, components/, lib/
+- Tech stack: Expo SDK 54, NativeWind v4 (TW3), Supabase (auth + DB + RLS), expo-router
 
 ## Constraints
 
@@ -79,7 +61,7 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - **Payments**: No Stripe/built-in payments — Venmo deep links only
 - **Scope**: v1 is personal use for their own household
 - **Team**: Two developers, no designer — design guided by reference mockup and spec
-- **Backend**: Needs a backend for shared state between roommates (real-time sync preferred)
+- **Backend**: Supabase for shared state between roommates with real-time sync
 
 ## Key Decisions
 
@@ -89,8 +71,11 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 | Venmo deep links over built-in payments | Personal project, no business account needed — Venmo is already how they pay each other | ✓ Good |
 | Modular features via onboarding quiz | Not every household needs every feature — quiz recommends a setup | ✓ Good |
 | Mobile first | Roommates interact with this at home, not at a desk | ✓ Good |
-| Green primary color (#2D6A4F) | Trust/money association, distinct from default orange — per design spec | — Pending |
-| Presentation-only redesign | All backend logic untouched — reduces risk and keeps functionality intact | — Pending |
+| Green brand palette (#10B981) | Trust/money association, distinct from default orange — successfully migrated in v1.1 | ✓ Good |
+| Presentation-only v1.1 redesign | All backend logic untouched — zero regressions, shipped in 3 days | ✓ Good |
+| NativeWind v4 for styling | Tailwind-in-RN with platformSelect for cross-platform — design tokens scale well | ✓ Good |
+| Centralized data fetching in parent screens | Promise.all in parent, pass to presentational children — avoids waterfall, simplifies refresh | ✓ Good |
+| Deterministic avatar colors via userId hash | charCodeAt hash % 8 gradient pairs — no DB storage, consistent across sessions | ✓ Good |
 
 ---
-*Last updated: 2026-03-11 after v1.1 milestone start*
+*Last updated: 2026-03-13 after v1.1 milestone completion*
