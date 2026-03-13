@@ -99,10 +99,10 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 ### Chores UI
 
-- [ ] **CHUI-01**: Chores screen shows a stats row with pending (warning), disputed (danger), and streak (brand + fire emoji) cards
-- [ ] **CHUI-02**: Chore rows show emoji icons in rounded icon containers mapped by chore type
-- [ ] **CHUI-03**: Chores screen separates "YOUR CHORES" from "HOUSEHOLD" sections with overline headers
-- [ ] **CHUI-04**: Disputed chore rows use danger-tinted background and border for visual urgency
+- [x] **CHUI-01**: Chores screen shows a stats row with pending (warning), disputed (danger), and streak (brand + fire emoji) cards
+- [x] **CHUI-02**: Chore rows show emoji icons in rounded icon containers mapped by chore type
+- [x] **CHUI-03**: Chores screen separates "YOUR CHORES" from "HOUSEHOLD" sections with overline headers
+- [x] **CHUI-04**: Disputed chore rows use danger-tinted background and border for visual urgency
 
 ### Navigation
 
@@ -182,10 +182,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GRUI-02 | Phase 9 | Complete |
 | GRUI-03 | Phase 9 | Complete |
 | GRUI-04 | Phase 9 | Complete |
-| CHUI-01 | Phase 9 | Pending |
-| CHUI-02 | Phase 9 | Pending |
-| CHUI-03 | Phase 9 | Pending |
-| CHUI-04 | Phase 9 | Pending |
+| CHUI-01 | Phase 9 | Complete |
+| CHUI-02 | Phase 9 | Complete |
+| CHUI-03 | Phase 9 | Complete |
+| CHUI-04 | Phase 9 | Complete |
 | ONBD-01 | Phase 10 | Pending |
 | ONBD-02 | Phase 10 | Pending |
 | ONBD-03 | Phase 10 | Pending |

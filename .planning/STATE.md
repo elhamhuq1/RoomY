@@ -43,7 +43,7 @@ Progress: [####################] 100% (v1.1 Phase 9: 2/2 plans)
 | 06 Design System | 4 | 31min | 7.8min |
 | 07 Home Screen | 4 | 17min | 4.3min |
 | 08 Expenses Screen | 3/3 | 8min | 2.7min |
-| 09 Groceries + Chores | 1/2 | 3min | 3.0min |
+| 09 Groceries + Chores | 2/2 | 6min | 3.0min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
@@ -54,6 +54,7 @@ Progress: [####################] 100% (v1.1 Phase 9: 2/2 plans)
 | Phase 08 P02 | 3min | 2 tasks | 1 file |
 | Phase 08 P03 | 2min | 2 tasks | 4 files |
 | Phase 09 P01 | 3min | 2 tasks | 6 files |
+| Phase 09 P02 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,10 @@ Recent decisions affecting current work:
 - [09-01]: Removed Keyboard.dismiss() from addItem for fast multi-item entry per CONTEXT.md
 - [09-01]: Circle checkbox inline in GroceryItemRow (grocery-specific, not extracted as separate component)
 - [09-01]: Profile batch fetch after fetchItems; realtime INSERT fetches single unknown profiles incrementally
+- [09-02]: Disputed count replaces Overdue count in stats row per CONTEXT.md
+- [09-02]: Personal best calculated by scanning all completions for longest consecutive non-reverted run
+- [09-02]: Emoji icon mapping uses case-insensitive keyword includes matching with clipboard fallback
+- [09-02]: 400ms setTimeout delay after completion RPC for visual feedback before refetch
 
 ### Pending Todos
 
@@ -123,5 +128,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 09-01-PLAN.md -- Grocery screen restyle (circle checkboxes, avatars, collapsible DONE)
+Stopped at: Completed 09-02-PLAN.md -- Chores screen restyle (Card stats, emoji icons, Avatar, personal best)
 Resume file: None
