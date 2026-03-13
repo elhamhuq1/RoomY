@@ -78,6 +78,9 @@ export function ExpenseRow({
             !isLast ? 'border-b border-neutral-border' : ''
           }`}
         >
+          <Text className="text-metadata text-neutral-secondary mb-1">
+            Split breakdown
+          </Text>
           {splits === null ? (
             <View className="items-center py-3">
               <ActivityIndicator size="small" />
@@ -98,8 +101,11 @@ export function ExpenseRow({
                   <Text className="ml-2 flex-1 text-metadata text-neutral-secondary">
                     {split.profile?.display_name ?? 'Unknown'}
                   </Text>
-                  {isPayer ? (
-                    <View className="flex-row items-center">
+                  <Text className="text-metadata font-semibold text-neutral-text">
+                    {formatCurrency(Number(split.share_amount))}
+                  </Text>
+                  {isPayer && (
+                    <View className="flex-row items-center ml-2">
                       <Ionicons
                         name="checkmark-circle"
                         size={14}
@@ -109,10 +115,6 @@ export function ExpenseRow({
                         Paid
                       </Text>
                     </View>
-                  ) : (
-                    <Text className="text-metadata font-semibold text-semantic-error">
-                      Owes {formatCurrency(Number(split.share_amount))}
-                    </Text>
                   )}
                 </View>
               );
