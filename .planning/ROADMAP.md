@@ -156,4 +156,4 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 7. Home Screen | v1.1 | 3/4 (gap closure) | In progress | - |
 | 8. Expenses Screen | v1.1 | 2/3 (gap closure) | In progress | - |
 | 9. Groceries + Chores | v1.1 | 0/2 | Planned | - |
-| 10. Onboarding Flow | 4/4 | Complete   | 2026-03-13 | - |
+| 10. Onboarding Flow | 4/4 | Complete    | 2026-03-13 | - |
