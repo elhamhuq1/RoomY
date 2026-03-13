@@ -18,12 +18,14 @@ import {
   BalanceSection,
   HistorySection,
   EmptyState,
+  RoommateSection,
 } from '@/components/expenses';
 import type {
   BalanceEntry,
   HistoryItem,
   GroupedHistory,
   SplitWithProfile,
+  RoommateMember,
 } from '@/components/expenses';
 
 const BATCH_SIZE = 20;
@@ -77,6 +79,7 @@ export default function ExpensesScreen() {
   const [balances, setBalances] = useState<BalanceEntry[]>([]);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [groupedHistory, setGroupedHistory] = useState<GroupedHistory[]>([]);
+  const [members, setMembers] = useState<RoommateMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -202,6 +205,33 @@ export default function ExpensesScreen() {
       setHasMore(
         expenses.length === BATCH_SIZE || settlements.length === BATCH_SIZE
       );
+
+      // Fetch all household members for roommate section
+      const { data: membersData } = await supabase
+        .from('household_members')
+        .select('user_id')
+        .eq('household_id', household.id);
+      if (membersData && membersData.length > 0) {
+        const memberUserIds = membersData
+          .map(m => m.user_id)
+          .filter(id => id !== user?.id);
+        if (memberUserIds.length > 0) {
+          const { data: memberProfiles } = await supabase
+            .from('profiles')
+            .select('id, display_name')
+            .in('id', memberUserIds);
+          setMembers(
+            memberUserIds.map(id => ({
+              user_id: id,
+              display_name: memberProfiles?.find(p => p.id === id)?.display_name ?? 'Unknown',
+            }))
+          );
+        } else {
+          setMembers([]);
+        }
+      } else {
+        setMembers([]);
+      }
 
       // Clear expanded state and splits cache on refresh
       setExpandedId(null);
@@ -461,6 +491,13 @@ export default function ExpensesScreen() {
           onRemind={handleRemind}
           onMemberPress={handleMemberPress}
         />
+
+        {members.length > 0 && (
+          <RoommateSection
+            members={members}
+            onMemberPress={handleMemberPress}
+          />
+        )}
 
         {groupedHistory.length === 0 ? (
           <EmptyState
