@@ -19,7 +19,7 @@ export function EmptyState({ onAddExpense }: EmptyStateProps) {
           color={colors.brand.DEFAULT}
         />
       </View>
-      <Text className="text-section-heading font-heading text-neutral-text">
+      <Text className="text-section-heading font-heading-semi text-neutral-text">
         No expenses yet
       </Text>
       <Text className="mt-1 text-center text-body text-neutral-secondary">

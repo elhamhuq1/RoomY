@@ -58,7 +58,7 @@ export function ExpenseRow({
           <IconContainer name="receipt-outline" variant="warning" />
         </View>
         <View className="flex-1 mr-2">
-          <Text className="text-card-title font-heading text-neutral-text">
+          <Text className="text-card-title font-heading-semi text-neutral-text">
             {expense.description}
           </Text>
           <Text className="text-metadata text-neutral-secondary">

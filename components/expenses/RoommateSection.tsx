@@ -18,7 +18,7 @@ interface RoommateSectionProps {
 export function RoommateSection({ members, onMemberPress }: RoommateSectionProps) {
   return (
     <Card className="mb-4">
-      <Text className="text-section-heading font-heading text-neutral-text mb-3">
+      <Text className="text-section-heading font-heading-semi text-neutral-text mb-3">
         Expenses by Roommate
       </Text>
       {members.map((member, index) => (
@@ -34,7 +34,7 @@ export function RoommateSection({ members, onMemberPress }: RoommateSectionProps
             name={member.display_name}
             size="sm"
           />
-          <Text className="ml-3 flex-1 text-card-title font-heading text-neutral-text">
+          <Text className="ml-3 flex-1 text-card-title font-heading-semi text-neutral-text">
             {member.display_name}
           </Text>
           <Ionicons

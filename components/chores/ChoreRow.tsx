@@ -128,7 +128,7 @@ export function ChoreRow({
 
         {/* Chore name + assignee */}
         <View className="flex-1">
-          <Text className="text-card-title font-heading text-neutral-text" numberOfLines={1}>
+          <Text className="text-card-title font-heading-semi text-neutral-text" numberOfLines={1}>
             {chore.name}
           </Text>
           <Text className="text-metadata text-neutral-secondary mt-0.5">
