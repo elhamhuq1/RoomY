@@ -192,18 +192,17 @@ export default function WelcomeScreen() {
       </View>
 
       {/* CTA section */}
-      <View style={{ paddingHorizontal: 32, paddingBottom: 48, paddingTop: 24 }}>
+      <View style={{ paddingHorizontal: 32, paddingBottom: 48, paddingTop: 24, alignItems: 'center' }}>
         <Pressable
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? '#059669' : '#10B981',
+          onPress={() => router.push('/(auth)/sign-up')}
+          style={{
+            backgroundColor: '#10B981',
             borderRadius: 999,
             paddingVertical: 16,
-            alignItems: 'center',
-            alignSelf: 'center',
             width: '100%',
+            alignItems: 'center',
             marginBottom: 16,
-          })}
-          onPress={() => router.push('/(auth)/sign-up')}
+          }}
         >
           <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
             Get Started
@@ -211,8 +210,8 @@ export default function WelcomeScreen() {
         </Pressable>
 
         <Pressable
-          style={{ alignItems: 'center', paddingVertical: 12 }}
           onPress={() => router.push('/(auth)/sign-in')}
+          style={{ alignItems: 'center', paddingVertical: 12 }}
         >
           <Text style={{ fontSize: 15, color: '#64748B' }}>
             Already have an account?{' '}
