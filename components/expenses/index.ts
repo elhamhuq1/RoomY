@@ -8,5 +8,5 @@ export { RoommateSection } from './RoommateSection';
 
 export type { BalanceEntry } from './BalanceSection';
 export type { HistoryItem, GroupedHistory } from './HistorySection';
-export type { SplitWithProfile } from './ExpenseRow';
+export type { SplitWithProfile, PayerBalanceMap } from './ExpenseRow';
 export type { RoommateMember } from './RoommateSection';
