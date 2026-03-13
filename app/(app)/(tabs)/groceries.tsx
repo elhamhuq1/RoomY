@@ -1,5 +1,5 @@
 import { colors } from "@/lib/theme/colors";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -56,6 +56,8 @@ export default function GroceriesScreen() {
   >({});
 
   const inputRef = useRef<TextInput>(null);
+  const creatorProfilesRef = useRef(creatorProfiles);
+  creatorProfilesRef.current = creatorProfiles;
 
   // -------------------------------------------------------------------------
   // Profile batch fetch for creator avatars
@@ -142,7 +144,7 @@ export default function GroceriesScreen() {
                 : [newItem, ...prev]
             );
             // Fetch profile for unknown creator
-            if (!creatorProfiles[newItem.created_by]) {
+            if (!creatorProfilesRef.current[newItem.created_by]) {
               supabase
                 .from("profiles")
                 .select("id, display_name")
@@ -179,7 +181,7 @@ export default function GroceriesScreen() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [household?.id, creatorProfiles]);
+  }, [household?.id]);
 
   // -------------------------------------------------------------------------
   // Refetch on screen focus (in case realtime events were missed)
@@ -362,14 +364,24 @@ export default function GroceriesScreen() {
   // Derived data
   // -------------------------------------------------------------------------
 
-  const uncheckedItems = items
+  // Deduplicate items by id (safety net against realtime race conditions)
+  const dedupedItems = useMemo(() => {
+    const seen = new Set<string>();
+    return items.filter((i) => {
+      if (seen.has(i.id)) return false;
+      seen.add(i.id);
+      return true;
+    });
+  }, [items]);
+
+  const uncheckedItems = dedupedItems
     .filter((i) => !i.is_checked && !i.archived_at)
     .sort(
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-  const checkedItems = items
+  const checkedItems = dedupedItems
     .filter((i) => i.is_checked && !i.archived_at)
     .sort(
       (a, b) =>
@@ -377,7 +389,7 @@ export default function GroceriesScreen() {
     );
 
   const hasCheckedItems = checkedItems.length > 0;
-  const isEmpty = items.length === 0 && !loading;
+  const isEmpty = dedupedItems.length === 0 && !loading;
 
   // -------------------------------------------------------------------------
   // Loading

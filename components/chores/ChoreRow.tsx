@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from '@/components/ui/Avatar';
 import type { Chore } from '@/lib/types/database';
 
 // ---------------------------------------------------------------------------
@@ -102,129 +101,119 @@ export function ChoreRow({
   const emoji = getChoreEmoji(chore.name);
   const isOverdue = overdueDays !== null;
 
-  // Row styling based on state
-  let rowClassName = 'flex-row items-center px-4 py-3.5';
+  // Row styling based on state — no mx/my on disputed/overdue since rows sit inside a Card
+  let rowBg = '';
   if (isDisputed) {
-    rowClassName = 'flex-row items-center bg-red-50 border border-red-200 rounded-xl mx-4 my-1 px-4 py-3.5';
+    rowBg = 'bg-red-50 border-l-4 border-red-300';
   } else if (isOverdue) {
-    rowClassName = 'flex-row items-center bg-red-50/50 rounded-xl mx-4 my-1 px-4 py-3.5';
+    rowBg = 'bg-red-50/50';
   }
 
   return (
-    <View className={rowClassName}>
-      {/* Emoji icon container */}
-      <View
-        className={`h-10 w-10 rounded-xl items-center justify-center mr-3 ${
-          isDisputed ? 'bg-red-100' : 'bg-brand-light'
-        }`}
-      >
-        <Text style={{ fontSize: 20 }}>{emoji}</Text>
-      </View>
+    <View className={`px-4 py-3 ${rowBg}`}>
+      {/* Top row: emoji + name + action buttons */}
+      <View className="flex-row items-center">
+        {/* Emoji icon container */}
+        <View
+          className={`h-10 w-10 rounded-xl items-center justify-center mr-3 ${
+            isDisputed ? 'bg-red-100' : 'bg-brand-light'
+          }`}
+        >
+          <Text style={{ fontSize: 20 }}>{emoji}</Text>
+        </View>
 
-      {/* Chore info */}
-      <View className="flex-1">
-        <View className="flex-row items-center gap-2">
+        {/* Chore name + assignee */}
+        <View className="flex-1">
           <Text className="text-card-title text-neutral-text" numberOfLines={1}>
             {chore.name}
           </Text>
-          {isDisputed && (
-            <View className="rounded-full bg-red-100 px-2 py-0.5">
-              <Text className="text-xs font-semibold text-red-600">Disputed</Text>
-            </View>
-          )}
-        </View>
-        <View className="mt-0.5 flex-row items-center gap-2">
-          <View className="bg-brand-light px-2 py-0.5 rounded-full">
-            <Text className="text-xs font-medium text-brand-dark">
-              {getFrequencyLabel(chore.frequency)}
-            </Text>
-          </View>
-          <Text className="text-metadata text-neutral-secondary">
+          <Text className="text-metadata text-neutral-secondary mt-0.5">
             {isMyChore ? 'You' : assigneeName}
           </Text>
-          {isOverdue ? (
-            <View className="rounded-full bg-red-100 px-2 py-0.5">
-              <Text className="text-xs font-semibold text-red-600">
-                {overdueDays}d overdue
-              </Text>
-            </View>
-          ) : (
-            <Text className="text-metadata text-neutral-tertiary">
-              {formatDueDate(chore.next_due_at)}
-            </Text>
+        </View>
+
+        {/* Action buttons */}
+        <View className="flex-row items-center gap-1.5">
+          {isMyChore && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-purple-50 active:bg-purple-100"
+              onPress={onSwap}
+            >
+              <Ionicons name="swap-horizontal-outline" size={18} color="#9333ea" />
+            </Pressable>
+          )}
+          {showDisputeButton && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-amber-50 active:bg-amber-100"
+              onPress={onDispute}
+              disabled={isDisputing}
+            >
+              {isDisputing ? (
+                <ActivityIndicator size="small" color="#d97706" />
+              ) : (
+                <Ionicons name="flag-outline" size={18} color="#d97706" />
+              )}
+            </Pressable>
+          )}
+          {!isMyChore && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-blue-50 active:bg-blue-100"
+              onPress={onClaim}
+              disabled={isClaiming}
+            >
+              {isClaiming ? (
+                <ActivityIndicator size="small" color="#3b82f6" />
+              ) : (
+                <Ionicons name="hand-left-outline" size={18} color="#3b82f6" />
+              )}
+            </Pressable>
+          )}
+          {isMyChore && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-green-50 active:bg-green-100"
+              onPress={onComplete}
+              disabled={isCompleting}
+            >
+              {isCompleting ? (
+                <ActivityIndicator size="small" color="#22c55e" />
+              ) : (
+                <Ionicons name="checkmark" size={20} color="#22c55e" />
+              )}
+            </Pressable>
           )}
         </View>
-        {isDisputedByMe && (
-          <Text className="mt-1 text-xs text-amber-600">
-            Your completion was disputed
+      </View>
+
+      {/* Bottom row: metadata pills */}
+      <View className="mt-2 ml-13 flex-row items-center gap-2">
+        <View className="bg-brand-light px-2 py-0.5 rounded-full">
+          <Text className="text-xs font-medium text-brand-dark">
+            {getFrequencyLabel(chore.frequency)}
+          </Text>
+        </View>
+        {isDisputed && (
+          <View className="rounded-full bg-red-100 px-2 py-0.5">
+            <Text className="text-xs font-semibold text-red-600">Disputed</Text>
+          </View>
+        )}
+        {isOverdue ? (
+          <View className="rounded-full bg-red-100 px-2 py-0.5">
+            <Text className="text-xs font-semibold text-red-600">
+              {overdueDays}d overdue
+            </Text>
+          </View>
+        ) : (
+          <Text className="text-metadata text-neutral-tertiary">
+            {formatDueDate(chore.next_due_at)}
           </Text>
         )}
       </View>
 
-      {/* Assignee avatar */}
-      {assigneeId && (
-        <View className="mr-2">
-          <Avatar userId={assigneeId} name={assigneeName} size="sm" />
-        </View>
+      {isDisputedByMe && (
+        <Text className="mt-1.5 ml-13 text-xs text-amber-600">
+          Your completion was disputed
+        </Text>
       )}
-
-      {/* Action buttons */}
-      <View className="flex-row items-center gap-1.5">
-        {/* Swap button -- only on my chores */}
-        {isMyChore && (
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-purple-50 active:bg-purple-100"
-            onPress={onSwap}
-          >
-            <Ionicons name="swap-horizontal-outline" size={18} color="#9333ea" />
-          </Pressable>
-        )}
-
-        {/* Dispute button */}
-        {showDisputeButton && (
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-amber-50 active:bg-amber-100"
-            onPress={onDispute}
-            disabled={isDisputing}
-          >
-            {isDisputing ? (
-              <ActivityIndicator size="small" color="#d97706" />
-            ) : (
-              <Ionicons name="flag-outline" size={18} color="#d97706" />
-            )}
-          </Pressable>
-        )}
-
-        {/* Claim button -- only on others' chores */}
-        {!isMyChore && (
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-blue-50 active:bg-blue-100"
-            onPress={onClaim}
-            disabled={isClaiming}
-          >
-            {isClaiming ? (
-              <ActivityIndicator size="small" color="#3b82f6" />
-            ) : (
-              <Ionicons name="hand-left-outline" size={18} color="#3b82f6" />
-            )}
-          </Pressable>
-        )}
-
-        {/* Complete button -- only on your own chores */}
-        {isMyChore && (
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-green-50 active:bg-green-100"
-            onPress={onComplete}
-            disabled={isCompleting}
-          >
-            {isCompleting ? (
-              <ActivityIndicator size="small" color="#22c55e" />
-            ) : (
-              <Ionicons name="checkmark" size={20} color="#22c55e" />
-            )}
-          </Pressable>
-        )}
-      </View>
     </View>
   );
 }
