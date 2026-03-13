@@ -8,11 +8,11 @@ export const ONBOARDING_CREAM = '#F5F0EB';
 
 /** Static require map for all onboarding illustrations */
 export const ONBOARDING_IMAGES = {
-  splitExpenses: require('@/assets/onboarding/split-expenses.jpg'),
-  sharedGrocery: require('@/assets/onboarding/shared-grocery.jpg'),
-  choreRotation: require('@/assets/onboarding/chore-rotation.jpg'),
-  displayName: require('@/assets/onboarding/display-name.jpg'),
-  setupHome: require('@/assets/onboarding/setup-home.jpg'),
-  nameHousehold: require('@/assets/onboarding/name-household.jpg'),
-  inviteCode: require('@/assets/onboarding/invite-code.jpg'),
+  splitExpenses: require('@/assets/onboarding/split-expenses.png'),
+  sharedGrocery: require('@/assets/onboarding/shared-grocery.png'),
+  choreRotation: require('@/assets/onboarding/chore-rotation.png'),
+  displayName: require('@/assets/onboarding/display-name.png'),
+  setupHome: require('@/assets/onboarding/setup-home.png'),
+  nameHousehold: require('@/assets/onboarding/name-household.png'),
+  inviteCode: require('@/assets/onboarding/invite-code.png'),
 } as const;

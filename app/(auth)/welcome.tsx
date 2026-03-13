@@ -20,30 +20,18 @@ const VALUE_PROPS = [
     title: 'Split Expenses Fairly',
     description:
       'Track shared costs and settle up with one tap. No more awkward money conversations.',
-    badges: [
-      { emoji: '\u{1F4B0}', label: 'Fair splits' },
-      { emoji: '\u26A1', label: 'One tap' },
-    ],
   },
   {
     image: ONBOARDING_IMAGES.sharedGrocery,
     title: 'Shared Grocery Lists',
     description:
       'Keep one list everyone can add to. Never buy duplicate milk again.',
-    badges: [
-      { emoji: '\u{1F6D2}', label: 'Real-time sync' },
-      { emoji: '\u{1F4F1}', label: 'Auto-split costs' },
-    ],
   },
   {
     image: ONBOARDING_IMAGES.choreRotation,
     title: 'Chore Rotation',
     description:
       'Take turns fairly with automatic chore scheduling. Everyone does their part.',
-    badges: [
-      { emoji: '\u{1F504}', label: 'Auto-rotate' },
-      { emoji: '\u2705', label: 'Track streaks' },
-    ],
   },
 ];
 
@@ -93,7 +81,7 @@ export default function WelcomeScreen() {
             }}
           >
             <Image
-              source={require('@/assets/icon.png')}
+              source={require('@/assets/android-icon-foreground.png')}
               style={{ width: 56, height: 56 }}
               resizeMode="contain"
             />
@@ -173,34 +161,7 @@ export default function WelcomeScreen() {
                 {prop.description}
               </Text>
 
-              {/* Emoji feature badges */}
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  gap: 8,
-                  marginTop: 12,
-                }}
-              >
-                {prop.badges.map((badge, bi) => (
-                  <View
-                    key={bi}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      backgroundColor: 'rgba(255,255,255,0.8)',
-                      borderRadius: 999,
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                    }}
-                  >
-                    <Text style={{ fontSize: 14 }}>
-                      {badge.emoji} {badge.label}
-                    </Text>
-                  </View>
-                ))}
-              </View>
+
             </View>
           ))}
         </ScrollView>
@@ -235,9 +196,11 @@ export default function WelcomeScreen() {
         <Pressable
           style={({ pressed }) => ({
             backgroundColor: pressed ? '#059669' : '#10B981',
-            borderRadius: 16,
+            borderRadius: 999,
             paddingVertical: 16,
             alignItems: 'center',
+            alignSelf: 'center',
+            width: '100%',
             marginBottom: 16,
           })}
           onPress={() => router.push('/(auth)/sign-up')}

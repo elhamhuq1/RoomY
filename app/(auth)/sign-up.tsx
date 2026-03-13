@@ -177,7 +177,7 @@ export default function SignUpScreen() {
                 }}
               >
                 <Image
-                  source={require("@/assets/icon.png")}
+                  source={require("@/assets/android-icon-foreground.png")}
                   style={{ width: 36, height: 36 }}
                   resizeMode="contain"
                 />
