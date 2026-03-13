@@ -1,63 +1,144 @@
-import { colors } from "@/lib/theme/colors";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Card, StepProgressBar } from "@/components/ui";
+import { ONBOARDING_CREAM, ONBOARDING_IMAGES } from "@/lib/onboarding-images";
+import { colors } from "@/lib/theme/colors";
 
 export default function HouseholdChoiceScreen() {
   const router = useRouter();
 
   return (
-    <View className="flex-1 bg-neutral-bg px-8 pt-20">
-      {/* Header */}
-      <View className="mb-12 items-center">
-        <Text className="text-3xl font-bold text-gray-800">
-          Set Up Your Home
-        </Text>
-        <Text className="mt-2 text-center text-base text-gray-500">
-          How would you like to get started?
-        </Text>
-      </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+      <StepProgressBar
+        currentStep={1}
+        totalSteps={3}
+        onBack={() => router.back()}
+      />
 
-      {/* Two equal-weight option cards */}
-      <View className="flex-1 justify-center gap-5 pb-24">
-        {/* Create a Household */}
-        <Pressable
-          className="flex-row items-center rounded-2xl border-2 border-neutral-border bg-white p-6 shadow-sm active:border-brand active:bg-brand-light"
-          onPress={() => router.push("/(onboarding)/create-household")}
-        >
-          <View className="mr-5 h-16 w-16 items-center justify-center rounded-2xl bg-brand-light">
-            <Ionicons name="home-outline" size={32} color={colors.brand.DEFAULT} />
-          </View>
-          <View className="flex-1">
-            <Text className="text-xl font-bold text-gray-800">
-              Create a Household
-            </Text>
-            <Text className="mt-1 text-sm text-gray-500">
-              Start fresh and invite your roommates
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={22} color={colors.neutral.tertiary} />
-        </Pressable>
+      <View style={{ flex: 1, paddingHorizontal: 32 }}>
+        {/* Illustration hero */}
+        <View style={{ alignItems: "center", marginTop: 8 }}>
+          <Image
+            source={ONBOARDING_IMAGES.setupHome}
+            style={{ width: "100%", height: 240 }}
+            resizeMode="contain"
+          />
+        </View>
 
-        {/* Join with Invite Code */}
-        <Pressable
-          className="flex-row items-center rounded-2xl border-2 border-neutral-border bg-white p-6 shadow-sm active:border-brand active:bg-brand-light"
-          onPress={() => router.push("/(onboarding)/join-household")}
-        >
-          <View className="mr-5 h-16 w-16 items-center justify-center rounded-2xl bg-brand-light">
-            <Ionicons name="key-outline" size={32} color={colors.brand.DEFAULT} />
-          </View>
-          <View className="flex-1">
-            <Text className="text-xl font-bold text-gray-800">
-              I Have an Invite Code
-            </Text>
-            <Text className="mt-1 text-sm text-gray-500">
-              Join a household a roommate already created
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={22} color={colors.neutral.tertiary} />
-        </Pressable>
+        {/* Title + subtitle */}
+        <View style={{ alignItems: "center", marginTop: 16, marginBottom: 28 }}>
+          <Text
+            style={{
+              fontSize: 26,
+              fontWeight: "700",
+              color: colors.neutral.text,
+              textAlign: "center",
+            }}
+          >
+            Set Up Your Home
+          </Text>
+          <Text
+            style={{
+              fontSize: 15,
+              color: colors.neutral.secondary,
+              textAlign: "center",
+              marginTop: 6,
+            }}
+          >
+            Create a new household or join an existing one
+          </Text>
+        </View>
+
+        {/* Option cards */}
+        <View style={{ gap: 16 }}>
+          {/* Create Household */}
+          <Pressable onPress={() => router.push("/(onboarding)/create-household")}>
+            <Card className="p-5">
+              <View style={{ alignItems: "center" }}>
+                <LinearGradient
+                  colors={["#10B981", "#059669"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 14,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 12,
+                  }}
+                >
+                  <Ionicons name="home" size={24} color="#fff" />
+                </LinearGradient>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: "700",
+                    color: colors.neutral.text,
+                    marginBottom: 4,
+                  }}
+                >
+                  Create Household
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: colors.neutral.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  Start a new home and invite roommates
+                </Text>
+              </View>
+            </Card>
+          </Pressable>
+
+          {/* Join Household */}
+          <Pressable onPress={() => router.push("/(onboarding)/join-household")}>
+            <Card className="p-5">
+              <View style={{ alignItems: "center" }}>
+                <LinearGradient
+                  colors={["#8B5CF6", "#7C3AED"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 14,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 12,
+                  }}
+                >
+                  <Ionicons name="key" size={24} color="#fff" />
+                </LinearGradient>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    fontWeight: "700",
+                    color: colors.neutral.text,
+                    marginBottom: 4,
+                  }}
+                >
+                  Join Household
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: colors.neutral.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  Enter an invite code from your roommate
+                </Text>
+              </View>
+            </Card>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

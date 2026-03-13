@@ -10,11 +10,15 @@ import {
   Platform,
   ScrollView,
   Share,
+  Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/lib/auth-context";
+import { IconContainer, StepProgressBar } from "@/components/ui";
+import { ONBOARDING_CREAM, ONBOARDING_IMAGES } from "@/lib/onboarding-images";
 
 export default function CreateHouseholdScreen() {
   const router = useRouter();
@@ -23,6 +27,7 @@ export default function CreateHouseholdScreen() {
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   const trimmedName = householdName.trim();
 
@@ -90,7 +95,7 @@ export default function CreateHouseholdScreen() {
     router.push("/(onboarding)/module-quiz");
   }
 
-  // Invite code display after creation
+  // ===== Invite code display after creation (UNCHANGED -- Plan 04 will restyle) =====
   if (inviteCode) {
     // Format code with spaces for readability (e.g., "ABCD EFGH")
     const formattedCode =
@@ -161,77 +166,118 @@ export default function CreateHouseholdScreen() {
     );
   }
 
-  // Household name form
+  // ===== Name form step (RESTYLED) =====
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-neutral-bg"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        contentContainerClassName="flex-grow justify-center px-8 py-12"
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+      <StepProgressBar
+        currentStep={1}
+        totalSteps={3}
+        onBack={() => router.back()}
+      />
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Header */}
-        <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
-            <Ionicons name="home" size={44} color={colors.brand.DEFAULT} />
-          </View>
-          <Text className="text-3xl font-bold text-gray-800">
-            Name Your Household
-          </Text>
-          <Text className="mt-2 text-center text-base text-gray-500">
-            Pick something your roommates will recognize
-          </Text>
-        </View>
-
-        {/* Error */}
-        {error ? (
-          <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
-          </View>
-        ) : null}
-
-        {/* Household name input */}
-        <View className="mb-8">
-          <Text className="mb-1.5 text-sm font-medium text-gray-700">
-            Household Name
-          </Text>
-          <TextInput
-            className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              error ? "border-red-400" : "border-neutral-border"
-            }`}
-            placeholder='e.g., "The Elm Street Crew"'
-            placeholderTextColor={colors.neutral.tertiary}
-            value={householdName}
-            onChangeText={(text) => {
-              setHouseholdName(text);
-              if (error) setError("");
-            }}
-            autoCapitalize="words"
-            editable={!loading}
-            autoFocus
-          />
-        </View>
-
-        {/* Create button */}
-        <Pressable
-          className={`items-center rounded-2xl py-4 ${
-            !trimmedName || loading
-              ? "bg-brand/50"
-              : "bg-brand active:bg-brand-dark"
-          }`}
-          onPress={handleCreate}
-          disabled={!trimmedName || loading}
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 32,
+            paddingBottom: 32,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text className="text-lg font-bold text-white">
-              Create Household
+          {/* Illustration hero */}
+          <View style={{ alignItems: "center", marginTop: 8 }}>
+            <Image
+              source={ONBOARDING_IMAGES.nameHousehold}
+              style={{ width: "100%", height: 220 }}
+              resizeMode="contain"
+            />
+          </View>
+
+          {/* Branded house icon */}
+          <View style={{ alignItems: "center", marginTop: 16, marginBottom: 12 }}>
+            <IconContainer name="home" variant="brand" size={24} />
+          </View>
+
+          {/* Title + subtitle */}
+          <View style={{ alignItems: "center", marginBottom: 24 }}>
+            <Text
+              style={{
+                fontSize: 26,
+                fontWeight: "700",
+                color: colors.neutral.text,
+                textAlign: "center",
+              }}
+            >
+              Name Your Household
             </Text>
-          )}
-        </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <Text
+              style={{
+                fontSize: 15,
+                color: colors.neutral.secondary,
+                textAlign: "center",
+                marginTop: 6,
+              }}
+            >
+              Give your home a name your roommates will recognize
+            </Text>
+          </View>
+
+          {/* Error */}
+          {error ? (
+            <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
+              <Text className="text-sm text-red-600">{error}</Text>
+            </View>
+          ) : null}
+
+          {/* Household name input */}
+          <View style={{ marginBottom: 24 }}>
+            <TextInput
+              className={`rounded-2xl px-4 py-3.5 text-base text-neutral-text ${
+                error
+                  ? "border-2 border-semantic-error bg-white"
+                  : focused
+                    ? "border-2 border-brand bg-white"
+                    : "bg-[#F5F5F5]"
+              }`}
+              placeholder="e.g., The Lake House"
+              placeholderTextColor={colors.neutral.tertiary}
+              value={householdName}
+              onChangeText={(text) => {
+                setHouseholdName(text);
+                if (error) setError("");
+              }}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              autoCapitalize="words"
+              editable={!loading}
+              autoFocus
+            />
+          </View>
+
+          {/* Create button */}
+          <Pressable
+            className={`items-center rounded-2xl py-4 ${
+              !trimmedName || loading
+                ? "bg-brand/50"
+                : "bg-brand active:bg-brand-dark"
+            }`}
+            onPress={handleCreate}
+            disabled={!trimmedName || loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-lg font-bold text-white">
+                Create Household
+              </Text>
+            )}
+          </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
