@@ -67,7 +67,7 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 ### Onboarding
 
 - [x] **ONBD-01**: Welcome screen shows a 3-slide carousel with gradient hero sections, glassmorphism logo, and emoji feature badges
-- [ ] **ONBD-02**: Sign up screen uses styled form inputs, branded primary button, and properly styled social auth buttons
+- [x] **ONBD-02**: Sign up screen uses styled form inputs, branded primary button, and properly styled social auth buttons
 - [x] **ONBD-03**: Display name screen shows a live avatar preview that updates as the user types
 - [x] **ONBD-04**: Setup choice screen presents create/join options as large cards with gradient icon containers
 - [x] **ONBD-05**: Household name screen shows a branded house icon and styled input
@@ -187,7 +187,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHUI-03 | Phase 9 | Complete |
 | CHUI-04 | Phase 9 | Complete |
 | ONBD-01 | Phase 10 | Complete |
-| ONBD-02 | Phase 10 | Pending |
+| ONBD-02 | Phase 10 | Complete |
 | ONBD-03 | Phase 10 | Complete |
 | ONBD-04 | Phase 10 | Complete |
 | ONBD-05 | Phase 10 | Complete |

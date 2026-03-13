@@ -56,6 +56,7 @@ Progress: [###############.....] 75% (v1.1 Phase 10: 3/4 plans)
 | Phase 09 P01 | 3min | 2 tasks | 6 files |
 | Phase 09 P02 | 3min | 2 tasks | 5 files |
 | Phase 10 P01 | 2min | 2 tasks | 12 files |
+| Phase 10 P02 | 4min | 2 tasks | 3 files |
 | Phase 10 P03 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
@@ -111,6 +112,10 @@ Recent decisions affecting current work:
 - [10-01]: ONBOARDING_CREAM set to #F5F0EB (closest match to illustration backgrounds)
 - [10-01]: Renamed 'Sign in' to 'Log in' on welcome screen per CONTEXT.md decision
 - [10-01]: Platform-aware glassmorphism: rgba(255,255,255,0.3) iOS, rgba(255,255,255,0.7) Android
+- [10-02]: Inset inputs use border-2 border-transparent default for consistent sizing across states
+- [10-02]: Confirm Password field added to sign-up for UX completeness
+- [10-02]: Removed input labels in favor of placeholder text for cleaner inset style
+- [10-02]: Success state on forgot-password also uses cream background for consistency
 - [10-03]: Profile Avatar uses user session ID (or 'preview' fallback) for deterministic gradient color
 - [10-03]: Gradient icon cards: green for create, violet for join -- matching Avatar GRADIENT_PAIRS palette
 - [10-03]: Invite code success state left visually unchanged for Plan 04
