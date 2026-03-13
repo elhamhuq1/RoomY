@@ -1,207 +1,302 @@
 # Pitfalls Research
 
-**Domain:** UI/UX redesign of an existing Expo React Native app (NativeWind v4, Tailwind 3, Expo SDK 54)
-**Researched:** 2026-03-11
-**Confidence:** HIGH (pitfalls verified through NativeWind official docs, React Native official docs, expo documentation, and codebase analysis of 30 existing screen files with 74 hardcoded color references and 76 inline style objects)
+**Domain:** Adding profile picture uploads, Google OAuth, empty state illustrations, and wintergreen palette shift to an existing Expo React Native app (NativeWind v4, TW3, Supabase, Expo SDK 54)
+**Researched:** 2026-03-13
+**Confidence:** HIGH (pitfalls verified through Supabase official docs, Expo official docs, codebase analysis of 49 files with 163 hardcoded brand color references, 11 Avatar import sites, 8 duplicated AVATAR_COLORS arrays, and the existing auth-utils.ts Google Sign-In implementation)
 
 ## Critical Pitfalls
 
-### Pitfall 1: Hardcoded Color Values Scattered Across 25+ Files
+### Pitfall 1: Google Sign-In Native Module Crashes Expo Go at Import Time
 
 **What goes wrong:**
-The existing codebase has 74 instances of the old orange primary color (`#f9a825`, `#f59b20`, etc.) hardcoded directly in JSX -- in `color=` props on Ionicons, in `style={{ backgroundColor: }}` objects, in NativeWind arbitrary values like `bg-[#3b82f6]`, and in third-party component theme configs (react-native-calendars). Changing the tailwind.config.js color tokens only updates NativeWind className references (`bg-primary-500`). It does NOT touch any of these hardcoded values. The result: a half-migrated app where some elements are green and others are still orange, creating visual incoherence that is worse than not redesigning at all.
+The `@react-native-google-signin/google-signin` package contains a native module that does not exist in Expo Go. If imported at the top level of any file, the entire app crashes on launch with a "Native module not found" error. The app already has a lazy import workaround in `lib/auth-utils.ts` (line 20: `await import(...)` inside the function body), but the Google Sign-In button on the auth screens must also handle this gracefully. If a developer adds a "Sign in with Google" button that eagerly calls `GoogleSignin.configure()` on mount or renders a `GoogleSigninButton` component from the library, Expo Go crashes immediately.
 
 **Why it happens:**
-During v1.0 development, inline `color=` props were used liberally because Ionicons and other components require string color values, not className props. The Calendar component theme object uses hardcoded hex strings. These bypass the NativeWind theme system entirely.
+`@react-native-google-signin/google-signin` is a native module that requires a custom development build. Expo Go ships with a fixed set of native modules and this library is not one of them. The app.json already lists the config plugin (line 33), which is correct for production builds but does nothing in Expo Go. The existing code correctly lazy-imports inside `signInWithGoogle()`, but any new code touching this library must follow the same pattern.
 
 **How to avoid:**
-- Create a `lib/colors.ts` constants file exporting the new design token values FIRST, before touching any screen.
-- Use grep/search to identify every hardcoded color reference: `#f9a825`, `#f59b20`, `#ef8a19`, `#e97a13`, `#66bb6a`, `#9ca3af`, `#374151`, `#d1d5db`, and gray-* references.
-- Replace Ionicons `color=` props with references to the constants file: `color={colors.brand}` instead of `color="#f9a825"`.
-- Replace the Calendar theme object to reference the same constants.
-- Do the color constants file as the VERY FIRST task before any screen redesign begins.
+- Never import `@react-native-google-signin/google-signin` at the top of any file. Always use dynamic `await import()` inside the function that needs it.
+- Never render the library's `GoogleSigninButton` component -- build a custom button that calls the lazy-imported `signInWithGoogle()` function.
+- Add a try/catch around the dynamic import itself, and if it fails, show a user-friendly message like "Google Sign-In requires a development build" or hide the button entirely when running in Expo Go.
+- Detect Expo Go at runtime using `Constants.executionEnvironment === 'storeClient'` from `expo-constants` to conditionally show/hide the Google button.
+- For v1.2 development, accept that Google Sign-In will only work in development builds. Email/password auth remains the Expo Go testing path.
 
 **Warning signs:**
-- Any screen showing a mix of orange and green elements.
-- Calendar still showing orange highlights after other screens are green.
-- Loading spinners still orange (`ActivityIndicator color="#f9a825"`).
+- App crashes on launch in Expo Go after adding Google Sign-In UI.
+- `GoogleSigninButton` component appearing in any import statement.
+- Top-level `import { GoogleSignin } from '@react-native-google-signin/google-signin'` in any file other than inside an async function body.
 
 **Phase to address:**
-Phase 1 (Design System Foundation) -- create color constants and update tailwind.config.js. Must be complete before ANY screen work begins.
+Google OAuth phase -- implement the button with runtime detection and lazy import. Test in Expo Go to verify the button gracefully degrades.
 
 ---
 
-### Pitfall 2: NativeWind className and Inline style Specificity Conflicts
+### Pitfall 2: Supabase Storage Upload Produces 0-Byte or Corrupted Files from React Native
 
 **What goes wrong:**
-NativeWind v4 has a defined specificity order: (1) `!important` styles, (2) inline `style={}` props, (3) `className` props. When you add new NativeWind classes to a component that already has an inline `style` prop, the inline style WINS for any overlapping properties. The redesign adds `className="bg-card rounded-2xl shadow"` to a View that already has `style={{ backgroundColor: '#fff', borderRadius: 16 }}` -- the inline style silently overrides the className, and the developer does not realize the NativeWind values are being ignored.
-
-The existing codebase has 76 `style={` occurrences across 19 files. Each is a potential conflict during the redesign.
+The standard web approach of uploading a `File` or `Blob` object to Supabase Storage does not work in React Native. `fetch(uri).then(r => r.blob())` produces a blob that Supabase's upload method either rejects or stores as a 0-byte file. This is a well-documented issue across Supabase GitHub discussions (#1268, #2336, #7252). The upload appears to succeed (no error), the file path is returned, but the stored file is empty or corrupted. The avatar URL works (no 404), but the image displays as a broken/blank element.
 
 **Why it happens:**
-In standard CSS, later declarations override earlier ones. NativeWind v4 reverses this intuition: inline styles have HIGHER specificity than className. Developers accustomed to web Tailwind expect className to be the primary styling mechanism, but inline styles silently win.
+React Native's `fetch` and `Blob` implementations differ from the browser. The Supabase JS client's `storage.upload()` expects either an `ArrayBuffer`, `File` (web File API), or `FormData`. In React Native, `Blob` objects created from `fetch` do not serialize correctly for the upload endpoint. The React Native runtime does not have the same File API as browsers.
 
 **How to avoid:**
-- When redesigning a component, REMOVE all inline `style` props that set visual properties (colors, borders, padding, margins, borderRadius).
-- Keep inline styles ONLY for values that cannot be expressed in NativeWind (dynamic values computed at runtime, like `style={{ width: calculatedWidth }}`).
-- Never mix `className` and `style` for the same property on the same element.
-- If you must override a className from a style prop, use the `!important` modifier: `className="!text-red-500"`.
+- Use the `base64-arraybuffer` library (install: `npm install base64-arraybuffer`).
+- Get the image as base64 from expo-image-picker by passing `options: { base64: true }` to `launchImageLibraryAsync` or `launchCameraAsync`.
+- Convert base64 to ArrayBuffer using `decode()` from `base64-arraybuffer`.
+- Upload the ArrayBuffer with explicit `contentType`:
+  ```typescript
+  import { decode } from 'base64-arraybuffer';
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 0.7,
+    base64: true,  // CRITICAL: request base64 encoding
+  });
+
+  if (!result.canceled && result.assets[0].base64) {
+    const { error } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, decode(result.assets[0].base64), {
+        contentType: 'image/jpeg',
+        upsert: true,
+      });
+  }
+  ```
+- Never use `fetch(uri).then(r => r.blob())` for Supabase uploads in React Native.
 
 **Warning signs:**
-- Styles not updating despite correct className values.
-- Different visual results on iOS vs Android for the same component.
-- Border radius appearing wrong despite correct `rounded-*` classes.
+- Files appearing in Supabase Storage dashboard with 0 bytes size.
+- Avatar images loading but displaying as blank/broken.
+- Upload succeeding (no error) but image not rendering.
+- Using `fetch()` + `.blob()` anywhere in the upload pipeline.
 
 **Phase to address:**
-Every phase -- but establish the rule in Phase 1 (Design System Foundation) and enforce it as each screen is redesigned.
+Profile picture upload phase -- implement using base64-arraybuffer from the start. Do not prototype with blob/fetch.
 
 ---
 
-### Pitfall 3: Shadow Rendering Differences Between iOS and Android
+### Pitfall 3: Supabase Storage RLS Policies Missing for Upload, Download, or Overwrite
 
 **What goes wrong:**
-The design spec calls for `shadow` and `shadowMd` elevation tokens with CSS-style box-shadow values (`0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)`). In NativeWind v4, shadow classes (`shadow`, `shadow-sm`, `shadow-md`) are compiled to iOS `shadowOffset`/`shadowOpacity`/`shadowRadius` properties AND Android `elevation`. These produce visually different results: iOS shadows are soft and directional, Android elevation shadows are uniform and baked into the system. The card designs from the mockup will look different on each platform. Additionally, shadows on Android will NOT render at all if the component has no `backgroundColor` set.
+Supabase Storage has its own RLS policies on the `storage.objects` table, separate from your database table RLS policies. By default, no operations are allowed. If you create an "avatars" bucket but forget RLS policies, every upload returns a "new row violates row-level security policy" error. If you add INSERT but forget SELECT, the upload succeeds but `getPublicUrl()` returns a URL that 403s. If you allow INSERT but not UPDATE, the first avatar upload works but updating the avatar (upsert) fails silently.
 
 **Why it happens:**
-React Native does not have a unified shadow model. iOS and Android use fundamentally different rendering approaches. NativeWind v4 translates Tailwind shadow classes into the platform-specific equivalents, but the visual output differs. The design spec was created in a web context (JSX/HTML mockup) where `box-shadow` renders identically across browsers.
+Developers set up database RLS policies and assume storage works the same way. It does not. Storage RLS operates on the `storage.objects` table, not your custom tables. The bucket "public" setting only controls whether anonymous downloads are allowed -- it does not bypass RLS for uploads. The project already has experience with RLS recursion issues (`get_user_household_ids()` SECURITY DEFINER function), but storage RLS is a separate system with its own patterns.
 
 **How to avoid:**
-- Always set `backgroundColor` on any element that needs a shadow (use `bg-card` or `bg-white`).
-- Accept that shadows will look slightly different on iOS vs Android. Do NOT try to make them pixel-identical.
-- Use only the built-in NativeWind shadow scale (`shadow-sm`, `shadow`, `shadow-md`, `shadow-lg`) rather than arbitrary shadow values (`shadow-[...]`), since arbitrary values are web-only in NativeWind v4.
-- Test every shadow on both iOS and Android physical devices. Shadows can look fine in iOS Simulator but wrong on Android emulator.
-- For the colored shadow on the FAB button (`0 4px 16px {brand}55`), this is NOT achievable with NativeWind shadow classes. Use an inline style with `Platform.select()` to set `shadowColor` on iOS and accept that Android elevation shadows are always dark gray.
+- Create three RLS policies on `storage.objects` for the "avatars" bucket:
+  1. **INSERT**: Users can upload their own avatar -- `(bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1])`
+  2. **SELECT**: Anyone authenticated can view avatars -- `(bucket_id = 'avatars')`
+  3. **UPDATE**: Users can overwrite their own avatar -- `(bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1])`
+- Structure file paths as `{user_id}/avatar.jpg` so the folder name matches the user ID for RLS enforcement.
+- Make the bucket **public** for reads (so `getPublicUrl()` works without signed URLs) but RLS-protected for writes.
+- Test the complete cycle: upload, retrieve URL, display image, upload replacement, verify replacement displays.
 
 **Warning signs:**
-- Cards appearing "flat" on Android (no visible shadow) despite correct className.
-- Colored shadows rendering on iOS but showing as default dark gray on Android.
-- Shadow clipping or being cut off by parent container `overflow: hidden`.
+- "new row violates row-level security policy" on upload attempts.
+- Upload succeeds but image URL returns 403.
+- First upload works, subsequent updates fail.
+- Using `createSignedUrl()` when a public bucket URL would suffice (unnecessary complexity).
 
 **Phase to address:**
-Phase 1 (Design System Foundation) -- define shadow utility approach. Phase 2+ (screen rebuilds) -- verify per-screen on both platforms.
+Profile picture upload phase -- create the storage bucket and all three RLS policies BEFORE writing any client-side upload code. Test via Supabase dashboard first.
 
 ---
 
-### Pitfall 4: Glassmorphism / backdrop-filter Does Not Exist in React Native
+### Pitfall 4: Avatar Photo Cached by CDN/Browser After Update -- User Sees Old Photo
 
 **What goes wrong:**
-The design spec explicitly calls for a "glass-morphism container" on the onboarding welcome carousel with `backdrop-filter: blur(12px)`, `rgba(255,255,255,0.15)` background, and translucent borders. The CSS `backdrop-filter` property does not exist in React Native. There is no equivalent style prop. The design as specified is impossible to implement with standard React Native components.
+After a user uploads a new profile picture, the avatar URL points to the same path (`{user_id}/avatar.jpg`). Supabase's CDN and React Native's image cache both serve the old cached version. The user uploads a new photo, sees a success message, but the avatar still shows the old photo everywhere in the app. Refreshing the app does not help because the cache has not expired.
 
 **Why it happens:**
-The design spec was created as a web mockup (JSX/HTML) where `backdrop-filter` is a standard CSS property. The designer/spec author did not account for React Native rendering limitations.
+Supabase Storage uses CDN caching with configurable cache-control headers. When a file is overwritten at the same path, the CDN may serve the cached version. React Native's `<Image>` component also caches images aggressively by URI. Even with Supabase's Smart CDN cache invalidation, the local React Native image cache is separate and will serve stale data.
 
 **How to avoid:**
-- Use `expo-blur` (`BlurView`) to approximate the effect. It supports `intensity` and `tint` props. On Expo SDK 54, `expo-blur` is included in Expo Go, so no custom dev build is needed.
-- Wrap the content area in a `BlurView` positioned absolutely over the gradient background.
-- Accept visual differences: `expo-blur` produces a system-level blur that varies between iOS (very smooth, gaussian) and Android (less refined, especially below API 31).
-- Alternative approach: skip true blur entirely and use a semi-transparent white overlay (`rgba(255,255,255,0.2)`) with a subtle border. This is visually "close enough" on mobile screens where the effect is subtle, and avoids platform inconsistency and performance overhead.
-- Do NOT use `react-native-skia` for this single effect -- it is a heavy dependency (adds ~2MB to bundle) and is overkill for one decorative element.
+- Append a cache-busting query parameter to the avatar URL: `avatarUrl + '?v=' + Date.now()` or use the `updated_at` timestamp from the profiles table.
+- Store the avatar URL in the `profiles.avatar_url` column WITH the cache-busting parameter, so all consumers automatically get the fresh version.
+- After a successful upload, update the profiles table with the new URL (including version parameter), then call `refreshProfile()` from the auth context to propagate the change.
+- The profile settings screen currently does not have avatar upload -- when adding it, ensure the auth context's `refreshProfile()` is called after upload to update the `profile.avatar_url` in state.
+- Alternative: use unique filenames like `{user_id}/{timestamp}.jpg` instead of overwriting the same file. This avoids caching issues entirely but requires deleting old files.
 
 **Warning signs:**
-- `backdrop-filter` appearing in any style prop (it will be silently ignored).
-- Onboarding hero section looking flat/opaque instead of translucent on either platform.
-- Performance issues (dropped frames) when blurring animated content beneath the overlay.
+- User uploads new photo, success shown, but old photo persists throughout app.
+- Avatar updates visible only after clearing app data or reinstalling.
+- Different avatars showing on different screens (some cached, some fresh).
 
 **Phase to address:**
-Phase 3 or whichever phase handles onboarding carousel rebuild -- decide the blur approach BEFORE building the carousel.
+Profile picture upload phase -- implement cache-busting strategy from the start. Do not assume CDN invalidation handles this automatically.
 
 ---
 
-### Pitfall 5: Breaking Existing Functionality During Visual-Only Changes
+### Pitfall 5: Wintergreen Palette Shift Requires Updating 163 Hardcoded Color References Across 49 Files
 
 **What goes wrong:**
-The project scope explicitly says "presentation layer only, all data models and APIs stay untouched." But visual redesigns routinely break functionality in subtle ways: restructuring a `Pressable` wrapper changes the touch target, moving elements inside a `ScrollView` breaks scroll behavior, changing a `View` hierarchy around a form input breaks keyboard avoidance, and renaming or restructuring components breaks expo-router navigation. The most dangerous pattern is when a screen "looks correct" in a static screenshot but interactive behaviors (pull-to-refresh, swipe-to-delete, keyboard dismiss, deep link navigation) are broken.
+The palette shift from emerald green (#10B981 / #059669 / #D1FAE5) to dark wintergreen (~#2D6A4F) affects far more than just the `tailwind.config.js` and `lib/theme/colors.ts` files. The codebase has:
+- **49 files** with NativeWind brand token usage (e.g., `bg-brand`, `text-brand`, `border-brand`)
+- **15 hardcoded #10B981 references** in inline styles, `color=` props, and component constants
+- **8 duplicated AVATAR_COLORS arrays** across 8 different files (settle.tsx, add.tsx, [id].tsx, members.tsx, complete-trip.tsx, swap-request.tsx, dashboard.tsx, chores/add.tsx), each containing `'#10B981'` as the first color
+- **1 Avatar.tsx** component with hardcoded `['#10B981', '#059669']` gradient pair
+- **1 Toggle.tsx** component with hardcoded `'#10B981'` as the active track color
+
+Updating only `tailwind.config.js` and `colors.ts` changes the NativeWind token references but leaves all hardcoded hex values on the old emerald green. The result is a two-tone green app: some elements wintergreen, others still emerald.
 
 **Why it happens:**
-Visual redesigns feel "safe" because no business logic is changing. But in React Native, layout structure IS behavior -- the component tree determines touch handling, scroll behavior, keyboard interaction, and accessibility. Restructuring JSX for visual purposes silently changes all of these.
+The v1.1 design system did not fully consolidate hardcoded colors. Components like Ionicons require string `color=` props, Calendar themes use hex strings, and the AVATAR_COLORS arrays were copy-pasted across files instead of imported from a shared constant. The v1.0 audit already flagged this ("AVATAR_COLORS and getInitials duplicated in 11 files"), but it was not resolved in v1.1.
 
 **How to avoid:**
-- Follow a strict verification checklist after EVERY screen redesign (the design spec already includes one -- use it).
-- Test each screen's interactive behaviors, not just its visual appearance: add an expense, complete a chore, check off a grocery item, pull-to-refresh, navigate via tab bar, navigate via deep link.
-- Keep the screen's functional JSX structure intact when possible. Wrap existing components in new styled containers rather than rewriting the component tree.
-- Do NOT combine visual redesign with functional changes or refactors. If a screen needs a bug fix AND a redesign, commit the bug fix first, then redesign.
-- Redesign one screen at a time. Never redesign multiple screens in a single commit.
+- Update the palette in THREE places simultaneously:
+  1. `tailwind.config.js` -- brand token values
+  2. `lib/theme/colors.ts` -- runtime color constants
+  3. Every file with hardcoded `#10B981`, `#059669`, or `#D1FAE5`
+- Before changing colors, consolidate the 8 duplicated AVATAR_COLORS arrays into a single export in `lib/theme/colors.ts` or a new `lib/ui-utils.ts`. Import it everywhere. Then the palette shift requires changing one file instead of eight.
+- Run a grep for the old hex values after migration: `grep -r '#10B981\|#059669\|#D1FAE5' --include='*.tsx' --include='*.ts'`. Zero results means success.
+- The Avatar component's GRADIENT_PAIRS should also reference the colors constant, not hardcode hex values.
 
 **Warning signs:**
-- "It looks right" but no one has actually tapped the buttons.
-- Pull-to-refresh stops working after wrapping content in a new parent View.
-- Keyboard covers input fields after changing the scroll container.
-- Tab bar icons stop navigating after changing the layout hierarchy.
+- Two different shades of green visible on the same screen.
+- Toggle switches showing old green when active but new green elsewhere.
+- Avatar gradient starting with old emerald but surrounding UI in wintergreen.
+- `welcome.tsx` auth screen still showing old green dots and buttons.
 
 **Phase to address:**
-Every phase -- include the verification checklist as a gate for each screen delivery. Never skip it.
+Palette shift phase -- this MUST be the first task, before any feature work begins. Consolidate AVATAR_COLORS first, then update the three color source files, then grep for stragglers.
 
 ---
 
-### Pitfall 6: Gradient Avatars Require LinearGradient, Not CSS
+### Pitfall 6: Avatar Component API Change Breaks 11 Consumer Files
 
 **What goes wrong:**
-The design spec defines member avatars with `linear-gradient(135deg, #E76F51, #F4A261)` backgrounds. In React Native, `View` does not support `background: linear-gradient(...)` as a style prop. The gradient is silently ignored, producing an avatar with no background color -- a blank circle with white text on a white card, invisible to the user. Every avatar on every screen breaks.
+The current `Avatar` component (in `components/ui/Avatar.tsx`) takes `{ userId, name, size }` props and renders a gradient circle with initials. Adding profile picture support means the component needs a new `avatarUrl` prop. If the API change is not backward-compatible, all 11 files importing Avatar break simultaneously. If the `avatarUrl` prop is added but the fallback (initials on gradient) is not preserved, users without photos see a broken or blank avatar.
 
 **Why it happens:**
-CSS gradients do not exist in React Native. React Native's style system only supports solid color `backgroundColor` values. Gradients require a dedicated `<LinearGradient>` component from `expo-linear-gradient`.
+The Avatar component is the most widely-used UI component in the codebase, imported in: `BalanceMemberRow`, `GroceryItemRow`, `RoommateSection`, `ExpenseRow`, `MembersCard`, `WeeklyTimeline`, `member-welcome.tsx`, `dispute.tsx`, and `chores.tsx` (tab). Each consumer passes `userId` and `name`. None pass an `avatarUrl` because it does not exist yet. A breaking API change ripples through the entire app.
+
+Additionally, the profile settings screen (`settings/profile.tsx` line 94) renders its OWN avatar using a simple `View` with `bg-brand` and initials text -- it does not use the shared Avatar component at all. This creates a second avatar implementation that must also be updated.
 
 **How to avoid:**
-- Install `expo-linear-gradient` (it is included in Expo Go SDK 54, no custom dev build needed).
-- Build the Avatar component using `<LinearGradient colors={[startColor, endColor]} start={{x:0, y:0}} end={{x:1, y:1}}>` as the background.
-- Define member gradient color pairs in the design token constants.
-- The balance summary card also uses a gradient background (`#2D6A4F` to `#1B4332`) -- use `LinearGradient` there too.
-- Each carousel slide uses a different gradient background -- same approach.
+- Make `avatarUrl` an optional prop with `undefined` default. When `avatarUrl` is provided and non-empty, render an `<Image>` inside the circle. When absent, fall back to the existing gradient + initials behavior.
+- Do NOT change the existing required props (`userId`, `name`, `size`). Keep the API additive-only.
+- Add an `onLoadError` handler on the Image that falls back to the gradient initials if the URL is broken/expired.
+- Update `settings/profile.tsx` to use the shared Avatar component instead of its inline implementation.
+- The component currently exports `getGradientForUser()` -- keep this exported for any consumer that needs the gradient color without rendering the full component.
 
 **Warning signs:**
-- Avatars appearing as solid color circles instead of gradients.
-- Attempting to set `background` or `backgroundImage` style props (these do not exist in React Native).
+- TypeScript errors in 11+ files after modifying Avatar props.
+- Users without profile photos seeing blank circles instead of initials.
+- Profile settings screen showing a different avatar style than the rest of the app.
+- No error handling for broken avatar URLs (image loads forever or shows broken icon).
 
 **Phase to address:**
-Phase 1 (Design System Foundation) -- build the Avatar component with LinearGradient. It is used on nearly every screen, so it must exist before screen rebuilds begin.
+Profile picture upload phase -- modify Avatar component FIRST with backward-compatible API, then update the profile settings screen to use it, then add upload functionality.
 
 ---
 
-### Pitfall 7: Carousel Swipe Gestures Conflicting with Tab Navigation
+### Pitfall 7: expo-image-picker Camera Permission Denied Silently on Android
 
 **What goes wrong:**
-The onboarding welcome screen has a horizontal swipe carousel. The main app has a tab bar navigator. If the carousel is built inside a screen that also has horizontal swipe gesture handling (e.g., swipe-to-go-back on iOS stack navigator, or swipe between tabs), the gestures conflict. The user tries to swipe the carousel but triggers a navigation gesture instead, or vice versa. The current welcome screen uses a basic `ScrollView` with `horizontal pagingEnabled`, which mostly works but can conflict with stack navigator gestures.
+`expo-image-picker` requires camera and media library permissions. On iOS, the system automatically prompts the user. On Android, `launchCameraAsync()` may silently fail or return `canceled: true` if camera permission was not requested beforehand. The developer tests on iOS, sees the permission prompt, and assumes it works on Android. On Android, the camera opens but the captured image is not returned, or the function throws a generic error.
 
 **Why it happens:**
-React Native Gesture Handler routes touch events through a gesture system that can only handle one gesture responder at a time. When multiple components (carousel `ScrollView`, stack navigator, tab navigator) all want horizontal swipe ownership, the first one to claim the gesture wins. The others are blocked.
+On Android 13+ (API 33), the permission model changed. `READ_EXTERNAL_STORAGE` was replaced with `READ_MEDIA_IMAGES`. `expo-image-picker` handles this internally, but the camera permission (`CAMERA`) must still be requested explicitly using `ImagePicker.requestCameraPermissionsAsync()` before calling `launchCameraAsync()`. Gallery access (`launchImageLibraryAsync()`) does not require explicit permission on newer Android versions but does on older ones.
 
 **How to avoid:**
-- The welcome carousel is inside the `(auth)` route group, which uses a stack navigator without tabs. This is inherently safer than putting a carousel inside a tabbed screen.
-- Use `ScrollView` with `pagingEnabled` (the current approach) rather than introducing a third-party carousel library with custom gesture handling.
-- On iOS, disable the stack navigator's `gestureEnabled` on the welcome screen specifically, since there is no screen to swipe back to.
-- Do NOT use `react-native-snap-carousel` -- it is unmaintained and has known gesture conflicts. If a more advanced carousel is needed, use `react-native-reanimated-carousel`, which is built on Reanimated and works with the gesture handler system.
-- Keep the home screen's week-strip calendar as a non-swipeable row, NOT a horizontal `ScrollView`, to avoid conflict with tab swipe gestures.
+- Always call `ImagePicker.requestCameraPermissionsAsync()` before `launchCameraAsync()`. Check the result and show a user-friendly message if denied.
+- For gallery: call `ImagePicker.requestMediaLibraryPermissionsAsync()` before `launchImageLibraryAsync()` on Android.
+- Handle the "permission denied permanently" case: if `canAskAgain` is false, direct the user to Settings to grant the permission manually.
+- `expo-image-picker` works in Expo Go without a development build -- this is confirmed in official Expo docs. No config plugin is needed for basic usage.
+- Test on both a physical iOS device and a physical Android device. Emulators often auto-grant permissions and hide this bug.
 
 **Warning signs:**
-- Carousel swipe only works on one platform but not the other.
-- Swiping the carousel triggers a navigation back gesture on iOS.
-- Carousel "sticks" and does not snap to pages cleanly.
+- Camera feature works on iOS but not Android.
+- `launchCameraAsync()` returning `canceled: true` without the camera ever opening.
+- No permission prompt appearing on Android.
+- Crash or unhandled promise rejection on Android when opening camera.
 
 **Phase to address:**
-Onboarding phase (carousel rebuild) -- test gesture isolation carefully. Home screen phase (calendar strip) -- avoid horizontal scroll for the week strip.
+Profile picture upload phase -- implement permission checks with proper error handling before any camera/gallery calls.
 
 ---
 
-### Pitfall 8: NativeWind Tailwind Content Paths Missing New Component Directories
+### Pitfall 8: Empty State Images Increase Bundle Size and Slow Cold Start
 
 **What goes wrong:**
-The current `tailwind.config.js` has `content` paths for `./app/**`, `./components/**`, and `./lib/**`. If the redesign creates shared components in a new directory (e.g., `./ui/**`, `./design-system/**`, or `./shared/**`), NativeWind will not scan those files for class names. Tailwind's purge step will strip out any classes that are only used in the unscanned directory. The result: components render with zero styling in production, but may appear to work in development due to caching.
+Adding illustration images for empty states (expenses, groceries, chores, home) as static assets via `require('./assets/empty-expenses.png')` bundles them into the JS bundle. If the illustrations are high-resolution (e.g., 3x at 600x600px each), four illustrations can add 200KB-1MB to the bundle size. React Native's asset system includes @1x, @2x, @3x variants, tripling the storage. Since empty states are only shown when there is no data (brief moment during onboarding), these assets are loaded eagerly but displayed rarely.
 
 **Why it happens:**
-Tailwind CSS tree-shakes unused classes based on what it finds in the `content` paths. If a file using `bg-brand` is not in a scanned directory, that class gets purged from the output. NativeWind inherits this behavior. Developers create a new folder, use classes, and never update the config.
+Static `require()` assets are bundled at build time regardless of whether they are displayed. The Metro bundler includes them in the JavaScript bundle. For development in Expo Go, this increases the initial JS bundle download time over the local network. For production, it increases app binary size.
 
 **How to avoid:**
-- If creating a new shared component directory, immediately add it to `content` in `tailwind.config.js`.
-- Better yet: put all shared UI components in the existing `./components/` directory (already in the content paths) rather than creating a new top-level folder.
-- After any directory structure changes, clear the Metro cache (`npx expo start --clear`) and verify styles apply.
+- Keep empty state illustrations small: use SVG-style illustrations at a max of 200x200px rendered size. Export at 2x (400x400px) maximum.
+- Use PNG with proper compression. Run through a tool like `pngquant` or `tinypng` before committing.
+- Consider using vector illustrations via `react-native-svg` instead of raster images. SVGs are typically 5-20KB vs 50-200KB for PNGs.
+- The current empty states use Ionicons (vector icons) inside colored circles. This is already lightweight. If the v1.2 goal is to add custom illustrations, keep them as simple, flat-color PNGs to minimize file size.
+- Do NOT use animated Lottie files for empty states -- `lottie-react-native` is a native module that does not work in Expo Go without a development build.
+- Alternative: keep the current Ionicons-based empty states and just restyle them with the new wintergreen palette. No additional assets needed.
 
 **Warning signs:**
-- Components render unstyled (no colors, no padding, no borders) in production but work in dev.
-- After a `--clear` restart, previously-working styles vanish.
-- New custom Tailwind classes (e.g., `bg-brand`) not applying.
+- JS bundle size increasing by more than 500KB after adding illustrations.
+- Expo Go taking noticeably longer to load the bundle over WiFi.
+- Images looking blurry on high-DPI screens (under-resolution) or unnecessarily large files (over-resolution).
 
 **Phase to address:**
-Phase 1 (Design System Foundation) -- decide the component directory structure and update tailwind.config.js content paths before creating any components.
+Empty state phase -- decide the illustration approach (keep icons vs. add images vs. SVGs) before creating any assets. If using images, establish a file size budget (e.g., max 50KB per illustration).
+
+---
+
+### Pitfall 9: Cream Background Color Requires Updating Safe Area and System Chrome
+
+**What goes wrong:**
+Shifting the app background from `#F8FAFC` (neutral-bg, blue-gray) to cream (e.g., `#FEFDFB` or similar) is not just a `bg-neutral-bg` token change. The safe area insets (status bar area, home indicator area), the splash screen background, the keyboard appearance, and the navigation bar must all match the cream color. If only the screen content background changes but the status bar area stays blue-gray, there is a visible color seam at the top of every screen. The splash screen (`app.json` line 14) already uses `#fefdfb`, which is good -- but other system chrome may not match.
+
+**Why it happens:**
+React Native screens render inside safe area boundaries. The area behind the status bar and below the home indicator is controlled by the root view's background color, the `StatusBar` component's `backgroundColor` (Android only), and the navigation bar theme. These are set in different places: `app.json`, `_layout.tsx`, and individual screen wrappers. A background color change in the Tailwind config does not propagate to these system chrome areas.
+
+**How to avoid:**
+- Update the cream color in ALL locations simultaneously:
+  1. `tailwind.config.js` -- `neutral.bg` token
+  2. `lib/theme/colors.ts` -- `neutral.bg` value
+  3. `app.json` -- `splash.backgroundColor` (already `#fefdfb`)
+  4. Root `_layout.tsx` -- any `backgroundColor` on the root View
+  5. Tab navigator -- `tabBarStyle.backgroundColor` and `sceneContainerStyle`
+  6. Stack navigator -- `screenOptions.contentStyle.backgroundColor`
+- On Android, set `StatusBar.setBackgroundColor()` or use the `StatusBar` component with `backgroundColor` to match the cream.
+- Test on devices with notches/dynamic islands and on devices without to verify no color seam appears.
+
+**Warning signs:**
+- White/gray band visible at the top of the screen above the content area.
+- Splash screen color not matching the post-load app background.
+- Tab bar background color mismatching the screen background.
+- Pull-to-refresh revealing a different color behind the content.
+
+**Phase to address:**
+Cream background phase -- update all system chrome locations as a single atomic change. Test on multiple device form factors.
+
+---
+
+### Pitfall 10: Card Style Change from Shadow to Outline Requires Removing Existing Shadows
+
+**What goes wrong:**
+The v1.2 design changes the Card component from an elevated style (white background + shadow) to an outlined style (transparent background + gray border). If the Card component is updated but screens that apply additional shadow styling to cards are not updated, the cards show BOTH an outline AND a shadow -- a visual contradiction. Some screens may apply shadow styles directly (not through the Card component) via `style={{ shadowColor, shadowOffset }}` or NativeWind `shadow` class.
+
+**Why it happens:**
+The v1.1 design system added shadows to cards as a design pattern. Some screens may layer additional shadows on top of the Card component's built-in shadow. When the Card component drops its shadow, these extra shadow layers remain, creating unexpected visual artifacts.
+
+**How to avoid:**
+- Search for all shadow-related styles that are applied to Card wrappers or card-like containers: `shadow`, `shadow-md`, `shadowColor`, `shadowOffset`, `shadowOpacity`, `elevation`.
+- Update the Card component to use `border border-neutral-border bg-transparent` (or whatever the outline spec calls for), removing all shadow styles.
+- Grep for `<Card` across the codebase and verify that no parent or wrapper applies additional shadows.
+- The BalanceCard (gradient card on home screen) may need to keep its shadow/gradient style even if regular cards become outlined. Clarify whether gradient cards are exempt from the outline treatment.
+
+**Warning signs:**
+- Cards showing both a border and a shadow simultaneously.
+- Card backgrounds not being transparent (old `bg-white` still applied).
+- Inconsistent card styles across different screens.
+- The home screen gradient balance card losing its visual prominence because it was also flattened.
+
+**Phase to address:**
+Card redesign phase -- update Card component, then search all consumers for shadow overrides. Decide which special cards (gradient balance card) keep elevated styling.
 
 ---
 
@@ -209,99 +304,113 @@ Phase 1 (Design System Foundation) -- decide the component directory structure a
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Keeping some inline `style={}` instead of converting to className | Faster per-screen migration | Mixed styling approaches make future changes harder; NativeWind v5 may break mixed styles entirely | Acceptable for truly dynamic runtime-computed values (animation interpolations, calculated widths), never for static visual properties |
-| Using arbitrary NativeWind values like `text-[13px]` instead of extending the theme | Avoids touching tailwind.config.js | Arbitrary values bypass the design token system and cannot be centrally updated | Never -- extend the theme instead with custom values like `text-meta` |
-| Hardcoding member gradient colors in each screen | Works for the current 3 members | Adding a 4th member requires updating every screen | Never -- define colors in a single constants file or database |
-| Skipping the iOS-specific `Platform.select()` for shadows | Less code, shadows "work" on iOS | Android shadows look wrong or invisible | Never -- always test both platforms |
-| Using `expo-blur` BlurView on Android SDK 54 for glassmorphism | Visual parity with iOS | Android blur performance is inconsistent below API 31; may cause dropped frames on older devices | Acceptable only if you add a `Platform.OS === 'android'` fallback to a solid semi-transparent background |
+| 8 duplicated AVATAR_COLORS arrays instead of shared import | Quick copy-paste during v1.0 | Every palette change requires 8 file edits; easy to miss one | Never -- consolidate before palette shift |
+| Storing avatar URL without cache-busting parameter | Simpler URL handling | Users see stale avatars after update until cache expires | Never -- cache busting is essential for mutable images |
+| Using `fetch().blob()` for upload instead of base64-arraybuffer | Familiar web pattern | Silently produces 0-byte files in React Native | Never in React Native -- always use base64-arraybuffer |
+| Skipping permission checks before camera/gallery access | Works on iOS (auto-prompts) | Silent failure on Android, no error feedback to user | Never -- always request permissions explicitly |
+| High-resolution empty state PNGs (600x600 @3x) | Sharp illustrations | 200KB+ per image, slower bundle load | Acceptable only for a production build with OTA updates; never for Expo Go development |
+| Public storage bucket without RLS on writes | Upload "just works" | Any authenticated user can overwrite any other user's avatar | Never -- always use path-based RLS policies |
 
 ## Integration Gotchas
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| react-native-calendars theme | Setting the Calendar `theme` prop once and forgetting to update it when the color system changes | Create a shared `calendarTheme` object that references the color constants file; import it in every screen that renders a Calendar |
-| expo-linear-gradient with NativeWind | Trying to use `className` on `LinearGradient` -- it does not support className natively | Use `cssInterop` or `remapProps` from NativeWind to map `className` to `style`, OR just use inline `style` on LinearGradient components (since the gradient props like `colors` and `start`/`end` cannot be expressed in Tailwind anyway) |
-| Ionicons color prop | Using className `text-brand` on the Ionicons component and expecting it to change the icon color | Ionicons requires a `color` prop (string). Use `color={colors.brand}` from the constants file. NativeWind className does NOT affect Ionicons color |
-| Tab bar styling | Setting tab bar colors via NativeWind className on the Tabs component | Tab bar styling uses `tabBarStyle` and `tabBarActiveTintColor` props (React Navigation API), not NativeWind className. These must be updated with color constant references |
-| expo-blur inside ScrollView | Wrapping content in BlurView inside a ScrollView and expecting it to blur the content behind it | BlurView blurs what is BEHIND the BlurView in the z-axis (the view beneath it), not the content inside it. Position BlurView absolutely over the gradient background, not around the content |
+| Supabase Storage + React Native | Using `fetch(uri).then(r => r.blob())` for uploads | Use `base64: true` option in image picker, then `decode()` from `base64-arraybuffer` to create ArrayBuffer for upload |
+| Supabase Storage RLS | Creating bucket but no RLS policies (all operations blocked by default) | Create INSERT, SELECT, and UPDATE policies on `storage.objects` before writing client code. Use `storage.foldername()` helper for path-based access control |
+| Supabase Storage + CDN caching | Overwriting avatar at same path and expecting immediate update | Append version/timestamp query parameter to avatar URL, or use unique filenames per upload |
+| Google Sign-In + Expo Go | Top-level import of `@react-native-google-signin/google-signin` | Dynamic `await import()` inside the function body; detect Expo Go at runtime to hide/disable the button |
+| expo-image-picker + Android permissions | Assuming iOS-style auto-prompting works on Android | Call `requestCameraPermissionsAsync()` and `requestMediaLibraryPermissionsAsync()` explicitly; handle "denied permanently" case |
+| NativeWind tokens + inline color props | Updating tailwind.config.js and expecting Ionicons `color=` props to change | Update `lib/theme/colors.ts` alongside tailwind.config.js; all inline `color=` props must reference the constants file |
+| Profile picture + auth context | Uploading avatar but not refreshing the auth context profile state | Call `refreshProfile()` after successful upload+DB update so all screens show the new avatar immediately |
+| Card component + consumer overrides | Changing Card style but not checking for shadow overrides on Card wrappers | Grep for shadow styles applied to Card parents and remove them |
 
 ## Performance Traps
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Animating shadows on every frame | Frame drops visible during scroll, especially on Android | Apply shadows as static styles. Never animate shadow values. Use opacity animation on a pre-shadowed component instead | Immediately on mid-range Android devices |
-| Re-rendering entire lists on color theme change | Noticeable jank when the screen first loads after a style change | Memoize list items with `React.memo()`. Use `useMemo()` for computed style objects that reference constants | When list exceeds ~20 items |
-| Gradient components inside FlatList items | Each `LinearGradient` creates a native view; 50+ in a list causes memory pressure | Pre-render avatar components with `React.memo()`. For long lists, use a solid color fallback and only render gradients for visible items | Lists with 30+ gradient-containing items |
-| BlurView in an animated carousel | Each carousel slide with a BlurView re-computes the blur effect during swipe animation | Apply BlurView only to the active/visible slide. Disable blur on off-screen slides. Or use a static semi-transparent overlay instead | Immediately on Android, noticeable on older iPhones |
-| Using JS-thread Animated API for carousel transitions | Swipe animation stutters when JS thread is busy (e.g., fetching data) | Use `react-native-reanimated` for any user-facing gesture-driven animation. The built-in Animated API runs on the JS thread and competes with data fetching and rendering | Noticeable when network requests fire during animation |
+| Large base64 strings in memory during avatar upload | Memory spike during upload, potential crash on low-RAM devices | Resize images before upload: set `quality: 0.7` and use `allowsEditing: true` with `aspect: [1, 1]` to crop to square. Max 500x500px output | Images over 2MB on devices with less than 2GB RAM |
+| Uncached avatar image downloads on every render | Avatars flicker or show loading state each time a list re-renders | Use a consistent URL (with version param) so React Native's built-in image cache can work. Consider `expo-image` for better caching control | Any list with 5+ avatar images |
+| Multiple image downloads for the same user across screens | Same avatar downloaded separately on Home, Expenses, Groceries, and Chores tabs | Store the avatar URL in the auth context (via `profile.avatar_url`) and pass it through props, so the same URL is used everywhere and cached once | Immediately on any household with 3+ members |
+| Static require for empty state images loaded at JS bundle parse time | Slower initial app load, wasted memory for screens user may never visit in that session | Use dynamic `require()` or lazy loading if images are large. Better: use SVGs or keep the current icon-based approach | When total image assets exceed 500KB |
+
+## Security Mistakes
+
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| Public storage bucket with no write-side RLS | Any authenticated user can upload files to any path, overwriting other users' avatars | Use path-based RLS: `auth.uid()::text = (storage.foldername(name))[1]` ensures users can only write to their own folder |
+| Storing unvalidated file types in avatar bucket | Users could upload non-image files (HTML, SVG with scripts, executables) to storage | Validate file type on client side (only allow `image/jpeg` and `image/png`). Set explicit `contentType` on upload. Consider server-side validation via Supabase Edge Function |
+| Avatar URL exposing user UUIDs in public URLs | User IDs visible in storage URLs like `avatars/{user-uuid}/avatar.jpg` | Acceptable for this personal project (UUIDs are not secret, RLS protects all data access). For a public app, consider hashing the user ID in the file path |
+| Google OAuth token handling in client code | ID token exposed in client memory | The existing `signInWithIdToken()` pattern is correct -- the token is passed directly to Supabase and not stored. Do not log tokens or store them in AsyncStorage |
 
 ## UX Pitfalls
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Redesigning all screens at once, shipping a "big bang" update | Users lose their mental model of where things are; everything looks unfamiliar at once | Redesign screen-by-screen. Ship the design system and shared components first, then migrate one screen at a time so the visual language converges gradually |
-| Over-designing empty states | Empty states with elaborate illustrations distract from the action the user needs to take (add first expense, invite roommate) | Keep empty states simple: one emoji or icon, one headline, one subtitle, one action button. The design spec already follows this pattern -- do not over-elaborate |
-| Changing touch targets during visual redesign | Buttons or tappable areas become smaller or shift position; users miss taps | Maintain minimum 44x44pt touch targets on all interactive elements. When restructuring a card layout, ensure the Pressable wrapper covers the same area |
-| Custom toggle switches that feel non-native | Toggles that do not have the right "snap" feel; users are unsure if the toggle registered | Use `react-native` `Switch` for native feel, or build custom toggles with Reanimated for smooth spring animation. Never use `Animated` from React Native core for toggle animations -- it is too slow |
-| Calendar week strip that is hard to read | Tiny date numbers, no clear "today" indicator, event dots too small | Ensure today has a filled background (brand color) that is at least 32px diameter. Event dots must be at least 4px diameter. Past dates should be visually dimmed but still readable |
+| No loading indicator during avatar upload | User taps "upload," nothing visibly happens for 2-5 seconds, they tap again and trigger a duplicate upload | Show an immediate loading spinner overlaid on the avatar circle. Disable the upload button during upload. Show success/error feedback |
+| Crop square not enforced, avatar stretched | Rectangular photos squeezed into circle avatars, faces distorted | Use `allowsEditing: true, aspect: [1, 1]` in image picker options to force square crop before upload |
+| Google Sign-In button visible but non-functional in Expo Go | User taps "Sign in with Google," gets a cryptic error or crash | Either hide the Google button in Expo Go entirely, or show a clear message: "Available in the full app" |
+| Empty states showing on first load before data arrives | User sees "No expenses yet" for 500ms while data loads, then content appears. Feels buggy | Distinguish between "loading" (show skeleton/spinner) and "truly empty" (show empty state). Only show empty state after data has loaded and the list is actually empty |
+| Palette shift making existing avatar gradients clash with new UI | The Avatar gradient pairs include the old emerald green which may clash with wintergreen UI elements | Update the first gradient pair in GRADIENT_PAIRS from `['#10B981', '#059669']` to the new wintergreen values. Other gradient pairs (blue, violet, pink, etc.) should remain as-is for visual variety |
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Color migration:** Search for `#f9a825`, `#f59b20`, `#66bb6a`, `#9ca3af`, `#374151` across all files -- any remaining instances mean the migration is incomplete
-- [ ] **Tab bar colors:** Verify `tabBarActiveTintColor`, `tabBarInactiveTintColor`, `tabBarStyle.backgroundColor`, and `tabBarStyle.borderTopColor` in `_layout.tsx` are updated to the new palette
-- [ ] **ActivityIndicator colors:** Search for `<ActivityIndicator` and verify every instance uses the new brand color, not hardcoded orange
-- [ ] **StatusBar style:** Verify `app.json` splash `backgroundColor` and any `<StatusBar>` components use the new `bg` color (`#FAFAF8`)
-- [ ] **Shadows on Android:** Load every card-containing screen on a physical Android device and verify shadows are visible (not invisible due to missing background color)
-- [ ] **Calendar theme:** Open the home screen calendar and verify selected day color, today text color, and arrow colors all match the new brand green
-- [ ] **Ionicons color props:** Spot-check at least 5 screens that use Ionicons and verify icon colors match the new design system (not old orange or hardcoded gray)
-- [ ] **Pull-to-refresh:** Test pull-to-refresh on home, expenses, groceries, and chores screens -- verify it still works after layout restructuring
-- [ ] **Keyboard avoidance:** Open the add-expense, add-chore, and sign-up screens and verify the keyboard does not cover input fields
-- [ ] **Navigation:** Tap every tab, navigate to every settings sub-screen, and verify no navigation regressions
-- [ ] **Avatar gradients:** Verify member avatars show gradient backgrounds (not solid colors or blank circles) on both iOS and Android
-- [ ] **Safe area:** Verify content does not overlap the notch/status bar or home indicator on iPhone and Android devices with cutouts
+- [ ] **Avatar upload:** Verify the uploaded image displays correctly on ALL screens that show avatars (Home MembersCard, Expenses rows, Groceries item rows, Chores assignee, Settings members, WeeklyTimeline) -- not just the upload screen
+- [ ] **Avatar fallback:** Verify users WITHOUT a profile picture still show gradient initials (the fallback). Test by creating a new account and checking all avatar-displaying screens
+- [ ] **Avatar cache busting:** Upload a new photo, verify the old photo is NOT still showing on any screen. Test without killing the app
+- [ ] **Storage RLS:** Try uploading an avatar for a different user's path via the Supabase client -- verify it is rejected by RLS
+- [ ] **Google Sign-In in Expo Go:** Launch the app in Expo Go and verify it does not crash. Verify the Google button is either hidden or shows a graceful message
+- [ ] **Google Sign-In in dev build:** If testing in a development build, verify the full Google OAuth flow: button tap, Google account picker, redirect back, user session established, profile created/updated
+- [ ] **Palette grep:** Run `grep -r '#10B981\|#059669\|#D1FAE5' --include='*.tsx' --include='*.ts' app/ components/ lib/` -- zero results means the palette migration is complete
+- [ ] **Empty state distinction:** Navigate to each module with no data and verify the empty state displays. Then add one item and verify the empty state disappears and content renders
+- [ ] **Cream background seams:** Check the top of the screen (status bar area), bottom (home indicator area), tab bar background, and pull-to-refresh background all match the cream color
+- [ ] **Card outlines:** Verify NO card shows both an outline border AND a shadow. Cards should be flat with border only
+- [ ] **Android permissions:** On a physical Android device, test camera and gallery access for avatar upload. Verify permission prompt appears and denial is handled gracefully
 
 ## Recovery Strategies
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Half-migrated colors (orange + green mix) | LOW | Run a project-wide search-and-replace for old hex values. Takes 1-2 hours with the color constants file as the source of truth |
-| Inline style overriding className | LOW | Remove the conflicting inline style prop from the element. Takes minutes per component once identified |
-| Broken shadows on Android | LOW | Add `bg-white` or `bg-card` className to every shadowed element. Batch fix across all screens |
-| Glassmorphism not rendering | MEDIUM | Replace `backdrop-filter` approach with `expo-blur` BlurView or a semi-transparent overlay. Requires restructuring the component tree |
-| Carousel gesture conflict | MEDIUM | Disable stack navigator gesture on the carousel screen. If carousel library conflicts, replace with ScrollView + pagingEnabled (the current working approach) |
-| Broken pull-to-refresh or keyboard avoidance | LOW-MEDIUM | Undo the JSX restructuring that broke it. Keep the outer ScrollView/KeyboardAvoidingView structure from the working v1.0 screen |
-| NativeWind styles not applying (content path issue) | LOW | Add the missing directory to `tailwind.config.js` content array. Clear Metro cache. Restart |
-| LinearGradient not rendering (component not imported) | LOW | Install expo-linear-gradient, import the component, replace the View with LinearGradient |
+| 0-byte file uploads from blob approach | LOW | Switch to base64-arraybuffer approach. Delete 0-byte files from storage bucket. Re-upload |
+| Missing storage RLS policies | LOW | Add policies via Supabase dashboard or migration. No code changes needed |
+| Cached stale avatars | LOW | Add cache-busting query param to avatar URL in profiles table. Call refreshProfile() to propagate |
+| Expo Go crash from Google Sign-In import | LOW | Move import to lazy `await import()` inside function body. Remove any GoogleSigninButton component usage |
+| Half-migrated palette (two greens) | MEDIUM | Grep for old hex values, update each file. Takes 1-2 hours with the color constants as source of truth |
+| Avatar component API break (11 files) | MEDIUM | Make avatarUrl prop optional with gradient fallback default. Fix TypeScript errors in each consumer |
+| Empty state images too large | LOW | Re-export at lower resolution or replace with SVG/icon approach. Update require() references |
+| Android camera permission denied silently | LOW | Add permission request calls before camera/gallery launch. Handle denied case with user-facing message |
+| Card style mixed (shadow + outline) | LOW | Grep for shadow styles on Card wrappers, remove them. Update Card component to remove built-in shadow |
+| Cream background color seam at status bar | LOW | Update backgroundColor in root layout, tab navigator sceneContainerStyle, and StatusBar component |
 
 ## Pitfall-to-Phase Mapping
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Hardcoded color values (#1) | Phase 1: Design System Foundation | Grep for old hex values returns zero results |
-| className vs style conflicts (#2) | Phase 1 + every subsequent phase | No inline `style` props for static visual properties in redesigned components |
-| Shadow rendering differences (#3) | Phase 1: define approach; Phase 2+: verify per screen | Load each screen on both iOS simulator and Android device/emulator |
-| Glassmorphism impossibility (#4) | Onboarding phase (carousel build) | BlurView or semi-transparent overlay renders correctly on both platforms |
-| Breaking existing functionality (#5) | Every phase | Run the 12-point verification checklist from the design spec after every screen |
-| Gradient avatars (#6) | Phase 1: build Avatar component | Avatars render with gradient backgrounds on both platforms |
-| Carousel gesture conflicts (#7) | Onboarding phase | Carousel swipes cleanly without triggering navigation gestures on both platforms |
-| Content path configuration (#8) | Phase 1: finalize directory structure | All components in new directories render with correct NativeWind styles |
+| Google Sign-In Expo Go crash (#1) | Google OAuth phase | App launches in Expo Go without crash. Google button hidden or shows fallback message |
+| 0-byte storage uploads (#2) | Profile picture upload phase | Avatar uploaded via image picker displays correctly in Supabase dashboard and in app |
+| Missing storage RLS (#3) | Profile picture upload phase (first task) | Upload succeeds for own path, fails for other users' paths. Public URL returns image, not 403 |
+| Cached stale avatars (#4) | Profile picture upload phase | Upload new photo, all screens show new photo without app restart |
+| Hardcoded palette values (#5) | Palette shift phase (first task) | Grep for old hex values returns zero results across all .ts/.tsx files |
+| Avatar API break (#6) | Profile picture upload phase (first task) | All 11 Avatar consumers render without TypeScript errors. Users with and without photos display correctly |
+| Android camera permissions (#7) | Profile picture upload phase | Camera and gallery work on physical Android device with proper permission prompts |
+| Empty state bundle size (#8) | Empty state phase | Total added image assets under 200KB. Bundle load time not noticeably slower |
+| Cream background seams (#9) | Cream background phase | No visible color boundary between content and system chrome on any device form factor |
+| Card shadow/outline conflict (#10) | Card redesign phase | No card displays both shadow and border simultaneously |
 
 ## Sources
 
-- [NativeWind Style Specificity](https://www.nativewind.dev/docs/core-concepts/style-specificity) -- className vs inline style precedence rules (HIGH confidence)
-- [NativeWind Box Shadow](https://www.nativewind.dev/docs/tailwind/effects/box-shadow) -- shadow class support and Android background requirement (HIGH confidence)
-- [NativeWind Third-Party Components](https://www.nativewind.dev/docs/guides/third-party-components) -- cssInterop and remapProps for non-className components (HIGH confidence)
-- [NativeWind Troubleshooting](https://www.nativewind.dev/docs/getting-started/troubleshooting) -- content path and caching issues (HIGH confidence)
-- [NativeWind v4 + Expo SDK 54 compatibility](https://medium.com/@matthitachi/nativewind-styling-not-working-with-expo-sdk-54-54488c07c20d) -- NativeWind v4.2.0+ required for SDK 54 (MEDIUM confidence)
-- [React Native Shadow Props](https://reactnative.dev/docs/shadow-props) -- platform differences in shadow rendering (HIGH confidence)
-- [BlurView - Expo Documentation](https://docs.expo.dev/versions/latest/sdk/blur-view/) -- expo-blur API and platform support (HIGH confidence)
-- [LinearGradient - Expo Documentation](https://docs.expo.dev/versions/latest/sdk/linear-gradient/) -- gradient component for React Native (HIGH confidence)
-- [React Native Reanimated Performance Guide](https://docs.swmansion.com/react-native-reanimated/docs/guides/performance/) -- UI thread vs JS thread animation (HIGH confidence)
-- [NativeWind className and style conflict Issue #665](https://github.com/nativewind/nativewind/issues/665) -- inconsistent style merging reports (MEDIUM confidence)
-- [NativeWind className and style conflict Issue #1018](https://github.com/nativewind/nativewind/issues/1018) -- styles not working in className but working in style prop (MEDIUM confidence)
-- [Expo Fonts Documentation](https://docs.expo.dev/develop/user-interface/fonts/) -- font loading and cross-platform differences (HIGH confidence)
-- Codebase analysis: 74 hardcoded primary color references across 25 files, 76 inline style objects across 19 files, 158 inline color prop references across 30 files (direct observation, HIGH confidence)
+- [Supabase Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control) -- RLS policy requirements, helper functions, public vs private buckets (HIGH confidence)
+- [Supabase React Native file upload blog post](https://supabase.com/blog/react-native-storage) -- ArrayBuffer upload pattern, base64-arraybuffer requirement (HIGH confidence)
+- [Supabase CDN cache busting discussion #5737](https://github.com/orgs/supabase/discussions/5737) -- version query parameter for cache invalidation (MEDIUM confidence)
+- [Supabase image upload discussion #1268](https://github.com/orgs/supabase/discussions/1268) -- 0-byte file and blob conversion issues in React Native (HIGH confidence)
+- [Supabase Smart CDN docs](https://supabase.com/docs/guides/storage/cdn/smart-cdn) -- CDN invalidation behavior for updated files (HIGH confidence)
+- [expo-image-picker documentation](https://docs.expo.dev/versions/latest/sdk/imagepicker/) -- Expo Go compatibility confirmed, base64 option, permissions API (HIGH confidence)
+- [Expo Google Authentication guide](https://docs.expo.dev/guides/google-authentication/) -- native SDK limitations in Expo Go (HIGH confidence)
+- [React Native Google Sign-In Expo setup](https://react-native-google-signin.github.io/docs/setting-up/expo) -- config plugin requirements, Expo Go incompatibility (HIGH confidence)
+- [Google Sign-In Expo Go limitations blog](https://www.amanmaharshi.com/blog/google-login-expo-react-native) -- workarounds for Expo Go development (MEDIUM confidence)
+- [React Native Images documentation](https://reactnative.dev/docs/images) -- static require vs URI, bundle size implications (HIGH confidence)
+- [Expo Assets documentation](https://docs.expo.dev/develop/user-interface/assets/) -- asset bundling and performance (HIGH confidence)
+- Codebase analysis: 163 brand color references across 49 files, 8 duplicated AVATAR_COLORS arrays, 11 Avatar import sites, inline avatar in settings/profile.tsx (direct observation, HIGH confidence)
 
 ---
-*Pitfalls research for: RoomY v1.1 UI Redesign (Expo/NativeWind/React Native)*
-*Researched: 2026-03-11*
+*Pitfalls research for: RoomY v1.2 Polish & Identity (Expo/Supabase/NativeWind)*
+*Researched: 2026-03-13*

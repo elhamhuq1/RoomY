@@ -1,14 +1,14 @@
-# Technology Stack: UI Redesign Additions
+# Technology Stack: v1.2 Polish & Identity Additions
 
-**Project:** RoomY v1.1 UI Redesign
-**Researched:** 2026-03-11
-**Scope:** New libraries and configuration changes needed for the visual redesign. This does NOT cover the existing stack (Expo SDK 54, NativeWind v4, Supabase, expo-router) -- only what must be ADDED or CHANGED.
+**Project:** RoomY v1.2 Polish & Identity
+**Researched:** 2026-03-13
+**Scope:** New libraries and backend changes needed for profile picture uploads (camera + gallery), Google OAuth in Expo Go, empty state image display, and design palette shift. This does NOT re-cover the existing stack -- only what must be ADDED or CHANGED.
 
 ---
 
 ## Existing Stack (DO NOT CHANGE)
 
-These are already installed and working. Listed for reference only.
+Already installed and working. Listed for reference only.
 
 | Technology | Version | Status |
 |------------|---------|--------|
@@ -16,341 +16,172 @@ These are already installed and working. Listed for reference only.
 | React Native | 0.81.5 | Installed |
 | NativeWind | 4.2.2 | Installed |
 | Tailwind CSS | 3.4.19 | Installed |
+| @supabase/supabase-js | ^2.99.0 | Installed |
+| expo-linear-gradient | ~15.0.8 | Installed |
+| expo-blur | ~15.0.8 | Installed |
 | react-native-reanimated | ~4.1.1 | Installed |
-| react-native-gesture-handler | ~2.28.0 | Installed |
-| react-native-calendars | ^1.1314.0 | Installed |
-| @expo/vector-icons | ^15.0.2 | Installed |
+| @react-native-google-signin/google-signin | ^16.1.2 | Installed (lazy import, crashes Expo Go) |
 
-**Architecture note:** SDK 54 runs the New Architecture by default (React Native 0.81). This means the `boxShadow` style property works cross-platform (iOS and Android) without needing legacy `shadowColor`/`shadowOffset`/`elevation` hacks. NativeWind v4's `shadow-*` classes use the legacy shadow props internally, but we can use `style` prop for custom colored shadows where needed.
+**Key existing fact:** The `profiles` table already has an `avatar_url TEXT` column. The auth trigger already captures `avatar_url` from Google/Apple auth metadata on sign-up. The `Avatar` component currently renders gradient initials only -- it has no image display path yet.
 
 ---
 
 ## New Dependencies to Install
 
-### Required Libraries
+### 1. expo-image-picker (~17.0.10) -- Image Selection
 
-| Library | Version | Purpose | Why This One |
-|---------|---------|---------|--------------|
-| expo-linear-gradient | ~15.0.8 | Gradient backgrounds on avatar circles, hero sections, balance card, setup choice cards | First-party Expo package. Included in Expo Go (no dev build needed). Provides `LinearGradient` component with `colors`, `start`, `end` props. The design spec calls for gradients in 8+ places -- avatars, carousel hero, balance card, icon containers, option cards, house icon. |
-| expo-blur | ~15.0.8 | Glass-morphism effect on onboarding welcome carousel (logo container, emoji badge) | First-party Expo package. Included in Expo Go. Provides `BlurView` with `intensity` (1-100) and `tint` props. The design spec requires `backdrop-filter: blur(12px)` on two glass containers in the welcome carousel. `BlurView` is the React Native equivalent. |
-| react-native-svg | 15.12.1 | SVG-based gradient avatars with precise circular clipping | Already a transitive dependency via other packages but needs explicit install for direct import. Enables `<Circle>` + `<LinearGradient>` + `<Defs>` for per-member gradient avatars that are true circles with gradient fills. Alternative: use `expo-linear-gradient` with `borderRadius` and `overflow: hidden` for simpler cases. |
+**Purpose:** Let users select a profile photo from their gallery or take one with the camera.
 
-### Installation Command
+**Why this one:** First-party Expo package. Included in Expo Go (no dev build needed). Provides both `launchImageLibraryAsync` and `launchCameraAsync` with built-in permission handling. The `allowsEditing: true` option gives users a square crop UI natively on both platforms -- sufficient for avatar photos without a third-party cropper.
 
-```bash
-npx expo install expo-linear-gradient expo-blur react-native-svg
+**Key API for avatar use case:**
+
+```typescript
+import * as ImagePicker from 'expo-image-picker';
+
+const result = await ImagePicker.launchImageLibraryAsync({
+  mediaTypes: ['images'],
+  allowsEditing: true,   // enables square crop UI
+  aspect: [1, 1],        // square aspect (Android only; iOS always square when editing)
+  quality: 0.8,          // slight compression, still high quality
+  base64: true,          // returns base64 string for Supabase upload
+});
 ```
 
-This resolves compatible versions automatically via `bundledNativeModules.json`. All three are included in Expo Go -- no development build required.
+**Permissions:** Camera permission requested automatically on first `launchCameraAsync` call. Media library permission requested automatically on first `launchImageLibraryAsync` call. No manual `requestPermissionsAsync` needed unless you want to check permission status in advance.
 
----
+**What it does NOT do:** Circular crop preview (iOS/Android native pickers show square crop only). The circular masking is visual -- apply `borderRadius: size/2` on the `Image` component when displaying. This is standard practice for avatars and does not require a cropping library.
 
-## NativeWind Theme Configuration Changes
+### 2. expo-file-system (~19.0.21) -- Read Image Data for Upload
 
-The existing `tailwind.config.js` has the old orange-based color palette. Replace it entirely with the design spec's green-based token system.
+**Purpose:** Read the picked image file as base64 for upload to Supabase Storage.
 
-### Updated tailwind.config.js
+**Why this one:** First-party Expo package. Included in Expo Go. While `expo-image-picker` has a `base64: true` option, it has known reliability issues on Android (line breaks in base64 string, inconsistent behavior). Using `expo-file-system`'s `readAsStringAsync` with `EncodingType.Base64` is the more reliable cross-platform pattern recommended by Supabase's own React Native storage guide.
 
-```javascript
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./app/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-    "./lib/**/*.{js,jsx,ts,tsx}",
-  ],
-  presets: [require("nativewind/preset")],
-  theme: {
-    extend: {
-      colors: {
-        // Brand
-        brand: {
-          DEFAULT: "#2D6A4F",
-          light: "#D8F3DC",
-          muted: "#95D5B2",
-          dark: "#1B4332",
-        },
-        // Semantic
-        danger: {
-          DEFAULT: "#E5383B",
-          light: "#FFE5E5",
-        },
-        warning: {
-          DEFAULT: "#F4A261",
-          light: "#FFF3E0",
-        },
-        success: {
-          DEFAULT: "#40916C",
-          light: "#E8F5E9",
-        },
-        // Neutral (override defaults)
-        bg: "#FAFAF8",
-        card: "#FFFFFF",
-        text: {
-          DEFAULT: "#1A1A1A",
-          secondary: "#8E8E93",
-          tertiary: "#AEAEB2",
-        },
-        border: "#F0EFEB",
-        // Member colors (for avatar JS logic, not usually in classes)
-        member: {
-          elham: "#E76F51",
-          tk: "#264653",
-          elham3: "#7209B7",
-        },
-      },
-      borderRadius: {
-        xl: "16px",
-        "2xl": "24px",
-        "3xl": "28px",
-        "4xl": "30px",
-      },
-      fontSize: {
-        // Design spec typography scale
-        "page-title": ["26px", { lineHeight: "32px", fontWeight: "700", letterSpacing: "-0.02em" }],
-        "key-number": ["34px", { lineHeight: "40px", fontWeight: "700", letterSpacing: "-0.02em" }],
-        "section-heading": ["18px", { lineHeight: "24px", fontWeight: "700", letterSpacing: "-0.01em" }],
-        "card-title": ["16px", { lineHeight: "22px", fontWeight: "700" }],
-        "body": ["15px", { lineHeight: "22px", fontWeight: "600" }],
-        "metadata": ["13px", { lineHeight: "18px", fontWeight: "500" }],
-        "overline": ["11px", { lineHeight: "16px", fontWeight: "600", letterSpacing: "0.06em" }],
-        "badge": ["11px", { lineHeight: "14px", fontWeight: "600", letterSpacing: "0.02em" }],
-      },
+**Key API:**
+
+```typescript
+import * as FileSystem from 'expo-file-system';
+
+const base64 = await FileSystem.readAsStringAsync(imageUri, {
+  encoding: FileSystem.EncodingType.Base64,
+});
+```
+
+### 3. base64-arraybuffer (^1.0.2) -- Base64 to ArrayBuffer Conversion
+
+**Purpose:** Convert base64 image data to ArrayBuffer for Supabase Storage upload.
+
+**Why this one:** Supabase's official React Native guide explicitly recommends this library. In React Native, `Blob`, `File`, and `FormData` upload methods do not work correctly with Supabase Storage. The `decode()` function from this library converts the base64 string to an `ArrayBuffer` that Supabase's `storage.from().upload()` accepts. Pure JavaScript, no native code, works everywhere.
+
+**Key API:**
+
+```typescript
+import { decode } from 'base64-arraybuffer';
+
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload(`${userId}.jpg`, decode(base64), {
+    contentType: 'image/jpeg',
+    upsert: true,  // overwrite previous avatar
+  });
+```
+
+### 4. expo-web-browser (~15.0.10) -- Google OAuth in Expo Go
+
+**Purpose:** Open Google's OAuth consent screen in an in-app browser for authentication, replacing the native `@react-native-google-signin/google-signin` approach that crashes in Expo Go.
+
+**Why this one:** First-party Expo package. Included in Expo Go. The `openAuthSessionAsync` method opens a browser that handles the OAuth redirect flow, then returns the redirect URL with tokens back to the app. This is the ONLY way to do Google OAuth in Expo Go -- the native `@react-native-google-signin/google-signin` library requires a development build because it uses native modules not available in Expo Go.
+
+**The complete Google OAuth flow for Expo Go:**
+
+```typescript
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
+import { supabase } from './supabase';
+
+async function signInWithGoogleWeb() {
+  // 1. Get the OAuth URL from Supabase (don't let it redirect automatically)
+  const redirectTo = Linking.createURL('/auth/callback');
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      skipBrowserRedirect: true,
     },
-  },
-  plugins: [],
-};
+  });
+
+  if (error || !data.url) throw error;
+
+  // 2. Open the OAuth URL in an in-app browser
+  const result = await WebBrowser.openAuthSessionAsync(
+    data.url,
+    redirectTo,
+  );
+
+  // 3. Extract tokens from the redirect URL
+  if (result.type === 'success') {
+    const url = result.url;
+    // Supabase returns tokens in the URL fragment (#access_token=...&refresh_token=...)
+    const params = new URLSearchParams(url.split('#')[1]);
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+
+    if (access_token && refresh_token) {
+      await supabase.auth.setSession({ access_token, refresh_token });
+    }
+  }
+}
 ```
 
-**Key decisions in this config:**
+**Migration path:** The existing `lib/auth-utils.ts` has `signInWithGoogle()` using `@react-native-google-signin/google-signin` with lazy import. Replace this with the `expo-web-browser` approach above. The lazy import workaround was a band-aid -- the native module still could not actually function in Expo Go. The web browser approach actually works.
 
-1. **Flat semantic names** (`brand`, `danger`, `warning`, `success`) instead of numbered scales (no `brand-50` through `brand-900`). The design spec defines exactly 2-4 shades per semantic group -- a numbered scale would create unused utilities and confuse implementation.
+**Known issue:** `supabase.auth.setSession()` has been reported to occasionally hang. Mitigation: add a timeout wrapper (5 seconds) and retry once on failure.
 
-2. **`text` as a color group** maps to NativeWind classes like `text-text` (primary), `text-text-secondary`, `text-text-tertiary`. Slightly awkward naming but avoids collision with Tailwind's built-in `text-*` utilities.
+**Supabase Dashboard config required:** Add the Expo redirect URL (`exp://...` for dev, `com.roomy://auth/callback` for production) to the "Redirect URLs" allowlist in Supabase Dashboard > Authentication > URL Configuration.
 
-3. **`fontSize` with full tuples** including lineHeight, fontWeight, and letterSpacing. NativeWind v4 supports the Tailwind CSS fontSize tuple syntax `[size, { lineHeight, fontWeight, letterSpacing }]`. This means `text-page-title` applies size, weight, height, AND spacing in one class. HIGH confidence -- verified on NativeWind docs.
+### 5. expo-image (~3.0.11) -- Display Avatar Images
 
-4. **`member` colors** are included for programmatic access via `resolveConfig` but avatars use `expo-linear-gradient` directly with hex values since gradients cannot be expressed in Tailwind classes.
+**Purpose:** Display profile pictures and empty state illustrations with caching, placeholder support, and smooth transitions.
 
-### What the Config Does NOT Need
+**Why this one over React Native's `<Image>`:** First-party Expo package. Included in Expo Go. Uses SDWebImage (iOS) and Glide (Android) under the hood for fast disk/memory caching. Supports placeholder (BlurHash/ThumbHash), transition animations between loading states, and content-fit modes. React Native's `<Image>` has no built-in disk caching -- every app restart re-downloads images. For user avatars that appear on every screen, caching is critical.
 
-- **CSS variables / `vars()` function**: The design spec has one theme (light mode only, no dark mode). CSS variable indirection adds complexity without benefit. Use static hex values.
-- **`platformColor()` / `platformSelect()`**: No platform-specific colors in the design spec. All colors are identical on iOS and Android.
-- **Custom `boxShadow` theme values**: NativeWind v4 shadow classes (`shadow-sm`, `shadow`, `shadow-md`, `shadow-lg`) use legacy shadow props. For the design spec's exact shadow tokens, use inline `style` props with the `boxShadow` property (React Native 0.81 supports this natively on New Architecture). See Shadows section below.
+**Key API for avatars:**
+
+```typescript
+import { Image } from 'expo-image';
+
+<Image
+  source={{ uri: avatarUrl }}
+  style={{ width: 40, height: 40, borderRadius: 20 }}
+  placeholder={{ blurhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj' }}
+  contentFit="cover"
+  transition={200}
+  cachePolicy="disk"
+/>
+```
+
+**Integration with Avatar component:** The existing `Avatar` component shows gradient initials. When `avatar_url` is set on the profile, show the `expo-image` `<Image>` instead. When no URL is set, fall back to the current gradient initials. This is a conditional render, not a rewrite.
 
 ---
 
-## Shadows Strategy
+## No New Library Needed
 
-The design spec defines two shadow tokens:
+### Image Cropping -- Built into expo-image-picker
 
-| Token | Value |
-|-------|-------|
-| `shadow` | `0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)` |
-| `shadowMd` | `0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)` |
+`allowsEditing: true` with `aspect: [1, 1]` provides a native square crop UI. No need for `react-native-image-crop-picker` (requires native code, not in Expo Go), `expo-image-crop` (unmaintained), or `expo-image-manipulator` (useful for server-side resize but not needed when the picker handles cropping). The picked image is already cropped to square.
 
-Plus colored shadows on avatars: `0 2px 8px {memberColor}33` and on brand buttons: `0 4px 16px {brand}55`.
+### Image Resizing -- Not Needed Client-Side
 
-### Approach: Hybrid (NativeWind classes + inline boxShadow)
+Avatars are small (max 256x256 display). Using `quality: 0.8` in the image picker and uploading the cropped square image directly is sufficient. Client-side resizing with `expo-image-manipulator` adds complexity without meaningful benefit -- the cropped square image from the picker at quality 0.8 is typically 50-150KB, well within acceptable upload size for a profile picture.
 
-**For standard shadows:** Use NativeWind's built-in `shadow-sm` and `shadow-md` classes. They are close enough to the spec tokens and work cross-platform. NativeWind v4 maps these to the legacy shadow* props which produce visually similar results. Always pair with a background color (`bg-card`, `bg-white`) -- shadows are invisible without one on native.
+### Server-Side Image Transforms -- Supabase Pro Plan Only
 
-**For colored shadows (avatars, brand buttons):** Use React Native 0.81's `boxShadow` style property directly. This is the only way to get colored shadows cross-platform. Example:
+Supabase Storage supports on-the-fly image transformations (resize, crop via URL parameters), but this is a **Pro Plan feature** ($25/month). The project is on the free tier. Resize client-side if needed (picker's quality setting is sufficient).
 
-```tsx
-// Avatar with colored shadow
-<View
-  className="rounded-full bg-white"
-  style={{
-    boxShadow: "0 2px 8px #E76F5133",
-  }}
->
-  {/* avatar content */}
-</View>
+### Empty State Illustrations -- Static Assets
 
-// Brand button with colored shadow
-<Pressable
-  className="bg-brand rounded-[14px]"
-  style={{
-    boxShadow: "0 4px 16px #2D6A4F55",
-  }}
->
-  {/* button content */}
-</Pressable>
-```
-
-**Why not put custom shadows in Tailwind theme?** NativeWind v4 converts shadow classes to legacy `shadowColor`/`shadowOffset`/`shadowOpacity`/`shadowRadius` props. It does NOT use the `boxShadow` property. Custom multi-layer shadows or colored shadows defined in the theme would be converted to legacy props, losing the multi-layer aspect and color precision. Using `style={{ boxShadow }}` directly bypasses this limitation.
-
----
-
-## Gradients Strategy
-
-React Native has no CSS gradient support. Every gradient in the design spec requires the `LinearGradient` component.
-
-### Gradient Usage Map
-
-| Location | Colors | Direction | Component |
-|----------|--------|-----------|-----------|
-| Avatar circles | Per-member (see spec) | 135deg (diagonal) | `expo-linear-gradient` or `react-native-svg` |
-| Carousel hero bg | Per-slide (3 variants) | Top-to-bottom | `expo-linear-gradient` |
-| Balance summary card | `#2D6A4F` to `#1B4332` | Top-to-bottom | `expo-linear-gradient` |
-| Setup choice icon containers | Brand gradient + purple gradient | 135deg | `expo-linear-gradient` |
-| House icon (name household) | Brand gradient | 135deg | `expo-linear-gradient` |
-
-### Implementation Pattern
-
-```tsx
-import { LinearGradient } from "expo-linear-gradient";
-
-// 135-degree diagonal gradient (design spec default)
-<LinearGradient
-  colors={["#E76F51", "#F4A261"]}
-  start={{ x: 0, y: 0 }}
-  end={{ x: 1, y: 1 }}
-  style={{ width: 36, height: 36, borderRadius: 18 }}
->
-  <Text className="text-white text-center">E</Text>
-</LinearGradient>
-```
-
-**expo-linear-gradient vs react-native-svg for avatars:** Use `expo-linear-gradient` with `borderRadius` and `overflow: hidden` for the standard round avatars. It is simpler and performs better. Only reach for `react-native-svg` if you need complex clipping paths or masking that `borderRadius` cannot achieve. For this design spec, `expo-linear-gradient` is sufficient for all gradient needs.
-
----
-
-## Glass-Morphism Strategy
-
-The design spec uses glass-morphism in exactly two places on the welcome carousel:
-1. Logo container (80px, rounded 24px)
-2. Feature emoji badge (72px rounded container)
-
-Both use: `background: rgba(255,255,255,0.15)`, `border: 1px solid rgba(255,255,255,0.2)`, `backdrop-filter: blur(12px)`.
-
-### Implementation
-
-```tsx
-import { BlurView } from "expo-blur";
-
-<BlurView
-  intensity={30}
-  tint="light"
-  style={{
-    width: 80,
-    height: 80,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  }}
->
-  <Text style={{ fontSize: 40 }}>house emoji</Text>
-</BlurView>
-```
-
-**intensity mapping:** The design spec says `blur(12px)`. `expo-blur`'s `intensity` is 1-100, not px. An `intensity` of 25-35 produces a visual effect comparable to `blur(12px)`. This requires visual tuning during implementation.
-
-**Android behavior:** On Android SDK 31+, `expo-blur` uses the native `BlurView` (dimezisBlurViewSdk31Plus method). On older Android, it falls back to a semi-transparent overlay (no actual blur). This is acceptable -- the glass-morphism is decorative, not functional.
-
----
-
-## Animation Strategy
-
-The design spec requires these animations:
-1. **Carousel swipe** (welcome screen) -- horizontal paging
-2. **Calendar collapse/expand** -- height transition between week strip and month grid
-3. **Toggle switches** -- knob slide + background color transition
-4. **Avatar preview** -- real-time update as user types display name
-
-### Already Installed: react-native-reanimated 4.1.1
-
-No new animation library needed. Reanimated 4 provides:
-
-- **Layout animations** for the calendar collapse/expand (`LinearTransition.duration(300)`)
-- **`useSharedValue` + `useAnimatedStyle`** for toggle switch knob position
-- **`withTiming` / `withSpring`** for smooth easing
-
-### Carousel: Use ScrollView, Not a Library
-
-The welcome carousel is 3 static slides with paging. Use React Native's built-in `ScrollView` with `pagingEnabled` and `horizontal` props. Track the active page index with `onMomentumScrollEnd`. No carousel library needed -- adding one for 3 slides is unnecessary dependency weight.
-
-```tsx
-<ScrollView
-  horizontal
-  pagingEnabled
-  showsHorizontalScrollIndicator={false}
-  onMomentumScrollEnd={(e) => {
-    const page = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
-    setActivePage(page);
-  }}
->
-  {slides.map((slide) => (
-    <View key={slide.id} style={{ width: screenWidth }}>
-      {/* slide content */}
-    </View>
-  ))}
-</ScrollView>
-```
-
-### Calendar Collapse/Expand
-
-Use Reanimated's layout transitions on the `Animated.View` wrapper:
-
-```tsx
-import Animated, { LinearTransition } from "react-native-reanimated";
-
-<Animated.View layout={LinearTransition.duration(300)}>
-  {isExpanded ? <MonthGrid /> : <WeekStrip />}
-</Animated.View>
-```
-
-### NativeWind Animation Classes
-
-NativeWind v4 has **experimental** support for Tailwind animation classes (`animate-spin`, `animate-bounce`, etc.) powered by Reanimated. These are fine for simple looping animations but are not suitable for the gesture-driven or state-driven animations in this design spec. Use Reanimated's imperative API directly for all animations in this project.
-
----
-
-## Typography Strategy
-
-The design spec uses system fonts with specific weights and letter-spacing values.
-
-### System Font Stack
-
-React Native uses the platform system font by default (`-apple-system` on iOS, `Roboto` on Android). No custom fonts need to be loaded. The `expo-font` package is already installed but is not needed for this redesign.
-
-### Letter-Spacing Support
-
-NativeWind v4 supports all tracking classes (`tracking-tighter` through `tracking-widest`) plus arbitrary values (`tracking-[0.06em]`). HIGH confidence -- verified on NativeWind docs.
-
-The design spec's letter-spacing values map to:
-
-| Spec Value | NativeWind Class | Usage |
-|------------|-----------------|-------|
-| `-0.02em` | `tracking-tight` (close enough at -0.025em) or `tracking-[-0.02em]` | Page titles, key numbers |
-| `-0.01em` | `tracking-[-0.01em]` | Section headings |
-| `0` | `tracking-normal` | Card titles, body text |
-| `0.02em` | `tracking-[0.02em]` | Badge text |
-| `0.06em` | `tracking-[0.06em]` | Overline labels |
-
-### Font Weight Support
-
-NativeWind supports `font-medium` (500), `font-semibold` (600), `font-bold` (700), `font-extrabold` (800). All weights in the design spec are covered.
-
----
-
-## Emoji Rendering
-
-The design spec uses emoji extensively (chore icons, onboarding elements, carousel badges). React Native renders emoji natively via the platform's emoji font. No library needed.
-
-For emoji in icon containers (40x40px box with background), use a simple `View` + `Text`:
-
-```tsx
-<View className="w-10 h-10 rounded-xl bg-warning-light items-center justify-center">
-  <Text style={{ fontSize: 20 }}>plate emoji</Text>
-</View>
-```
-
-The `fontSize` on the emoji `Text` controls the emoji size. Use `style` prop rather than NativeWind `text-*` class because emoji sizing is more predictable with explicit pixel values.
+Empty state illustrations are static PNG/SVG files bundled with the app. No library needed beyond `expo-image` (for display) and React Native's `<Image>` with `require()` for local assets. Use `expo-image` for consistency, since it handles both local and remote images.
 
 ---
 
@@ -358,46 +189,194 @@ The `fontSize` on the emoji `Text` controls the emoji size. Use `style` prop rat
 
 | Library | Why It Seems Needed | Why It Is Not |
 |---------|--------------------|--------------|
-| `react-native-linear-gradient` (non-Expo) | Gradients | Use `expo-linear-gradient` instead. The non-Expo version requires native linking and a dev build. The Expo version works in Expo Go. |
-| `react-native-shadow-2` | Custom shadows | React Native 0.81 (New Architecture) supports `boxShadow` style natively. No third-party shadow library needed. |
-| `@gorhom/bottom-sheet` | Modals/sheets | Not in the design spec. No bottom sheets in the UI redesign. |
-| `react-native-pager-view` or `react-native-snap-carousel` | Welcome carousel | 3-slide carousel does not need a library. `ScrollView` with `pagingEnabled` is sufficient. |
-| `expo-font` / custom fonts | Typography | Already installed but unused. Design spec uses system fonts only. |
-| `react-native-skia` | Advanced graphics/blur | Massively over-powered for this use case. `expo-blur` handles the two glass-morphism containers. Skia adds ~3MB to bundle size. |
-| `tailwindcss-animate` | Tailwind animation utilities | NativeWind v4 has its own experimental animation support. But we are using Reanimated directly for all animations, so neither is needed. |
-| `nativewind@preview` (v5) | Latest NativeWind | The app runs NativeWind v4.2.2 on Tailwind CSS 3.4.19. Upgrading to v5 mid-project is a breaking change (v5 requires Tailwind CSS v4.1+ and `react-native-css`). The existing v4 setup handles everything in this design spec. Do not upgrade. |
-| CSS variables / `vars()` | Design tokens | The app has one theme (light mode only). Static hex values in `tailwind.config.js` are simpler and sufficient. CSS variables add indirection without benefit. |
+| `react-native-image-crop-picker` | Circular crop for avatars | Requires native code (not in Expo Go). Square crop from `expo-image-picker` + `borderRadius` display is the standard pattern. |
+| `expo-image-manipulator` | Resize images before upload | Picker's `quality: 0.8` and crop produce small enough files. Adds unnecessary complexity. |
+| `expo-camera` | Take profile photos | `expo-image-picker`'s `launchCameraAsync` already opens the system camera. No need for a custom camera UI for avatars. |
+| `react-native-fast-image` | Image caching | Unmaintained. `expo-image` is the modern replacement, included in Expo Go, uses the same underlying native libraries (SDWebImage/Glide). |
+| `expo-auth-session` | Google OAuth | Deprecated approach. `expo-web-browser` + `signInWithOAuth` is simpler and does not require the `expo-auth-session` request/response dance. |
+| `@react-native-google-signin/google-signin` | Native Google Sign-In | Already installed but cannot run in Expo Go. The `expo-web-browser` approach replaces it entirely for Expo Go compatibility. Keep the package for future dev build support but do not use it as the primary auth path. |
+
+---
+
+## Backend Changes: Supabase Storage
+
+### New Storage Bucket: `avatars`
+
+Create a public storage bucket for profile pictures.
+
+```sql
+-- Create the avatars bucket
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true);
+
+-- RLS: Anyone can view avatars (public bucket)
+CREATE POLICY "Avatar images are publicly accessible"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'avatars');
+
+-- RLS: Authenticated users can upload their own avatar
+CREATE POLICY "Users can upload their own avatar"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'avatars'
+  AND auth.role() = 'authenticated'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- RLS: Users can update (overwrite) their own avatar
+CREATE POLICY "Users can update their own avatar"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'avatars'
+  AND auth.role() = 'authenticated'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- RLS: Users can delete their own avatar
+CREATE POLICY "Users can delete their own avatar"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'avatars'
+  AND auth.role() = 'authenticated'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+```
+
+**File path convention:** `{userId}/avatar.jpg` -- one file per user, upserted on each upload. This avoids orphaned files from previous uploads.
+
+**Public URL pattern:** After upload, construct the public URL as:
+```
+https://{project-ref}.supabase.co/storage/v1/object/public/avatars/{userId}/avatar.jpg
+```
+
+Or use the SDK:
+```typescript
+const { data } = supabase.storage.from('avatars').getPublicUrl(`${userId}/avatar.jpg`);
+const publicUrl = data.publicUrl;
+```
+
+**Cache busting:** Append `?t={timestamp}` to the URL after upload to bust CDN and `expo-image` disk cache. Store the full URL with timestamp in `profiles.avatar_url`.
+
+### Profile Update After Upload
+
+After uploading the image to storage, update the `profiles.avatar_url` column:
+
+```typescript
+await supabase
+  .from('profiles')
+  .update({ avatar_url: `${publicUrl}?t=${Date.now()}` })
+  .eq('id', userId);
+```
+
+---
+
+## Supabase Dashboard Configuration: Google OAuth
+
+### Required changes for expo-web-browser flow
+
+1. **Redirect URLs:** In Supabase Dashboard > Authentication > URL Configuration > Redirect URLs, add:
+   - `com.roomy://auth/callback` (production deep link)
+   - `exp://192.168.x.x:8081/--/auth/callback` (dev, use actual local IP)
+
+2. **Google provider settings:** In Authentication > Providers > Google:
+   - Ensure "Skip nonce checks" is enabled (required for web OAuth flow)
+   - Verify Web Client ID matches `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`
+
+3. **Google Cloud Console:** In the OAuth consent screen, add the Supabase callback URL (`https://{project-ref}.supabase.co/auth/v1/callback`) as an authorized redirect URI. This should already be configured from the existing Google OAuth setup.
+
+---
+
+## Design Token Changes (tailwind.config.js)
+
+### Wintergreen Palette Shift
+
+The v1.1 research already established the green palette in `tailwind.config.js`. The v1.2 changes are:
+
+| Change | Current | New | Impact |
+|--------|---------|-----|--------|
+| Background color | `bg: "#FAFAF8"` | `bg: "#FEFDFB"` (cream) | All screens, consistent warm tone |
+| Card style | White fill + shadow | Transparent + gray outline border | Card component CSS change, no library |
+| Brand green | `#2D6A4F` (already wintergreen) | No change needed | Already set in v1.1 |
+
+The palette shift is a config/CSS change, not a library addition. No new dependencies needed.
+
+---
+
+## Installation Command
+
+```bash
+npx expo install expo-image-picker expo-file-system expo-web-browser expo-image && npm install base64-arraybuffer
+```
+
+Use `npx expo install` for Expo packages (resolves SDK 54 compatible versions from `bundledNativeModules.json`). Use `npm install` for pure JS packages (`base64-arraybuffer`).
 
 ---
 
 ## Version Compatibility Matrix (New Dependencies Only)
 
-| Package | SDK 54 Compatible Version | In Expo Go? | New Architecture Required? |
-|---------|--------------------------|-------------|---------------------------|
-| expo-linear-gradient | ~15.0.8 | Yes | No |
-| expo-blur | ~15.0.8 | Yes | No |
-| react-native-svg | 15.12.1 | Yes | No |
+| Package | SDK 54 Compatible Version | In Expo Go? | Native Code? | Purpose |
+|---------|--------------------------|-------------|--------------|---------|
+| expo-image-picker | ~17.0.10 | Yes | Yes (bundled) | Camera + gallery picker |
+| expo-file-system | ~19.0.21 | Yes | Yes (bundled) | Read image as base64 |
+| expo-web-browser | ~15.0.10 | Yes | Yes (bundled) | Google OAuth browser flow |
+| expo-image | ~3.0.11 | Yes | Yes (bundled) | Display avatars + illustrations |
+| base64-arraybuffer | ^1.0.2 | N/A (pure JS) | No | Base64 to ArrayBuffer for upload |
 
-All versions verified from `bundledNativeModules.json` in the installed `expo@54` package. HIGH confidence.
+All Expo package versions verified from `bundledNativeModules.json` in the installed `expo@54` package. HIGH confidence.
 
 ---
 
-## Integration Points with Existing Setup
+## Complete Upload Flow: Profile Picture
 
-### babel.config.js -- NO CHANGES
-The existing config with `nativewind/babel` preset and `jsxImportSource: "nativewind"` is correct.
+```
+1. User taps avatar in settings/onboarding
+2. Show ActionSheet: "Take Photo" / "Choose from Library" / "Cancel"
+3. Call launchCameraAsync or launchImageLibraryAsync
+   - allowsEditing: true, aspect: [1,1], quality: 0.8
+4. If not canceled:
+   a. Read image as base64 via expo-file-system
+   b. Convert to ArrayBuffer via base64-arraybuffer decode()
+   c. Upload to Supabase Storage: avatars/{userId}/avatar.jpg (upsert)
+   d. Get public URL, append cache-bust timestamp
+   e. Update profiles.avatar_url with new URL
+   f. Update local state to show new avatar immediately
+5. Avatar component detects avatar_url is set, shows <Image> instead of gradient initials
+```
 
-### metro.config.js -- NO CHANGES
-The existing `withNativeWind(config, { input: "./global.css" })` wrapper is correct.
+---
 
-### global.css -- NO CHANGES
-The existing `@tailwind base/components/utilities` directives are correct.
+## Complete Auth Flow: Google OAuth (Expo Go)
 
-### app.json -- NO CHANGES
-No new config plugins needed. `expo-linear-gradient`, `expo-blur`, and `react-native-svg` do not require Expo config plugins.
+```
+1. User taps "Continue with Google" button
+2. Call supabase.auth.signInWithOAuth({ provider: 'google', skipBrowserRedirect: true })
+3. Open returned URL via WebBrowser.openAuthSessionAsync()
+4. User completes Google consent in browser
+5. Browser redirects to com.roomy://auth/callback#access_token=...&refresh_token=...
+6. Extract tokens from URL fragment
+7. Call supabase.auth.setSession({ access_token, refresh_token })
+8. Auth state listener triggers navigation to onboarding/home
+```
 
-### tailwind.config.js -- FULL REPLACEMENT
-Replace the existing orange color palette with the green-based design token system (see NativeWind Theme Configuration section above). The `content` paths and `presets` stay the same.
+---
+
+## Integration Points with Existing Code
+
+### lib/auth-utils.ts -- MODIFY signInWithGoogle()
+
+Replace the `@react-native-google-signin/google-signin` lazy import approach with the `expo-web-browser` flow. The function signature stays the same (`async function signInWithGoogle()` returning `{ data, error }`), so callers don't need changes.
+
+### components/ui/Avatar.tsx -- ADD image display path
+
+Add an optional `avatarUrl` prop. When set and non-empty, render `expo-image` `<Image>` instead of `LinearGradient` initials. Keep the gradient as fallback.
+
+### app.json -- NO CHANGES for new packages
+
+`expo-image-picker`, `expo-file-system`, `expo-web-browser`, and `expo-image` do not require Expo config plugins in app.json. They work out of the box.
+
+### tailwind.config.js -- MINOR color tweak
+
+Update `bg` color from `#FAFAF8` to `#FEFDFB` for cream background. Add any new tokens needed for outline card borders.
 
 ---
 
@@ -405,38 +384,32 @@ Replace the existing orange color palette with the green-based design token syst
 
 | Decision | Confidence | Reasoning |
 |----------|------------|-----------|
-| expo-linear-gradient ~15.0.8 | HIGH | Version from bundledNativeModules.json, Expo Go compatible, first-party package |
-| expo-blur ~15.0.8 | HIGH | Version from bundledNativeModules.json, Expo Go compatible, verified on Expo docs |
-| react-native-svg 15.12.1 | HIGH | Version from bundledNativeModules.json, widely used with Expo |
-| NativeWind v4 color token config | HIGH | Standard tailwind.config.js extend pattern, verified on NativeWind docs |
-| NativeWind v4 fontSize tuples | MEDIUM | Tailwind CSS 3 supports this syntax; NativeWind v4 docs confirm typography support but exact tuple behavior not individually verified. Test during implementation. |
-| boxShadow style on RN 0.81 | HIGH | React Native 0.81 docs confirm boxShadow property on New Architecture. SDK 54 uses New Architecture by default. |
-| NativeWind shadow-* classes for standard shadows | HIGH | Verified on NativeWind docs. Requires background color on native. |
-| Colored shadows via style prop | MEDIUM | boxShadow with color values confirmed in RN 0.81 docs. Exact color string format (hex with alpha like `#2D6A4F55`) needs testing -- may need `rgba()` format instead. |
-| expo-blur intensity mapping | LOW | The mapping between `blur(12px)` CSS and `intensity={30}` is an estimate. Requires visual tuning. |
-| ScrollView carousel approach | HIGH | Standard React Native pattern for fixed-count horizontal paging. |
-| Reanimated layout transitions | HIGH | Layout transitions verified in Reanimated 4 docs. `LinearTransition.duration()` confirmed. |
-| No NativeWind upgrade needed | HIGH | v4.2.2 on TW3 handles all required features (colors, shadows, typography, letter-spacing). v5 upgrade would be a breaking change with no benefit for this scope. |
+| expo-image-picker ~17.0.10 for avatar photos | HIGH | Version from bundledNativeModules.json. Included in Expo Go. Square crop via allowsEditing is documented in official Expo docs. |
+| expo-file-system ~19.0.21 for base64 read | HIGH | Version from bundledNativeModules.json. Included in Expo Go. Standard pattern from Supabase's official React Native guide. |
+| base64-arraybuffer for upload | HIGH | Explicitly recommended by Supabase's official React Native storage documentation. 1.0.2 is stable (517 dependents). |
+| expo-web-browser for Google OAuth in Expo Go | MEDIUM | Multiple community guides confirm this pattern works. Official Supabase docs mention signInWithOAuth + skipBrowserRedirect. Known issue: setSession can hang -- needs timeout handling. The redirect URL parsing (fragment vs query params) varies and needs testing. |
+| expo-image for avatar display | HIGH | Version from bundledNativeModules.json. Included in Expo Go. Official Expo recommendation over react-native-fast-image. |
+| Supabase Storage public bucket for avatars | HIGH | Standard pattern from Supabase's official Expo tutorial. RLS policies follow official docs. |
+| No expo-image-manipulator needed | MEDIUM | Picker's quality + crop should produce small files, but untested. If files are too large (>500KB), add expo-image-manipulator resize step. Flag for testing. |
+| setSession hang issue with web OAuth | MEDIUM | Reported in GitHub issue #1429 on supabase-js. May be fixed in @supabase/supabase-js 2.99.0. Needs testing with timeout wrapper as safety net. |
 
 ---
 
 ## Sources
 
-- [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54) -- SDK features, React Native 0.81, New Architecture default (HIGH)
-- [Expo LinearGradient Docs](https://docs.expo.dev/versions/latest/sdk/linear-gradient/) -- API, installation, props (HIGH)
-- [Expo BlurView Docs](https://docs.expo.dev/versions/latest/sdk/blur-view/) -- API, intensity, tint, Expo Go support (HIGH)
-- [NativeWind Box Shadow Docs](https://www.nativewind.dev/docs/tailwind/effects/box-shadow) -- shadow class support, background color requirement (HIGH)
-- [NativeWind Box Shadow Color Docs](https://www.nativewind.dev/docs/tailwind/effects/box-shadow-color) -- arbitrary color shadow support (HIGH)
-- [NativeWind Colors Docs](https://www.nativewind.dev/docs/customization/colors) -- custom color config pattern (HIGH)
-- [NativeWind Themes Guide](https://www.nativewind.dev/docs/guides/themes) -- CSS variables, vars() function, dynamic theming (HIGH)
-- [NativeWind Letter Spacing Docs](https://www.nativewind.dev/docs/tailwind/typography/letter-spacing) -- tracking class support (HIGH)
-- [NativeWind Animation Docs](https://www.nativewind.dev/docs/tailwind/transitions-animation/animation) -- experimental animation class support (HIGH)
-- [React Native 0.81 View Style Props](https://reactnative.dev/docs/0.81/view-style-props) -- boxShadow property documentation (HIGH)
-- [Reanimated Layout Transitions Docs](https://docs.swmansion.com/react-native-reanimated/docs/layout-animations/layout-transitions/) -- LinearTransition, CurvedTransition API (HIGH)
-- [NativeWind v4 to v5 Migration](https://www.nativewind.dev/v5/guides/migrate-from-v4) -- breaking changes, why NOT to upgrade mid-project (HIGH)
-- `bundledNativeModules.json` in local `node_modules/expo/` -- exact compatible version numbers (HIGH)
-- [NativeWind GitHub #1442](https://github.com/nativewind/nativewind/issues/1442) -- boxShadow vs legacy shadow props discussion (MEDIUM)
+- [Expo ImagePicker Docs](https://docs.expo.dev/versions/latest/sdk/imagepicker/) -- API, allowsEditing, permissions, Expo Go support (HIGH)
+- [Expo ImageManipulator Docs](https://docs.expo.dev/versions/latest/sdk/imagemanipulator/) -- resize/crop API, why NOT needed here (HIGH)
+- [Expo Image Docs](https://docs.expo.dev/versions/latest/sdk/image/) -- caching, placeholder, transition, Expo Go support (HIGH)
+- [Expo Google Authentication Guide](https://docs.expo.dev/guides/google-authentication/) -- confirms @react-native-google-signin requires dev build (HIGH)
+- [Supabase React Native Storage Blog](https://supabase.com/blog/react-native-storage) -- ArrayBuffer upload pattern, base64-arraybuffer recommendation (HIGH)
+- [Supabase Expo Tutorial](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native) -- avatar bucket setup, RLS policies (HIGH)
+- [Supabase Google Login Docs](https://supabase.com/docs/guides/auth/social-login/auth-google) -- signInWithOAuth, signInWithIdToken, skip nonce (HIGH)
+- [Supabase Storage Image Transformations](https://supabase.com/docs/guides/storage/serving/image-transformations) -- Pro plan only, why client-side resize instead (HIGH)
+- [Erdem Gonul Blog: Google Sign In with Supabase + Expo](https://www.erdemgonul.com/blog/google-signin-supabase-expo-react-native) -- expo-web-browser OAuth flow (MEDIUM)
+- [supabase-js Issue #1429: setSession hangs](https://github.com/supabase/supabase-js/issues/1429) -- known issue with web OAuth flow (MEDIUM)
+- [base64-arraybuffer npm](https://www.npmjs.com/package/base64-arraybuffer) -- version 1.0.2, usage (HIGH)
+- `bundledNativeModules.json` in local `node_modules/expo/` -- exact compatible version numbers for SDK 54 (HIGH)
 
 ---
-*Stack research for: RoomY v1.1 UI Redesign*
-*Researched: 2026-03-11*
+*Stack research for: RoomY v1.2 Polish & Identity*
+*Researched: 2026-03-13*
