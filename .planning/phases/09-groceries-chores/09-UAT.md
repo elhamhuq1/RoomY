@@ -1,5 +1,5 @@
 ---
-status: complete
+status: resolved
 phase: 09-groceries-chores
 source: [09-01-SUMMARY.md, 09-02-SUMMARY.md]
 started: 2026-03-13T05:00:00Z
@@ -68,7 +68,7 @@ skipped: 0
 ## Gaps
 
 - truth: "Chore rows display emoji icons with clean, uncluttered layout"
-  status: failed
+  status: resolved
   reason: "User reported: passes but chore rows are too cluttered — frequency badge, username, due date, avatar, flag button, and volunteer button all on one line. Needs better layout to reduce visual noise."
   severity: cosmetic
   test: 7
@@ -77,7 +77,7 @@ skipped: 0
   missing: []
   debug_session: ""
 - truth: "Disputed chore rows have same dimensions as normal rows with added red styling"
-  status: failed
+  status: resolved
   reason: "User reported: passes but disputed row kind of shrinks compared to normal rows"
   severity: cosmetic
   test: 9
