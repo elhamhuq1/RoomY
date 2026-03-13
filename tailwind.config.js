@@ -1,3 +1,5 @@
+const { platformSelect } = require("nativewind/theme");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -8,6 +10,12 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        heading: platformSelect({
+          ios: "SF Pro Rounded",
+          default: "System",
+        }),
+      },
       colors: {
         brand: {
           DEFAULT: "#10B981",
