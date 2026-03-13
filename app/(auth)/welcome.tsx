@@ -1,41 +1,55 @@
-import { colors } from "@/lib/theme/colors";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
   Pressable,
   ScrollView,
+  Image,
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+  Platform,
+} from 'react-native';
+import { BlurView } from 'expo-blur';
+import { useRouter } from 'expo-router';
+import { ONBOARDING_IMAGES, ONBOARDING_CREAM } from '@/lib/onboarding-images';
 
 const VALUE_PROPS = [
   {
-    icon: "wallet-outline" as const,
-    title: "Split Expenses Fairly",
+    image: ONBOARDING_IMAGES.splitExpenses,
+    title: 'Split Expenses Fairly',
     description:
-      "Track shared costs and settle up with one tap. No more awkward money conversations.",
+      'Track shared costs and settle up with one tap. No more awkward money conversations.',
+    badges: [
+      { emoji: '\u{1F4B0}', label: 'Fair splits' },
+      { emoji: '\u26A1', label: 'One tap' },
+    ],
   },
   {
-    icon: "cart-outline" as const,
-    title: "Shared Grocery Lists",
+    image: ONBOARDING_IMAGES.sharedGrocery,
+    title: 'Shared Grocery Lists',
     description:
-      "Keep one list everyone can add to. Never buy duplicate milk again.",
+      'Keep one list everyone can add to. Never buy duplicate milk again.',
+    badges: [
+      { emoji: '\u{1F6D2}', label: 'Real-time sync' },
+      { emoji: '\u{1F4F1}', label: 'Auto-split costs' },
+    ],
   },
   {
-    icon: "checkbox-outline" as const,
-    title: "Chore Rotation",
+    image: ONBOARDING_IMAGES.choreRotation,
+    title: 'Chore Rotation',
     description:
-      "Take turns fairly with automatic chore scheduling. Everyone does their part.",
+      'Take turns fairly with automatic chore scheduling. Everyone does their part.',
+    badges: [
+      { emoji: '\u{1F504}', label: 'Auto-rotate' },
+      { emoji: '\u2705', label: 'Track streaks' },
+    ],
   },
 ];
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -48,21 +62,66 @@ export default function WelcomeScreen() {
     [width],
   );
 
+  const imageHeight = height * 0.3;
+
   return (
-    <View className="flex-1 bg-neutral-bg">
-      {/* Header area */}
-      <View className="items-center pt-20 pb-6">
-        <View className="mb-4 h-20 w-20 items-center justify-center rounded-2xl bg-brand-light">
-          <Ionicons name="home" size={40} color={colors.brand.DEFAULT} />
-        </View>
-        <Text className="text-4xl font-bold text-gray-800">RoomY</Text>
-        <Text className="mt-2 text-lg text-gray-500">
+    <View style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+      {/* Fixed header: glassmorphism logo + title + tagline */}
+      <View style={{ alignItems: 'center', paddingTop: 64, paddingBottom: 12 }}>
+        <BlurView
+          intensity={25}
+          tint="light"
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: 20,
+            overflow: 'hidden',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <View
+            style={{
+              ...Platform.select({
+                ios: { backgroundColor: 'rgba(255,255,255,0.3)' },
+                android: { backgroundColor: 'rgba(255,255,255,0.7)' },
+              }),
+              width: '100%',
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Image
+              source={require('@/assets/icon.png')}
+              style={{ width: 56, height: 56 }}
+              resizeMode="contain"
+            />
+          </View>
+        </BlurView>
+        <Text
+          style={{
+            fontSize: 32,
+            fontWeight: '700',
+            color: '#1E293B',
+            marginTop: 12,
+          }}
+        >
+          RoomY
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: '#64748B',
+            marginTop: 4,
+          }}
+        >
           Living together, made easy
         </Text>
       </View>
 
-      {/* Value prop carousel */}
-      <View className="flex-1 justify-center">
+      {/* Carousel */}
+      <View style={{ flex: 1, justifyContent: 'center' }}>
         <ScrollView
           ref={scrollRef}
           horizontal
@@ -74,55 +133,127 @@ export default function WelcomeScreen() {
           {VALUE_PROPS.map((prop, index) => (
             <View
               key={index}
-              style={{ width }}
-              className="items-center justify-center px-8"
+              style={{ width, alignItems: 'center', paddingHorizontal: 32 }}
             >
-              <View className="w-full items-center rounded-2xl bg-white p-8 shadow-sm">
-                <View className="mb-5 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
-                  <Ionicons name={prop.icon} size={44} color={colors.brand.DEFAULT} />
-                </View>
-                <Text className="mb-3 text-center text-2xl font-bold text-gray-800">
-                  {prop.title}
-                </Text>
-                <Text className="text-center text-base leading-6 text-gray-500">
-                  {prop.description}
-                </Text>
+              {/* Illustration hero ~50% of slide area */}
+              <Image
+                source={prop.image}
+                style={{
+                  width: width - 64,
+                  height: imageHeight,
+                }}
+                resizeMode="contain"
+              />
+
+              {/* Title */}
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontWeight: '700',
+                  color: '#1E293B',
+                  textAlign: 'center',
+                  marginTop: 16,
+                }}
+              >
+                {prop.title}
+              </Text>
+
+              {/* Subtitle */}
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: '#64748B',
+                  textAlign: 'center',
+                  marginTop: 8,
+                  lineHeight: 22,
+                  maxWidth: 300,
+                }}
+                numberOfLines={2}
+              >
+                {prop.description}
+              </Text>
+
+              {/* Emoji feature badges */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  gap: 8,
+                  marginTop: 12,
+                }}
+              >
+                {prop.badges.map((badge, bi) => (
+                  <View
+                    key={bi}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      borderRadius: 999,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                    }}
+                  >
+                    <Text style={{ fontSize: 14 }}>
+                      {badge.emoji} {badge.label}
+                    </Text>
+                  </View>
+                ))}
               </View>
             </View>
           ))}
         </ScrollView>
 
         {/* Page indicator dots */}
-        <View className="mt-6 flex-row items-center justify-center gap-2">
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            marginTop: 20,
+          }}
+        >
           {VALUE_PROPS.map((_, index) => (
             <View
               key={index}
-              className={`h-2.5 rounded-full ${
-                index === activeIndex
-                  ? "w-8 bg-brand"
-                  : "w-2.5 bg-gray-300"
-              }`}
+              style={{
+                width: index === activeIndex ? 24 : 8,
+                height: 8,
+                borderRadius: 999,
+                backgroundColor:
+                  index === activeIndex ? '#10B981' : '#D1D5DB',
+              }}
             />
           ))}
         </View>
       </View>
 
-      {/* CTA buttons */}
-      <View className="px-8 pb-12 pt-6">
+      {/* CTA section */}
+      <View style={{ paddingHorizontal: 32, paddingBottom: 48, paddingTop: 24 }}>
         <Pressable
-          className="mb-4 items-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
-          onPress={() => router.push("/(auth)/sign-up")}
+          style={({ pressed }) => ({
+            backgroundColor: pressed ? '#059669' : '#10B981',
+            borderRadius: 16,
+            paddingVertical: 16,
+            alignItems: 'center',
+            marginBottom: 16,
+          })}
+          onPress={() => router.push('/(auth)/sign-up')}
         >
-          <Text className="text-lg font-bold text-white">Get Started</Text>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
+            Get Started
+          </Text>
         </Pressable>
 
         <Pressable
-          className="items-center py-3"
-          onPress={() => router.push("/(auth)/sign-in")}
+          style={{ alignItems: 'center', paddingVertical: 12 }}
+          onPress={() => router.push('/(auth)/sign-in')}
         >
-          <Text className="text-base text-gray-500">
-            Already have an account?{" "}
-            <Text className="font-semibold text-brand-dark">Sign in</Text>
+          <Text style={{ fontSize: 15, color: '#64748B' }}>
+            Already have an account?{' '}
+            <Text style={{ fontWeight: '600', color: '#059669' }}>Log in</Text>
           </Text>
         </Pressable>
       </View>
