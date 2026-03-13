@@ -17,4 +17,7 @@ export const ONBOARDING_IMAGES = {
   inviteCode: require('@/assets/onboarding/invite-code.png'),
   createHouseholdIcon: require('@/assets/onboarding/create-household-icon.png'),
   joinHouseholdIcon: require('@/assets/onboarding/join-household-icon.png'),
+  expensesIcon: require('@/assets/onboarding/expenses-icon.png'),
+  groceriesIcon: require('@/assets/onboarding/groceries-icon.png'),
+  choresIcon: require('@/assets/onboarding/chores-icon.png'),
 } as const;

@@ -6,20 +6,21 @@ import {
   Pressable,
   ActivityIndicator,
   ScrollView,
+  Image,
+  ImageSourcePropType,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/lib/auth-context";
-import { Card, Toggle, StepProgressBar } from "@/components/ui";
-import { ONBOARDING_CREAM } from "@/lib/onboarding-images";
+import { Toggle, StepProgressBar } from "@/components/ui";
+import { ONBOARDING_CREAM, ONBOARDING_IMAGES } from "@/lib/onboarding-images";
 
 type ModuleConfig = {
   key: "expenses" | "groceries" | "chores";
   title: string;
   description: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  image: ImageSourcePropType;
   locked: boolean;
 };
 
@@ -28,21 +29,21 @@ const MODULES: ModuleConfig[] = [
     key: "expenses",
     title: "Expenses",
     description: "Split bills and track who owes what",
-    icon: "wallet-outline",
+    image: ONBOARDING_IMAGES.expensesIcon,
     locked: true,
   },
   {
     key: "groceries",
     title: "Groceries",
     description: "Shared shopping list with cost splitting",
-    icon: "cart-outline",
+    image: ONBOARDING_IMAGES.groceriesIcon,
     locked: false,
   },
   {
     key: "chores",
     title: "Chores",
     description: "Fair chore rotation with effort tracking",
-    icon: "brush-outline",
+    image: ONBOARDING_IMAGES.choresIcon,
     locked: false,
   },
 ];
@@ -183,69 +184,66 @@ export default function ModuleQuizScreen() {
           {MODULES.map((mod) => {
             const isOn = getToggleValue(mod.key);
             return (
-              <Card key={mod.key} className="p-5">
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  {/* Icon */}
-                  <View
+              <View
+                key={mod.key}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderWidth: 1,
+                  borderColor: "#D1D5DB",
+                  borderRadius: 16,
+                  paddingVertical: 16,
+                  paddingHorizontal: 16,
+                }}
+              >
+                {/* Icon image */}
+                <Image
+                  source={mod.image}
+                  style={{ width: 48, height: 48, marginRight: 14 }}
+                  resizeMode="contain"
+                />
+
+                {/* Title + description */}
+                <View style={{ flex: 1, marginRight: 12 }}>
+                  <Text
                     style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 12,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: isOn ? colors.brand.light : "#F3F4F6",
-                      marginRight: 14,
+                      fontSize: 17,
+                      fontWeight: "700",
+                      color: colors.neutral.text,
                     }}
                   >
-                    <Ionicons
-                      name={mod.icon}
-                      size={24}
-                      color={isOn ? colors.brand.DEFAULT : colors.neutral.tertiary}
-                    />
-                  </View>
-
-                  {/* Title + description */}
-                  <View style={{ flex: 1, marginRight: 12 }}>
+                    {mod.title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: colors.neutral.secondary,
+                      marginTop: 2,
+                    }}
+                  >
+                    {mod.description}
+                  </Text>
+                  {mod.locked ? (
                     <Text
                       style={{
-                        fontSize: 17,
-                        fontWeight: "700",
-                        color: colors.neutral.text,
+                        fontSize: 12,
+                        fontWeight: "600",
+                        color: colors.brand.DEFAULT,
+                        marginTop: 4,
                       }}
                     >
-                      {mod.title}
+                      Always enabled
                     </Text>
-                    <Text
-                      style={{
-                        fontSize: 13,
-                        color: colors.neutral.secondary,
-                        marginTop: 2,
-                      }}
-                    >
-                      {mod.description}
-                    </Text>
-                    {mod.locked ? (
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: "600",
-                          color: colors.brand.DEFAULT,
-                          marginTop: 4,
-                        }}
-                      >
-                        Always enabled
-                      </Text>
-                    ) : null}
-                  </View>
-
-                  {/* Toggle */}
-                  <Toggle
-                    value={isOn}
-                    onChange={() => handleToggle(mod.key)}
-                    locked={mod.locked || loading}
-                  />
+                  ) : null}
                 </View>
-              </Card>
+
+                {/* Toggle */}
+                <Toggle
+                  value={isOn}
+                  onChange={() => handleToggle(mod.key)}
+                  locked={mod.locked || loading}
+                />
+              </View>
             );
           })}
         </View>
