@@ -71,8 +71,8 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 - [x] **ONBD-03**: Display name screen shows a live avatar preview that updates as the user types
 - [x] **ONBD-04**: Setup choice screen presents create/join options as large cards with gradient icon containers
 - [x] **ONBD-05**: Household name screen shows a branded house icon and styled input
-- [ ] **ONBD-06**: Invite code screen shows a celebration layout with prominent code display and share/continue buttons
-- [ ] **ONBD-07**: Module selection screen uses toggle cards with visual active/inactive states
+- [x] **ONBD-06**: Invite code screen shows a celebration layout with prominent code display and share/continue buttons
+- [x] **ONBD-07**: Module selection screen uses toggle cards with visual active/inactive states
 - [x] **ONBD-08**: Onboarding flow shows a 3-segment step progress bar on applicable screens
 
 ### Home Screen
@@ -191,8 +191,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ONBD-03 | Phase 10 | Complete |
 | ONBD-04 | Phase 10 | Complete |
 | ONBD-05 | Phase 10 | Complete |
-| ONBD-06 | Phase 10 | Pending |
-| ONBD-07 | Phase 10 | Pending |
+| ONBD-06 | Phase 10 | Complete |
+| ONBD-07 | Phase 10 | Complete |
 | ONBD-08 | Phase 10 | Complete |
 
 **Coverage:**
