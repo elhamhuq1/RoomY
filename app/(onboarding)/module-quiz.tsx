@@ -4,14 +4,16 @@ import {
   View,
   Text,
   Pressable,
-  Switch,
   ActivityIndicator,
   ScrollView,
-  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/lib/auth-context";
+import { Card, Toggle, StepProgressBar } from "@/components/ui";
+import { ONBOARDING_CREAM } from "@/lib/onboarding-images";
 
 type ModuleConfig = {
   key: "expenses" | "groceries" | "chores";
@@ -46,6 +48,7 @@ const MODULES: ModuleConfig[] = [
 ];
 
 export default function ModuleQuizScreen() {
+  const router = useRouter();
   const { user, refreshProfile } = useSession();
   const [groceriesEnabled, setGroceriesEnabled] = useState(false);
   const [choresEnabled, setChoresEnabled] = useState(false);
@@ -129,18 +132,42 @@ export default function ModuleQuizScreen() {
   }
 
   return (
-    <View className="flex-1 bg-neutral-bg">
+    <SafeAreaView style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+      <StepProgressBar
+        currentStep={2}
+        totalSteps={3}
+        onBack={() => router.back()}
+      />
+
       <ScrollView
-        contentContainerClassName="flex-grow px-8 pt-20 pb-12"
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 32,
+          paddingBottom: 32,
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View className="mb-8 items-center">
-          <Text className="text-3xl font-bold text-gray-800">
+        {/* Title + subtitle */}
+        <View style={{ alignItems: "center", marginTop: 24, marginBottom: 32 }}>
+          <Text
+            style={{
+              fontSize: 26,
+              fontWeight: "700",
+              color: colors.neutral.text,
+              textAlign: "center",
+            }}
+          >
             Choose Your Modules
           </Text>
-          <Text className="mt-2 text-center text-base text-gray-500">
-            You can always change these later in Settings
+          <Text
+            style={{
+              fontSize: 15,
+              color: colors.neutral.secondary,
+              textAlign: "center",
+              marginTop: 6,
+            }}
+          >
+            Pick what you want to manage
           </Text>
         </View>
 
@@ -152,68 +179,78 @@ export default function ModuleQuizScreen() {
         ) : null}
 
         {/* Module toggle cards */}
-        <View className="mb-8 gap-4">
+        <View style={{ gap: 16, marginBottom: 32 }}>
           {MODULES.map((mod) => {
             const isOn = getToggleValue(mod.key);
             return (
-              <View
-                key={mod.key}
-                className={`flex-row items-center rounded-2xl border-2 bg-white p-5 shadow-sm ${
-                  isOn ? "border-brand" : "border-neutral-border"
-                }`}
-              >
-                {/* Icon */}
-                <View
-                  className={`mr-4 h-14 w-14 items-center justify-center rounded-2xl ${
-                    isOn ? "bg-brand-light" : "bg-gray-100"
-                  }`}
-                >
-                  <Ionicons
-                    name={mod.icon}
-                    size={28}
-                    color={isOn ? colors.brand.DEFAULT : colors.neutral.tertiary}
+              <Card key={mod.key} className="p-5">
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {/* Icon */}
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 12,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: isOn ? colors.brand.light : "#F3F4F6",
+                      marginRight: 14,
+                    }}
+                  >
+                    <Ionicons
+                      name={mod.icon}
+                      size={24}
+                      color={isOn ? colors.brand.DEFAULT : colors.neutral.tertiary}
+                    />
+                  </View>
+
+                  {/* Title + description */}
+                  <View style={{ flex: 1, marginRight: 12 }}>
+                    <Text
+                      style={{
+                        fontSize: 17,
+                        fontWeight: "700",
+                        color: colors.neutral.text,
+                      }}
+                    >
+                      {mod.title}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: colors.neutral.secondary,
+                        marginTop: 2,
+                      }}
+                    >
+                      {mod.description}
+                    </Text>
+                    {mod.locked ? (
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: "600",
+                          color: colors.brand.DEFAULT,
+                          marginTop: 4,
+                        }}
+                      >
+                        Always enabled
+                      </Text>
+                    ) : null}
+                  </View>
+
+                  {/* Toggle */}
+                  <Toggle
+                    value={isOn}
+                    onChange={() => handleToggle(mod.key)}
+                    locked={mod.locked || loading}
                   />
                 </View>
-
-                {/* Title + description */}
-                <View className="flex-1 mr-3">
-                  <Text className="text-lg font-bold text-gray-800">
-                    {mod.title}
-                  </Text>
-                  <Text className="mt-0.5 text-sm text-gray-500">
-                    {mod.description}
-                  </Text>
-                  {mod.locked ? (
-                    <Text className="mt-1 text-xs font-medium text-brand">
-                      Always enabled
-                    </Text>
-                  ) : null}
-                </View>
-
-                {/* Toggle */}
-                <Switch
-                  value={isOn}
-                  onValueChange={() => handleToggle(mod.key)}
-                  disabled={mod.locked || loading}
-                  trackColor={{
-                    false: Platform.OS === "ios" ? undefined : "#d1d5db",
-                    true: colors.brand.DEFAULT,
-                  }}
-                  thumbColor={
-                    Platform.OS === "android"
-                      ? isOn
-                        ? "#fff"
-                        : "#f4f3f4"
-                      : undefined
-                  }
-                  ios_backgroundColor="#e5e7eb"
-                />
-              </View>
+              </Card>
             );
           })}
         </View>
 
-        {/* Continue button */}
+        {/* Finish Setup button */}
         <Pressable
           className={`items-center rounded-2xl py-4 ${
             loading ? "bg-brand/50" : "bg-brand active:bg-brand-dark"
@@ -225,11 +262,11 @@ export default function ModuleQuizScreen() {
             <ActivityIndicator color="#fff" />
           ) : (
             <Text className="text-lg font-bold text-white">
-              Let's Go!
+              Finish Setup
             </Text>
           )}
         </Pressable>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

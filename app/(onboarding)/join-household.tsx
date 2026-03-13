@@ -10,15 +10,18 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
+import { StepProgressBar } from "@/components/ui";
+import { ONBOARDING_CREAM } from "@/lib/onboarding-images";
 
 export default function JoinHouseholdScreen() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   const trimmedCode = code.trim().toUpperCase();
 
@@ -81,85 +84,117 @@ export default function JoinHouseholdScreen() {
   }
 
   // Format code display with space in middle
-  const displayCode = code.length > 4 ? code.slice(0, 4) + " " + code.slice(4) : code;
+  const displayCode =
+    code.length > 4 ? code.slice(0, 4) + " " + code.slice(4) : code;
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-neutral-bg"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        contentContainerClassName="flex-grow justify-center px-8 py-12"
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+      <StepProgressBar
+        currentStep={1}
+        totalSteps={3}
+        onBack={() => router.back()}
+      />
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Back button */}
-        <Pressable
-          className="absolute left-8 top-16 z-10 h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm"
-          onPress={() => router.back()}
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 32,
+            paddingBottom: 32,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Ionicons name="arrow-back" size={22} color={colors.neutral.text} />
-        </Pressable>
-
-        {/* Header */}
-        <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
-            <Ionicons name="key" size={44} color={colors.brand.DEFAULT} />
-          </View>
-          <Text className="text-3xl font-bold text-gray-800">
-            Enter Invite Code
-          </Text>
-          <Text className="mt-2 text-center text-base text-gray-500">
-            Ask your roommate for their household's code
-          </Text>
-        </View>
-
-        {/* Error */}
-        {error ? (
-          <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
-          </View>
-        ) : null}
-
-        {/* Code input */}
-        <View className="mb-8">
-          <TextInput
-            className={`rounded-xl border bg-white px-4 py-4 text-center text-2xl font-bold tracking-widest text-gray-800 ${
-              error ? "border-red-400" : "border-neutral-border"
-            }`}
-            placeholder="ABCD EFGH"
-            placeholderTextColor="#d1d5db"
-            value={displayCode}
-            onChangeText={handleCodeChange}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            maxLength={9} // 8 chars + 1 space
-            editable={!loading}
-            autoFocus
-          />
-          <Text className="mt-2 text-center text-xs text-gray-400">
-            8-character code from your roommate
-          </Text>
-        </View>
-
-        {/* Join button */}
-        <Pressable
-          className={`items-center rounded-2xl py-4 ${
-            trimmedCode.length < 8 || loading
-              ? "bg-brand/50"
-              : "bg-brand active:bg-brand-dark"
-          }`}
-          onPress={handleJoin}
-          disabled={trimmedCode.length < 8 || loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text className="text-lg font-bold text-white">
+          {/* Title + subtitle */}
+          <View style={{ alignItems: "center", marginTop: 32, marginBottom: 32 }}>
+            <Text
+              style={{
+                fontSize: 26,
+                fontWeight: "700",
+                color: colors.neutral.text,
+                textAlign: "center",
+              }}
+            >
               Join Household
             </Text>
-          )}
-        </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <Text
+              style={{
+                fontSize: 15,
+                color: colors.neutral.secondary,
+                textAlign: "center",
+                marginTop: 6,
+              }}
+            >
+              Enter the invite code from your roommate
+            </Text>
+          </View>
+
+          {/* Error */}
+          {error ? (
+            <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
+              <Text className="text-sm text-red-600">{error}</Text>
+            </View>
+          ) : null}
+
+          {/* Code input -- inset style */}
+          <View style={{ marginBottom: 8 }}>
+            <TextInput
+              className={`rounded-2xl px-4 py-4 text-center text-2xl font-bold tracking-widest text-neutral-text ${
+                error
+                  ? "border-2 border-semantic-error bg-white"
+                  : focused
+                    ? "border-2 border-brand bg-white"
+                    : "border-2 border-transparent bg-[#F5F5F5]"
+              }`}
+              placeholder="ABCD EFGH"
+              placeholderTextColor={colors.neutral.tertiary}
+              value={displayCode}
+              onChangeText={handleCodeChange}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={9}
+              editable={!loading}
+              autoFocus
+            />
+            <Text
+              style={{
+                fontSize: 12,
+                color: colors.neutral.tertiary,
+                textAlign: "center",
+                marginTop: 8,
+              }}
+            >
+              8-character code from your roommate
+            </Text>
+          </View>
+
+          {/* Join button */}
+          <View style={{ marginTop: 24 }}>
+            <Pressable
+              className={`items-center rounded-2xl py-4 ${
+                trimmedCode.length < 8 || loading
+                  ? "bg-brand/50"
+                  : "bg-brand active:bg-brand-dark"
+              }`}
+              onPress={handleJoin}
+              disabled={trimmedCode.length < 8 || loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-lg font-bold text-white">
+                  Join Household
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

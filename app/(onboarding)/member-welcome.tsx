@@ -7,9 +7,11 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase";
+import { Avatar } from "@/components/ui";
+import { ONBOARDING_CREAM } from "@/lib/onboarding-images";
 import type { Profile } from "@/lib/types/database";
 
 type MemberWithProfile = {
@@ -66,69 +68,113 @@ export default function MemberWelcomeScreen() {
     fetchMembers();
   }, [params.household_id]);
 
-  function getInitial(name: string): string {
-    return name ? name.charAt(0).toUpperCase() : "?";
-  }
-
-  // Alternate colors for member avatars
-  const avatarColors = [
-    "bg-brand-light",
-    "bg-semantic-success/20",
-    "bg-blue-100",
-    "bg-purple-100",
-    "bg-pink-100",
-  ];
-
   return (
-    <View className="flex-1 bg-neutral-bg">
+    <SafeAreaView style={{ flex: 1, backgroundColor: ONBOARDING_CREAM }}>
+      {/* No StepProgressBar -- celebration screen for joiners */}
       <ScrollView
-        contentContainerClassName="flex-grow justify-center px-8 py-12"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: 32,
+          paddingVertical: 32,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {/* Celebration header */}
-        <View className="mb-8 items-center">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-semantic-success/20">
-            <Ionicons name="checkmark-circle" size={56} color={colors.semantic.success} />
-          </View>
-          <Text className="text-4xl font-bold text-gray-800">
+        <View style={{ alignItems: "center", marginBottom: 32 }}>
+          <Text
+            style={{
+              fontSize: 36,
+              fontWeight: "800",
+              color: colors.neutral.text,
+              textAlign: "center",
+            }}
+          >
             You're in!
           </Text>
-          <Text className="mt-2 text-center text-xl font-semibold text-brand-dark">
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "600",
+              color: colors.brand.dark,
+              textAlign: "center",
+              marginTop: 8,
+            }}
+          >
             {params.household_name}
           </Text>
-          <Text className="mt-1 text-center text-base text-gray-500">
+          <Text
+            style={{
+              fontSize: 15,
+              color: colors.neutral.secondary,
+              textAlign: "center",
+              marginTop: 4,
+            }}
+          >
             You're member #{params.member_count}
           </Text>
         </View>
 
-        {/* Member list */}
-        <View className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-          <Text className="mb-4 text-sm font-medium text-gray-400">
+        {/* Member list card */}
+        <View
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: 16,
+            padding: 20,
+            marginBottom: 32,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 11,
+              fontWeight: "600",
+              letterSpacing: 1,
+              color: colors.neutral.tertiary,
+              textTransform: "uppercase",
+              marginBottom: 16,
+            }}
+          >
             HOUSEHOLD MEMBERS
           </Text>
 
           {loading ? (
-            <ActivityIndicator color={colors.brand.DEFAULT} className="py-4" />
+            <ActivityIndicator
+              color={colors.brand.DEFAULT}
+              style={{ paddingVertical: 16 }}
+            />
           ) : (
-            <View className="gap-3">
-              {members.map((member, index) => (
+            <View style={{ gap: 12 }}>
+              {members.map((member) => (
                 <View
                   key={member.user_id}
-                  className="flex-row items-center"
+                  style={{ flexDirection: "row", alignItems: "center" }}
                 >
-                  <View
-                    className={`mr-3 h-10 w-10 items-center justify-center rounded-full ${avatarColors[index % avatarColors.length]}`}
-                  >
-                    <Text className="text-lg font-bold text-gray-700">
-                      {getInitial(member.profiles?.display_name ?? "")}
-                    </Text>
+                  <View style={{ marginRight: 12 }}>
+                    <Avatar
+                      userId={member.user_id}
+                      name={member.profiles?.display_name ?? "?"}
+                      size="md"
+                    />
                   </View>
-                  <View className="flex-1">
-                    <Text className="text-base font-semibold text-gray-800">
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "600",
+                        color: colors.neutral.text,
+                      }}
+                    >
                       {member.profiles?.display_name || "Unknown"}
                     </Text>
                     {member.role === "creator" ? (
-                      <Text className="text-xs text-gray-400">Creator</Text>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: colors.neutral.tertiary,
+                        }}
+                      >
+                        Creator
+                      </Text>
                     ) : null}
                   </View>
                 </View>
@@ -139,12 +185,25 @@ export default function MemberWelcomeScreen() {
 
         {/* Continue button */}
         <Pressable
-          className="items-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
+          style={{
+            backgroundColor: colors.brand.DEFAULT,
+            borderRadius: 16,
+            paddingVertical: 16,
+            alignItems: "center",
+          }}
           onPress={() => router.push("/(onboarding)/module-quiz")}
         >
-          <Text className="text-lg font-bold text-white">Continue</Text>
+          <Text
+            style={{
+              fontSize: 17,
+              fontWeight: "700",
+              color: "#FFFFFF",
+            }}
+          >
+            Continue
+          </Text>
         </Pressable>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
