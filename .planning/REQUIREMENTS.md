@@ -92,10 +92,10 @@ Presentation-layer redesign. All backend logic, data models, and navigation stru
 
 ### Groceries UI
 
-- [ ] **GRUI-01**: Grocery list splits into "TO GET" and "DONE" sections with item counts in overline headers
-- [ ] **GRUI-02**: Grocery items show circle checkboxes (unchecked: empty circle, checked: brand fill with checkmark)
-- [ ] **GRUI-03**: Grocery item rows show a member avatar indicating who added each item
-- [ ] **GRUI-04**: Quick-add input uses card-styled input field with a branded square add button
+- [x] **GRUI-01**: Grocery list splits into "TO GET" and "DONE" sections with item counts in overline headers
+- [x] **GRUI-02**: Grocery items show circle checkboxes (unchecked: empty circle, checked: brand fill with checkmark)
+- [x] **GRUI-03**: Grocery item rows show a member avatar indicating who added each item
+- [x] **GRUI-04**: Quick-add input uses card-styled input field with a branded square add button
 
 ### Chores UI
 
@@ -178,10 +178,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | XPUI-01 | Phase 8 | Complete |
 | XPUI-02 | Phase 8 | Complete |
 | XPUI-03 | Phase 8 | Complete |
-| GRUI-01 | Phase 9 | Pending |
-| GRUI-02 | Phase 9 | Pending |
-| GRUI-03 | Phase 9 | Pending |
-| GRUI-04 | Phase 9 | Pending |
+| GRUI-01 | Phase 9 | Complete |
+| GRUI-02 | Phase 9 | Complete |
+| GRUI-03 | Phase 9 | Complete |
+| GRUI-04 | Phase 9 | Complete |
 | CHUI-01 | Phase 9 | Pending |
 | CHUI-02 | Phase 9 | Pending |
 | CHUI-03 | Phase 9 | Pending |

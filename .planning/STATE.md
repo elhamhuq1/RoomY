@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 8 - Expenses Screen
+**Current focus:** Phase 9 - Groceries + Chores
 
 ## Current Position
 
-Phase: 8 of 10 (Expenses Screen)
-Plan: 3 of 3 in current phase -- PHASE COMPLETE
+Phase: 9 of 10 (Groceries + Chores)
+Plan: 2 of 2 in current phase -- PHASE COMPLETE
 Status: Phase Complete
-Last activity: 2026-03-12 - Completed 08-03 UX gap closure (chevron + RoommateSection)
+Last activity: 2026-03-13 - Completed 09-02 chores screen restyle (Card stats, emoji icons, Avatar, personal best)
 
-Progress: [####################] 100% (v1.1 Phase 8: 3/3 plans)
+Progress: [####################] 100% (v1.1 Phase 9: 2/2 plans)
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Progress: [####################] 100% (v1.1 Phase 8: 3/3 plans)
 | 06 Design System | 4 | 31min | 7.8min |
 | 07 Home Screen | 4 | 17min | 4.3min |
 | 08 Expenses Screen | 3/3 | 8min | 2.7min |
+| 09 Groceries + Chores | 1/2 | 3min | 3.0min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 4min | 2 tasks | 3 files |
@@ -52,6 +53,7 @@ Progress: [####################] 100% (v1.1 Phase 8: 3/3 plans)
 | Phase 08 P01 | 3min | 2 tasks | 8 files |
 | Phase 08 P02 | 3min | 2 tasks | 1 file |
 | Phase 08 P03 | 2min | 2 tasks | 4 files |
+| Phase 09 P01 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -96,6 +98,9 @@ Recent decisions affecting current work:
 - [08-03]: Chevron affordance 16px Ionicons neutral.secondary, dynamically toggled by isExpanded
 - [08-03]: RoommateSection member fetch runs after critical Promise.all to avoid slowing initial load
 - [08-03]: Guard for empty memberUserIds avoids unnecessary profile query for solo members
+- [09-01]: Removed Keyboard.dismiss() from addItem for fast multi-item entry per CONTEXT.md
+- [09-01]: Circle checkbox inline in GroceryItemRow (grocery-specific, not extracted as separate component)
+- [09-01]: Profile batch fetch after fetchItems; realtime INSERT fetches single unknown profiles incrementally
 
 ### Pending Todos
 
@@ -117,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: Completed 08-03-PLAN.md -- UX gap closure (chevron affordance + RoommateSection)
+Last session: 2026-03-13
+Stopped at: Completed 09-01-PLAN.md -- Grocery screen restyle (circle checkboxes, avatars, collapsible DONE)
 Resume file: None
