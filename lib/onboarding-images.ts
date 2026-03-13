@@ -15,4 +15,6 @@ export const ONBOARDING_IMAGES = {
   setupHome: require('@/assets/onboarding/setup-home.png'),
   nameHousehold: require('@/assets/onboarding/name-household.png'),
   inviteCode: require('@/assets/onboarding/invite-code.png'),
+  createHouseholdIcon: require('@/assets/onboarding/create-household-icon.png'),
+  joinHouseholdIcon: require('@/assets/onboarding/join-household-icon.png'),
 } as const;
