@@ -70,6 +70,7 @@ interface ChoreRowProps {
   isMyChore: boolean;
   isDisputed: boolean;
   isDisputedByMe: boolean;
+  disputeReason?: string | null;
   overdueDays: number | null;
   isCompleting: boolean;
   isClaiming: boolean;
@@ -79,6 +80,7 @@ interface ChoreRowProps {
   onClaim: () => void;
   onDispute: () => void;
   onSwap: () => void;
+  onViewDispute?: () => void;
 }
 
 export function ChoreRow({
@@ -88,6 +90,7 @@ export function ChoreRow({
   isMyChore,
   isDisputed,
   isDisputedByMe,
+  disputeReason,
   overdueDays,
   isCompleting,
   isClaiming,
@@ -97,6 +100,7 @@ export function ChoreRow({
   onClaim,
   onDispute,
   onSwap,
+  onViewDispute,
 }: ChoreRowProps) {
   const emoji = getChoreEmoji(chore.name);
   const isOverdue = overdueDays !== null;
@@ -106,7 +110,7 @@ export function ChoreRow({
   if (isDisputed) {
     rowBg = 'bg-red-50 border-l-4 border-red-300';
   } else if (isOverdue) {
-    rowBg = 'bg-red-50/50';
+    rowBg = 'bg-amber-50/50';
   }
 
   return (
@@ -136,48 +140,48 @@ export function ChoreRow({
         <View className="flex-row items-center gap-1.5">
           {isMyChore && (
             <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-purple-50 active:bg-purple-100"
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
               onPress={onSwap}
             >
-              <Ionicons name="swap-horizontal-outline" size={18} color="#9333ea" />
+              <Ionicons name="swap-horizontal-outline" size={18} color="#64748B" />
             </Pressable>
           )}
           {showDisputeButton && (
             <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-amber-50 active:bg-amber-100"
+              className="h-9 w-9 items-center justify-center rounded-full bg-red-50 active:bg-red-100"
               onPress={onDispute}
               disabled={isDisputing}
             >
               {isDisputing ? (
-                <ActivityIndicator size="small" color="#d97706" />
+                <ActivityIndicator size="small" color="#EF4444" />
               ) : (
-                <Ionicons name="flag-outline" size={18} color="#d97706" />
+                <Ionicons name="flag-outline" size={18} color="#EF4444" />
               )}
             </Pressable>
           )}
           {!isMyChore && (
             <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-blue-50 active:bg-blue-100"
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
               onPress={onClaim}
               disabled={isClaiming}
             >
               {isClaiming ? (
-                <ActivityIndicator size="small" color="#3b82f6" />
+                <ActivityIndicator size="small" color="#64748B" />
               ) : (
-                <Ionicons name="hand-left-outline" size={18} color="#3b82f6" />
+                <Ionicons name="hand-left-outline" size={18} color="#64748B" />
               )}
             </Pressable>
           )}
           {isMyChore && (
             <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-green-50 active:bg-green-100"
+              className="h-9 w-9 items-center justify-center rounded-full bg-brand-light active:bg-emerald-200"
               onPress={onComplete}
               disabled={isCompleting}
             >
               {isCompleting ? (
-                <ActivityIndicator size="small" color="#22c55e" />
+                <ActivityIndicator size="small" color="#10B981" />
               ) : (
-                <Ionicons name="checkmark" size={20} color="#22c55e" />
+                <Ionicons name="checkmark" size={20} color="#10B981" />
               )}
             </Pressable>
           )}
@@ -197,8 +201,8 @@ export function ChoreRow({
           </View>
         )}
         {isOverdue ? (
-          <View className="rounded-full bg-red-100 px-2 py-0.5">
-            <Text className="text-xs font-semibold text-red-600">
+          <View className="rounded-full bg-amber-100 px-2 py-0.5">
+            <Text className="text-xs font-semibold text-amber-700">
               {overdueDays}d overdue
             </Text>
           </View>
@@ -209,10 +213,26 @@ export function ChoreRow({
         )}
       </View>
 
-      {isDisputedByMe && (
-        <Text className="mt-1.5 ml-13 text-xs text-amber-600">
-          Your completion was disputed
-        </Text>
+      {isDisputed && (
+        <Pressable
+          className="mt-1.5 ml-13 flex-row items-center"
+          onPress={onViewDispute}
+          disabled={!onViewDispute}
+        >
+          <Text className="text-xs text-red-600 flex-1" numberOfLines={2}>
+            {isDisputedByMe
+              ? `Your completion was disputed${disputeReason ? `: "${disputeReason}"` : ''}`
+              : `You disputed this${disputeReason ? `: "${disputeReason}"` : ''}`}
+          </Text>
+          {onViewDispute && (
+            <View className="flex-row items-center ml-2">
+              <Text className="text-xs font-semibold text-brand mr-0.5">
+                View
+              </Text>
+              <Ionicons name="chevron-forward" size={12} color="#10B981" />
+            </View>
+          )}
+        </Pressable>
       )}
     </View>
   );

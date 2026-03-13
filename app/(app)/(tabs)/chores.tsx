@@ -476,14 +476,14 @@ export default function ChoresScreen() {
         {/* Swap requests banner */}
         {pendingSwapCount > 0 && (
           <Pressable
-            className="mx-4 mt-2 flex-row items-center rounded-xl bg-purple-50 px-4 py-3"
+            className="mx-4 mt-2 flex-row items-center rounded-xl bg-gray-100 px-4 py-3"
             onPress={() => router.push("/(app)/chores/swap-request" as never)}
           >
-            <Ionicons name="swap-horizontal" size={20} color="#9333ea" />
-            <Text className="ml-2 flex-1 text-sm font-medium text-purple-700">
+            <Ionicons name="swap-horizontal" size={20} color="#64748B" />
+            <Text className="ml-2 flex-1 text-sm font-medium text-neutral-text">
               {pendingSwapCount} pending swap request{pendingSwapCount !== 1 ? "s" : ""}
             </Text>
-            <Ionicons name="chevron-forward" size={16} color="#9333ea" />
+            <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
         )}
 
@@ -636,7 +636,7 @@ export default function ChoresScreen() {
                     {member.display_name}
                   </Text>
                   {swapSubmitting ? (
-                    <ActivityIndicator size="small" color="#9333ea" />
+                    <ActivityIndicator size="small" color="#64748B" />
                   ) : (
                     <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
                   )}
