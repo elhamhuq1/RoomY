@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Phase 9 - Groceries + Chores
+**Current focus:** Phase 10 - Onboarding Flow
 
 ## Current Position
 
-Phase: 9 of 10 (Groceries + Chores)
-Plan: 2 of 2 in current phase -- PHASE COMPLETE
-Status: Phase Complete
-Last activity: 2026-03-13 - Completed 09-02 chores screen restyle (Card stats, emoji icons, Avatar, personal best)
+Phase: 10 of 10 (Onboarding Flow)
+Plan: 1 of 4 in current phase
+Status: In Progress
+Last activity: 2026-03-13 - Completed 10-01 onboarding assets and welcome carousel restyle
 
-Progress: [####################] 100% (v1.1 Phase 9: 2/2 plans)
+Progress: [#####...............] 25% (v1.1 Phase 10: 1/4 plans)
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [####################] 100% (v1.1 Phase 9: 2/2 plans)
 | Phase 08 P03 | 2min | 2 tasks | 4 files |
 | Phase 09 P01 | 3min | 2 tasks | 6 files |
 | Phase 09 P02 | 3min | 2 tasks | 5 files |
+| Phase 10 P01 | 2min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,9 @@ Recent decisions affecting current work:
 - [09-02]: Personal best calculated by scanning all completions for longest consecutive non-reverted run
 - [09-02]: Emoji icon mapping uses case-insensitive keyword includes matching with clipboard fallback
 - [09-02]: 400ms setTimeout delay after completion RPC for visual feedback before refetch
+- [10-01]: ONBOARDING_CREAM set to #F5F0EB (closest match to illustration backgrounds)
+- [10-01]: Renamed 'Sign in' to 'Log in' on welcome screen per CONTEXT.md decision
+- [10-01]: Platform-aware glassmorphism: rgba(255,255,255,0.3) iOS, rgba(255,255,255,0.7) Android
 
 ### Pending Todos
 
@@ -119,14 +123,14 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Research]: expo-blur intensity mapping (CSS blur 12px -> intensity ~25-35) requires visual tuning in Phase 10
+- [Resolved 10-01]: expo-blur intensity mapping -- using intensity=25 with tint="light", Platform-aware inner bg opacity
 - [Resolved 06-03]: Colored shadow -- used iOS shadow props (shadowColor, shadowOffset, shadowOpacity, shadowRadius) directly in FAB.tsx
 - [Resolved 06-01]: NativeWind fontSize tuples work with fontWeight/letterSpacing in Tailwind config extend
 - [Resolved 06-02]: Deterministic member color via hashString(userId) % 8 gradient pairs -- simple charCodeAt hash, no DB storage needed
-- [Research]: Gradient interpolation scope for onboarding carousel (static-per-slide vs scroll-handler) -- decide during Phase 10 planning
+- [Resolved 10-01]: Gradient interpolation scope -- static cream background per CONTEXT.md (no per-slide gradient needed)
 
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 09-02-PLAN.md -- Chores screen restyle (Card stats, emoji icons, Avatar, personal best)
+Stopped at: Completed 10-01-PLAN.md -- Onboarding assets, StepProgressBar, and welcome carousel restyle
 Resume file: None
