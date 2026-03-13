@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { IconContainer } from '@/components/ui/IconContainer';
 import { Avatar } from '@/components/ui/Avatar';
+import { colors } from '@/lib/theme/colors';
 import type { Expense } from '@/lib/types/database';
 
 const formatCurrency = (amount: number): string =>
@@ -61,6 +63,13 @@ export function ExpenseRow({
         <Text className="text-body font-bold text-neutral-text">
           {formatCurrency(Number(expense.amount))}
         </Text>
+        <View className="ml-2">
+          <Ionicons
+            name={isExpanded ? 'chevron-up' : 'chevron-down'}
+            size={16}
+            color={colors.neutral.secondary}
+          />
+        </View>
       </Pressable>
 
       {isExpanded && (
