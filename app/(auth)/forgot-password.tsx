@@ -1,4 +1,5 @@
 import { colors } from "@/lib/theme/colors";
+import { ONBOARDING_CREAM } from "@/lib/onboarding-images";
 import { useState } from "react";
 import {
   View,
@@ -8,7 +9,9 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from "react-native";
+import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { requestPasswordReset } from "@/lib/auth-utils";
@@ -20,6 +23,7 @@ export default function ForgotPasswordScreen() {
   const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   function validateEmail(value: string): boolean {
     if (!value.trim()) {
@@ -54,10 +58,23 @@ export default function ForgotPasswordScreen() {
     }
   }
 
+  function inputStyle(field: string, hasError: boolean) {
+    if (hasError) {
+      return "rounded-2xl bg-white border-2 border-semantic-error px-4 py-3.5 text-base text-gray-800";
+    }
+    if (focusedField === field) {
+      return "rounded-2xl bg-white border-2 border-brand px-4 py-3.5 text-base text-gray-800";
+    }
+    return "rounded-2xl bg-[#F5F5F5] border-2 border-transparent px-4 py-3.5 text-base text-gray-800";
+  }
+
   // Success state: confirmation message
   if (sent) {
     return (
-      <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
+      <View
+        className="flex-1 items-center justify-center px-8"
+        style={{ backgroundColor: ONBOARDING_CREAM }}
+      >
         <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-semantic-success/20">
           <Ionicons name="mail-outline" size={40} color={colors.semantic.success} />
         </View>
@@ -69,10 +86,10 @@ export default function ForgotPasswordScreen() {
           <Text className="font-semibold text-gray-700">{email}</Text>
         </Text>
         <Pressable
-          className="w-full items-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
+          className="w-full items-center rounded-2xl bg-brand py-3.5 active:bg-brand-dark"
           onPress={() => router.replace("/(auth)/sign-in")}
         >
-          <Text className="text-lg font-bold text-white">Back to Sign In</Text>
+          <Text className="text-lg font-bold text-white">Back to Log In</Text>
         </Pressable>
       </View>
     );
@@ -80,7 +97,8 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-neutral-bg"
+      className="flex-1"
+      style={{ backgroundColor: ONBOARDING_CREAM }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View className="flex-grow justify-center px-8">
@@ -92,16 +110,49 @@ export default function ForgotPasswordScreen() {
           <Ionicons name="arrow-back" size={22} color={colors.neutral.text} />
         </Pressable>
 
+        {/* Glassmorphism logo */}
+        <View className="mb-6 items-center">
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              overflow: "hidden",
+            }}
+          >
+            <BlurView
+              intensity={25}
+              tint="light"
+              style={{ flex: 1 }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: Platform.select({
+                    ios: "rgba(255,255,255,0.3)",
+                    default: "rgba(255,255,255,0.7)",
+                  }),
+                }}
+              >
+                <Image
+                  source={require("@/assets/icon.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMode="contain"
+                />
+              </View>
+            </BlurView>
+          </View>
+        </View>
+
         {/* Header */}
         <View className="mb-8 items-center">
-          <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-brand-light">
-            <Ionicons name="lock-closed-outline" size={32} color={colors.brand.DEFAULT} />
-          </View>
           <Text className="text-2xl font-bold text-gray-800">
             Reset Password
           </Text>
-          <Text className="mt-2 text-center text-base text-gray-500">
-            Enter your email and we'll send you a link to reset your password
+          <Text className="mt-2 text-center text-base text-neutral-secondary">
+            Enter your email and we'll send you a reset link
           </Text>
         </View>
 
@@ -114,21 +165,20 @@ export default function ForgotPasswordScreen() {
 
         {/* Email input */}
         <View className="mb-6">
-          <Text className="mb-1.5 text-sm font-medium text-gray-700">
-            Email
-          </Text>
           <TextInput
-            className={`rounded-xl border bg-white px-4 py-3.5 text-base text-gray-800 ${
-              emailError ? "border-red-400" : "border-neutral-border"
-            }`}
-            placeholder="you@example.com"
+            className={inputStyle("email", !!emailError)}
+            placeholder="Email"
             placeholderTextColor={colors.neutral.tertiary}
             value={email}
             onChangeText={(text) => {
               setEmail(text);
               if (emailError) validateEmail(text);
             }}
-            onBlur={() => email && validateEmail(email)}
+            onFocus={() => setFocusedField("email")}
+            onBlur={() => {
+              setFocusedField(null);
+              if (email) validateEmail(email);
+            }}
             autoCapitalize="none"
             autoComplete="email"
             keyboardType="email-address"
@@ -142,7 +192,7 @@ export default function ForgotPasswordScreen() {
 
         {/* Send reset link button */}
         <Pressable
-          className={`items-center rounded-2xl py-4 ${
+          className={`mb-6 items-center rounded-2xl py-3.5 ${
             loading ? "bg-brand/50" : "bg-brand active:bg-brand-dark"
           }`}
           onPress={handleReset}
@@ -155,6 +205,17 @@ export default function ForgotPasswordScreen() {
               Send Reset Link
             </Text>
           )}
+        </Pressable>
+
+        {/* Back to Log In link */}
+        <Pressable
+          className="items-center py-3"
+          onPress={() => router.replace("/(auth)/sign-in")}
+        >
+          <Text className="text-base text-gray-500">
+            Back to{" "}
+            <Text className="font-semibold text-brand-dark">Log In</Text>
+          </Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
