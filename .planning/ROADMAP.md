@@ -130,7 +130,13 @@ Plans:
   3. Display name screen shows a live avatar preview that updates its initial as the user types
   4. Setup choice and household screens use large styled cards with gradient icon containers and branded inputs
   5. Onboarding flow shows a 3-segment step progress bar that fills as the user advances through applicable screens
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Infrastructure setup (images, expo-blur, StepProgressBar) and welcome carousel restyle
+- [ ] 10-02-PLAN.md — Auth screens restyle (sign-up, sign-in, forgot-password) with "Sign In" to "Log In" rename
+- [ ] 10-03-PLAN.md — Profile, household choice, and create-household name form with illustrations and progress bar
+- [ ] 10-04-PLAN.md — Invite code celebration, join-household, member-welcome, and module-quiz restyle
 
 ## Progress
 
@@ -150,4 +156,4 @@ Phases execute in numeric order: 6 -> 7 -> 8 -> 9 -> 10
 | 7. Home Screen | v1.1 | 3/4 (gap closure) | In progress | - |
 | 8. Expenses Screen | v1.1 | 2/3 (gap closure) | In progress | - |
 | 9. Groceries + Chores | v1.1 | 0/2 | Planned | - |
-| 10. Onboarding Flow | v1.1 | 0/TBD | Not started | - |
+| 10. Onboarding Flow | v1.1 | 0/4 | Planned | - |
