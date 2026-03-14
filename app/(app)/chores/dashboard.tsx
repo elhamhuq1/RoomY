@@ -1,4 +1,4 @@
-import { colors, AVATAR_COLORS } from "@/lib/theme/colors";
+import { colors } from "@/lib/theme/colors";
 import { useState, useCallback } from "react";
 import {
   View,
@@ -12,21 +12,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
+import { Avatar } from "@/components/ui";
 import type { ChoreCompletion, Profile } from "@/lib/types/database";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 // ---------------------------------------------------------------------------
 // Date helpers
@@ -77,6 +69,7 @@ function calculateStreak(completions: ChoreCompletion[]): number {
 interface MemberStats {
   userId: string;
   displayName: string;
+  avatarUrl: string | null;
   completionCount: number;
   streak: number;
 }
@@ -207,6 +200,7 @@ export default function DashboardScreen() {
         stats.push({
           userId,
           displayName,
+          avatarUrl: profileMap[userId]?.avatar_url ?? null,
           completionCount,
           streak,
         });
@@ -366,18 +360,13 @@ export default function DashboardScreen() {
                 >
                   <View className="flex-row items-center">
                     {/* Avatar */}
-                    <View
-                      className="mr-3 h-11 w-11 items-center justify-center rounded-full"
-                      style={{
-                        backgroundColor:
-                          AVATAR_COLORS[
-                            member.userId.charCodeAt(0) % AVATAR_COLORS.length
-                          ],
-                      }}
-                    >
-                      <Text className="text-sm font-bold text-white">
-                        {getInitials(member.displayName)}
-                      </Text>
+                    <View className="mr-3">
+                      <Avatar
+                        userId={member.userId}
+                        name={member.displayName}
+                        size="md"
+                        avatarUrl={member.avatarUrl}
+                      />
                     </View>
 
                     {/* Name and streak */}

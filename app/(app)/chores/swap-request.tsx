@@ -1,4 +1,4 @@
-import { colors, AVATAR_COLORS } from "@/lib/theme/colors";
+import { colors } from "@/lib/theme/colors";
 import { useState, useCallback } from "react";
 import {
   View,
@@ -12,6 +12,7 @@ import {
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
+import { Avatar } from "@/components/ui";
 import type {
   Chore,
   ChoreSwapRequest,
@@ -23,15 +24,6 @@ import type {
 // ---------------------------------------------------------------------------
 
 
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -40,6 +32,7 @@ interface SwapRequestWithDetails extends ChoreSwapRequest {
   choreName: string;
   otherPersonName: string;
   otherPersonId: string;
+  otherPersonAvatarUrl: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -127,6 +120,7 @@ export default function SwapRequestScreen() {
           otherPersonName:
             profileMap[r.requested_by]?.display_name ?? "Unknown",
           otherPersonId: r.requested_by,
+          otherPersonAvatarUrl: profileMap[r.requested_by]?.avatar_url ?? null,
         });
       }
 
@@ -137,6 +131,7 @@ export default function SwapRequestScreen() {
           otherPersonName:
             profileMap[r.requested_to]?.display_name ?? "Unknown",
           otherPersonId: r.requested_to,
+          otherPersonAvatarUrl: profileMap[r.requested_to]?.avatar_url ?? null,
         });
       }
     });
@@ -273,19 +268,13 @@ export default function SwapRequestScreen() {
                     }`}
                   >
                     <View className="flex-row items-center">
-                      <View
-                        className="mr-3 h-9 w-9 items-center justify-center rounded-full"
-                        style={{
-                          backgroundColor:
-                            AVATAR_COLORS[
-                              request.otherPersonId.charCodeAt(0) %
-                                AVATAR_COLORS.length
-                            ],
-                        }}
-                      >
-                        <Text className="text-xs font-bold text-white">
-                          {getInitials(request.otherPersonName)}
-                        </Text>
+                      <View className="mr-3">
+                        <Avatar
+                          userId={request.otherPersonId}
+                          name={request.otherPersonName}
+                          size="sm"
+                          avatarUrl={request.otherPersonAvatarUrl}
+                        />
                       </View>
                       <View className="flex-1">
                         <Text
@@ -355,19 +344,13 @@ export default function SwapRequestScreen() {
                       : ""
                   }`}
                 >
-                  <View
-                    className="mr-3 h-9 w-9 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor:
-                        AVATAR_COLORS[
-                          request.otherPersonId.charCodeAt(0) %
-                            AVATAR_COLORS.length
-                        ],
-                    }}
-                  >
-                    <Text className="text-xs font-bold text-white">
-                      {getInitials(request.otherPersonName)}
-                    </Text>
+                  <View className="mr-3">
+                    <Avatar
+                      userId={request.otherPersonId}
+                      name={request.otherPersonName}
+                      size="sm"
+                      avatarUrl={request.otherPersonAvatarUrl}
+                    />
                   </View>
                   <View className="flex-1">
                     <Text

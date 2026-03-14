@@ -2,6 +2,7 @@ import { View, Text, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSession } from "@/lib/auth-context";
+import { Avatar } from "@/components/ui";
 
 type SettingsRow = {
   key: string;
@@ -15,7 +16,7 @@ type SettingsRow = {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { profile, household, signOut } = useSession();
+  const { user, profile, household, signOut } = useSession();
 
   function handleSignOut() {
     Alert.alert(
@@ -33,15 +34,6 @@ export default function SettingsScreen() {
       ]
     );
   }
-
-  const initials = profile?.display_name
-    ? profile.display_name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "?";
 
   const rows: SettingsRow[] = [
     {
@@ -79,8 +71,13 @@ export default function SettingsScreen() {
     <View className="flex-1 bg-neutral-bg px-6 pt-6">
       {/* User card */}
       <View className="mb-6 flex-row items-center rounded-card bg-transparent border border-neutral-border p-5">
-        <View className="mr-4 h-14 w-14 items-center justify-center rounded-full bg-brand">
-          <Text className="text-lg font-bold text-white">{initials}</Text>
+        <View className="mr-4">
+          <Avatar
+            userId={user?.id ?? ""}
+            name={profile?.display_name ?? "?"}
+            size="lg"
+            avatarUrl={profile?.avatar_url}
+          />
         </View>
         <View className="flex-1">
           <Text className="text-lg font-semibold text-gray-800">

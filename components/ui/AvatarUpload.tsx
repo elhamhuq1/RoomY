@@ -77,20 +77,11 @@ export function AvatarUpload({
     );
   }
 
-  function showEditSubMenu() {
-    Alert.alert('Edit Photo', undefined, [
-      { text: 'Take Photo', onPress: handleCamera },
-      { text: 'Choose from Library', onPress: handleGallery },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
-  }
-
   function showActionSheet() {
     if (avatarUrl) {
       Alert.alert('Profile Photo', undefined, [
         { text: 'Take Photo', onPress: handleCamera },
         { text: 'Choose from Library', onPress: handleGallery },
-        { text: 'Edit', onPress: showEditSubMenu },
         { text: 'Remove Photo', style: 'destructive', onPress: handleRemove },
         { text: 'Cancel', style: 'cancel' },
       ]);

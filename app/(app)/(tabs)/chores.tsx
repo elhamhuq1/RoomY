@@ -545,6 +545,7 @@ export default function ChoresScreen() {
                       chore={chore}
                       assigneeName={assigneeName}
                       assigneeId={chore.current_assignee}
+                      assigneeAvatarUrl={assigneeProfile?.avatar_url}
                       isMyChore={true}
                       isDisputed={isDisputed}
                       isDisputedByMe={isDisputedByMe}
@@ -600,6 +601,7 @@ export default function ChoresScreen() {
                       chore={chore}
                       assigneeName={assigneeName}
                       assigneeId={chore.current_assignee}
+                      assigneeAvatarUrl={assigneeProfile?.avatar_url}
                       isMyChore={false}
                       isDisputed={isDisputed}
                       isDisputedByMe={isDisputedByMe}

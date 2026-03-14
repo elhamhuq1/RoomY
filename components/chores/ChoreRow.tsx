@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/lib/theme/colors';
+import { Avatar } from '@/components/ui';
 import type { Chore } from '@/lib/types/database';
 
 // ---------------------------------------------------------------------------
@@ -68,6 +69,7 @@ interface ChoreRowProps {
   chore: Chore;
   assigneeName: string;
   assigneeId: string | null;
+  assigneeAvatarUrl?: string | null;
   isMyChore: boolean;
   isDisputed: boolean;
   isDisputedByMe: boolean;
@@ -89,6 +91,7 @@ export function ChoreRow({
   chore,
   assigneeName,
   assigneeId,
+  assigneeAvatarUrl,
   isMyChore,
   isDisputed,
   isDisputedByMe,
@@ -118,8 +121,17 @@ export function ChoreRow({
 
   return (
     <View className={`px-4 py-3 ${rowBg}`}>
-      {/* Top row: emoji + name + action buttons */}
+      {/* Top row: avatar + name + action buttons */}
       <View className="flex-row items-center">
+        {/* Avatar */}
+        <View className="mr-3">
+          <Avatar
+            userId={assigneeId ?? ""}
+            name={assigneeName}
+            size="sm"
+            avatarUrl={assigneeAvatarUrl}
+          />
+        </View>
         {/* Chore name + assignee */}
         <View className="flex-1">
           <Text className="text-card-title font-heading-semi text-neutral-text" numberOfLines={1}>
