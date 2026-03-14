@@ -7,7 +7,9 @@ import { useEffect, useRef } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
+import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useSession } from "@/lib/auth-context";
+import { useFonts, Nunito_600SemiBold, Nunito_700Bold } from "@expo-google-fonts/nunito";
 import {
   registerForPushNotifications,
   setupNotificationChannels,
@@ -98,8 +100,22 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.neutral.bg }}>
+        <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style="dark" />
       <AuthProvider>
         <RootNavigator />
       </AuthProvider>
