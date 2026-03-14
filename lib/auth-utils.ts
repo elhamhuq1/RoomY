@@ -1,43 +1,88 @@
-// Auth helper functions for social sign-in and password reset
-// Uses native SDKs + signInWithIdToken (NOT signInWithOAuth browser redirect)
-// Sources: RESEARCH.md Patterns 6 & 7, Supabase Auth docs
+// Auth helper functions for browser-based Google OAuth and password reset
+// Uses expo-web-browser + signInWithOAuth (Expo Go compatible)
 
-import { Platform } from "react-native";
-import * as AppleAuthentication from "expo-apple-authentication";
+import * as WebBrowser from "expo-web-browser";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import { makeRedirectUri } from "expo-auth-session";
 import { supabase } from "./supabase";
 
+WebBrowser.maybeCompleteAuthSession();
+
+const redirectTo = makeRedirectUri();
+
+async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(
+      () => reject(new Error("Session setup timed out. Please try again.")),
+      ms,
+    ),
+  );
+  return Promise.race([promise, timeout]);
+}
+
 /**
- * Sign in with Google using native SDK.
- * Uses signInWithIdToken (not signInWithOAuth) for native experience.
- * Per RESEARCH.md Pattern 6.
- *
- * GoogleSignin is imported lazily because the native module is not available
- * in Expo Go — only in development builds. A top-level import would crash
- * the entire app at startup.
+ * Sign in with Google using browser-based OAuth flow.
+ * Opens system browser for Google consent, then extracts tokens from redirect.
+ * Works in Expo Go without native modules.
  */
 export async function signInWithGoogle() {
   try {
-    const { GoogleSignin } = await import(
-      "@react-native-google-signin/google-signin"
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
+    });
+
+    if (error) return { data: null, error };
+    if (!data?.url)
+      return { data: null, error: new Error("No OAuth URL returned") };
+
+    const result = await WebBrowser.openAuthSessionAsync(
+      data.url,
+      redirectTo,
+      { showInRecents: true },
     );
 
-    GoogleSignin.configure({
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    });
-
-    await GoogleSignin.hasPlayServices();
-    const response = await GoogleSignin.signIn();
-
-    if (!response.data?.idToken) {
-      return { data: null, error: new Error("No ID token received from Google") };
+    if (result.type !== "success") {
+      // User cancelled -- silent return per CONTEXT.md
+      return { data: null, error: null };
     }
 
-    const { data, error } = await supabase.auth.signInWithIdToken({
-      provider: "google",
-      token: response.data.idToken,
-    });
+    // Extract tokens from redirect URL
+    const { params, errorCode } = QueryParams.getQueryParams(result.url);
+    if (errorCode) return { data: null, error: new Error(errorCode) };
 
-    return { data, error };
+    const { access_token, refresh_token } = params;
+    if (!access_token)
+      return { data: null, error: new Error("No access token received") };
+
+    // Set session with timeout wrapper (known hang issue)
+    const { data: sessionData, error: sessionError } = await withTimeout(
+      supabase.auth.setSession({
+        access_token,
+        refresh_token: refresh_token ?? "",
+      }),
+      10000,
+    );
+
+    // Handle account conflict: email exists with different provider
+    if (
+      sessionError?.message &&
+      /already registered|already exists|different provider/i.test(
+        sessionError.message,
+      )
+    ) {
+      return {
+        data: null,
+        error: new Error(
+          "An account with this email already exists. Please sign in with your password.",
+        ),
+      };
+    }
+
+    return { data: sessionData, error: sessionError };
   } catch (err) {
     return {
       data: null,
@@ -47,60 +92,8 @@ export async function signInWithGoogle() {
 }
 
 /**
- * Sign in with Apple using native SDK (iOS only).
- * Captures fullName on first sign-in (Apple only sends it once -- Pitfall 3).
- * Per RESEARCH.md Pattern 7.
- */
-export async function signInWithApple() {
-  if (Platform.OS !== "ios") {
-    return { data: null, error: new Error("Apple Sign-In is only available on iOS") };
-  }
-
-  try {
-    const credential = await AppleAuthentication.signInAsync({
-      requestedScopes: [
-        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-        AppleAuthentication.AppleAuthenticationScope.EMAIL,
-      ],
-    });
-
-    if (!credential.identityToken) {
-      return { data: null, error: new Error("No identity token from Apple") };
-    }
-
-    const { data, error } = await supabase.auth.signInWithIdToken({
-      provider: "apple",
-      token: credential.identityToken,
-    });
-
-    // CRITICAL: Apple only provides full name on first sign-in.
-    // Capture it immediately and save to user metadata (Pitfall 3).
-    if (!error && credential.fullName) {
-      const fullName = [
-        credential.fullName.givenName,
-        credential.fullName.familyName,
-      ]
-        .filter(Boolean)
-        .join(" ");
-
-      if (fullName) {
-        await supabase.auth.updateUser({ data: { full_name: fullName } });
-      }
-    }
-
-    return { data, error };
-  } catch (err) {
-    return {
-      data: null,
-      error: err instanceof Error ? err : new Error("Apple sign-in failed"),
-    };
-  }
-}
-
-/**
  * Request a password reset email.
  * Uses Supabase resetPasswordForEmail with deep link redirect.
- * Per RESEARCH.md Code Example: Password Reset Flow.
  */
 export async function requestPasswordReset(email: string) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
