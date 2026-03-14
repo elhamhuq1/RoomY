@@ -9,9 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
+import { AvatarUpload } from "@/components/ui";
 
 export default function ProfileSettingsScreen() {
   const { user, profile, refreshProfile } = useSession();
@@ -21,18 +23,10 @@ export default function ProfileSettingsScreen() {
   const [venmoUsername, setVenmoUsername] = useState(
     profile?.venmo_username ?? ""
   );
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
-
-  const initials = displayName
-    ? displayName
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "?";
 
   const hasChanges =
     displayName.trim() !== (profile?.display_name ?? "") ||
@@ -91,11 +85,19 @@ export default function ProfileSettingsScreen() {
       >
         {/* Avatar preview */}
         <View className="mb-8 items-center">
-          <View className="h-24 w-24 items-center justify-center rounded-full bg-brand">
-            <Text className="text-3xl font-bold text-white">{initials}</Text>
-          </View>
-          <Text className="mt-2 text-sm text-gray-400">
-            Initials from your display name
+          <AvatarUpload
+            userId={user!.id}
+            name={displayName || '?'}
+            avatarUrl={avatarUrl}
+            size="2xl"
+            onUploadComplete={async (url) => {
+              setAvatarUrl(url);
+              await refreshProfile();
+            }}
+            onError={(msg) => Alert.alert('Error', msg)}
+          />
+          <Text className="mt-3 text-sm text-gray-400">
+            Tap to change photo
           </Text>
         </View>
 

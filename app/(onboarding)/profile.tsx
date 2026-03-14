@@ -9,19 +9,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/lib/auth-context";
-import { StepProgressBar } from "@/components/ui";
-import { ONBOARDING_CREAM, ONBOARDING_IMAGES } from "@/lib/onboarding-images";
+import { AvatarUpload, StepProgressBar } from "@/components/ui";
+import { ONBOARDING_CREAM } from "@/lib/onboarding-images";
 
 export default function ProfileSetupScreen() {
   const router = useRouter();
   const { user } = useSession();
   const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -83,13 +84,22 @@ export default function ProfileSetupScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Illustration hero */}
-          <View style={{ alignItems: "center", marginTop: 8 }}>
-            <Image
-              source={ONBOARDING_IMAGES.displayName}
-              style={{ width: "100%", height: 240 }}
-              resizeMode="contain"
+          {/* Avatar upload */}
+          <View style={{ alignItems: 'center', marginTop: 24, marginBottom: 16 }}>
+            <AvatarUpload
+              userId={user!.id}
+              name={displayName || '?'}
+              avatarUrl={avatarUrl}
+              size="2xl"
+              showBadgeAlways={true}
+              onUploadComplete={async (url) => {
+                setAvatarUrl(url);
+              }}
+              onError={(msg) => Alert.alert('Error', msg)}
             />
+            <Text style={{ fontSize: 13, color: colors.neutral.secondary, marginTop: 8 }}>
+              Add a profile photo (optional)
+            </Text>
           </View>
 
           {/* Title + subtitle */}
