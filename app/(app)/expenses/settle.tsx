@@ -128,7 +128,7 @@ export default function SettleScreen() {
     }
   }
 
-  function handleRequestVenmo() {
+  function handleVenmo() {
     if (!otherProfile?.venmo_username) return;
 
     const username = otherProfile.venmo_username.replace(/^@/, "");
@@ -136,7 +136,8 @@ export default function SettleScreen() {
     const note = desc && params.date
       ? `${desc} - ${new Date(params.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}`
       : `RoomY: Settlement for ${household?.name ?? "household"}`;
-    const url = `https://venmo.com/${username}?txn=charge&amount=${parsedAmount.toFixed(2)}&note=${encodeURIComponent(note)}`;
+    const txnType = direction === "you_owe" ? "pay" : "charge";
+    const url = `https://venmo.com/${username}?txn=${txnType}&amount=${parsedAmount.toFixed(2)}&note=${encodeURIComponent(note)}`;
 
     Linking.openURL(url);
     setVenmoSent(true);
@@ -264,12 +265,12 @@ export default function SettleScreen() {
             )}
           </Pressable>
 
-          {/* Request via Venmo - secondary */}
+          {/* Pay/Request via Venmo - secondary */}
           {otherProfile?.venmo_username ? (
             <Pressable
               className="flex-row items-center justify-center rounded-2xl py-4 active:opacity-80"
               style={{ backgroundColor: "#3D95CE" }}
-              onPress={handleRequestVenmo}
+              onPress={handleVenmo}
               disabled={!isValidAmount || submitting}
             >
               <Ionicons
@@ -279,7 +280,7 @@ export default function SettleScreen() {
                 style={{ marginRight: 8 }}
               />
               <Text className="text-lg font-bold text-white">
-                Request via Venmo
+                {direction === "you_owe" ? "Pay via Venmo" : "Request via Venmo"}
               </Text>
             </Pressable>
           ) : (
