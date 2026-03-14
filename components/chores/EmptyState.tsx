@@ -52,9 +52,10 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
           {SUGGESTED_CHORES.map((suggestion) => (
             <Pressable
               key={suggestion.name}
+              className="w-[47%]"
               onPress={() => onSelectSuggestion(suggestion.name, suggestion.frequency)}
             >
-              <Card className="w-[47%] flex-row items-center px-3 py-3.5">
+              <Card className="flex-row items-center px-3 py-3.5">
                 <View className="h-8 w-8 rounded-xl bg-brand-light items-center justify-center mr-2.5">
                   <Text style={{ fontSize: 16 }}>{suggestion.emoji}</Text>
                 </View>
