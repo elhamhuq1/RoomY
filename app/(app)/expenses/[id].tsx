@@ -388,7 +388,7 @@ export default function ExpenseDetailScreen() {
         className="flex-1 bg-neutral-bg"
         contentContainerClassName="px-6 pt-6 pb-12"
       >
-        <View className="items-center rounded-2xl bg-white p-6 shadow-sm">
+        <View className="items-center rounded-card bg-transparent border border-neutral-border p-6">
           <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <Ionicons name="checkmark-circle" size={36} color={colors.semantic.success} />
           </View>
@@ -646,7 +646,7 @@ export default function ExpenseDetailScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* Header card */}
-      <View className="items-center rounded-2xl bg-white p-6 shadow-sm">
+      <View className="items-center rounded-card bg-transparent border border-neutral-border p-6">
         <Text className="text-2xl font-bold text-gray-800">
           {expense.description}
         </Text>
@@ -674,7 +674,7 @@ export default function ExpenseDetailScreen() {
       <Text className="mb-3 mt-6 text-sm font-semibold text-gray-400">
         SPLIT BETWEEN
       </Text>
-      <View className="rounded-2xl bg-white shadow-sm">
+      <View className="rounded-card bg-transparent border border-neutral-border">
         {splits.map((split, index) => (
           <View
             key={split.id}

@@ -203,7 +203,7 @@ export default function SettleScreen() {
         </View>
 
         {/* Amount field */}
-        <View className="mb-2 rounded-2xl bg-white p-6 shadow-sm">
+        <View className="mb-2 rounded-card bg-transparent border border-neutral-border p-6">
           <Text className="mb-2 text-sm font-medium text-gray-500">
             Settlement Amount
           </Text>

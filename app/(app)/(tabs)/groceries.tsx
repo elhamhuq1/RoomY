@@ -517,7 +517,7 @@ export default function GroceriesScreen() {
 
       {/* Complete Trip button -- sticky bottom */}
       {hasCheckedItems && (
-        <View className="border-t border-neutral-border bg-white px-4 pb-6 pt-3">
+        <View className="border-t border-neutral-border bg-[#F5F0EB] px-4 pb-6 pt-3">
           <Pressable
             className="flex-row items-center justify-center rounded-2xl bg-brand py-4 active:bg-brand-dark"
             onPress={() => router.push("/(app)/groceries/complete-trip")}

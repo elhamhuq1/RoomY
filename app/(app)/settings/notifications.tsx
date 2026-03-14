@@ -86,7 +86,7 @@ export default function NotificationsSettingsScreen() {
       <Stack.Screen options={{ headerShown: true, title: "Notifications" }} />
 
       {/* Toggle card */}
-      <View className="rounded-2xl bg-white shadow-sm">
+      <View className="rounded-card bg-transparent border border-neutral-border">
         {/* Expenses toggle */}
         <View className="flex-row items-center border-b border-neutral-border px-5 py-4">
           <View className="mr-4 h-10 w-10 items-center justify-center rounded-xl bg-blue-50">

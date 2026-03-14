@@ -365,7 +365,7 @@ export default function DashboardScreen() {
 
         {/* Empty state */}
         {totalCompletions === 0 && (
-          <View className="mx-4 mt-8 items-center rounded-xl bg-white px-6 py-8">
+          <View className="mx-4 mt-8 items-center rounded-card bg-transparent border border-neutral-border px-6 py-8">
             <View className="mb-3 h-14 w-14 items-center justify-center rounded-full bg-gray-100">
               <Ionicons name="bar-chart-outline" size={28} color={colors.neutral.tertiary} />
             </View>
@@ -394,14 +394,7 @@ export default function DashboardScreen() {
               return (
                 <View
                   key={member.userId}
-                  className="mx-4 mb-3 rounded-xl bg-white p-4"
-                  style={{
-                    elevation: 1,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.05,
-                    shadowRadius: 2,
-                  }}
+                  className="mx-4 mb-3 rounded-card bg-transparent border border-neutral-border p-4"
                 >
                   <View className="flex-row items-center">
                     {/* Avatar */}

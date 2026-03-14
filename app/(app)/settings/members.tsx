@@ -199,7 +199,7 @@ export default function MembersSettingsScreen() {
           </Text>
         </View>
 
-        <View className="rounded-2xl bg-white shadow-sm">
+        <View className="rounded-card bg-transparent border border-neutral-border">
           {members.map((member, index) => (
             <View
               key={member.user_id}
@@ -264,7 +264,7 @@ export default function MembersSettingsScreen() {
           Invite Code
         </Text>
 
-        <View className="items-center rounded-2xl bg-white p-6 shadow-sm">
+        <View className="items-center rounded-card bg-transparent border border-neutral-border p-6">
           {/* Code display */}
           <Text
             className="text-3xl font-bold tracking-widest text-brand-dark"

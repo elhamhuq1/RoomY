@@ -139,7 +139,7 @@ export default function TripHistoryScreen() {
           return (
             <Pressable
               key={trip.id}
-              className="mb-3 rounded-xl bg-white p-4 shadow-sm"
+              className="mb-3 rounded-card bg-transparent border border-neutral-border p-4"
               onPress={() =>
                 setExpandedTripId(isExpanded ? null : trip.id)
               }

@@ -137,7 +137,7 @@ export default function CalendarSection({
       </View>
 
       {/* Calendar content */}
-      <View className="overflow-hidden rounded-2xl bg-white shadow-sm">
+      <View className="overflow-hidden rounded-card bg-transparent border border-neutral-border">
         {expanded ? (
           // Full month calendar view
           <Calendar

@@ -159,7 +159,7 @@ export default function ModuleSettingsScreen() {
             return (
               <View
                 key={mod.key}
-                className={`flex-row items-center rounded-2xl border-2 bg-white p-5 shadow-sm ${
+                className={`flex-row items-center rounded-card border-2 bg-transparent p-5 ${
                   isOn ? "border-brand" : "border-neutral-border"
                 }`}
               >

@@ -321,7 +321,7 @@ export default function AddChoreScreen() {
       </ScrollView>
 
       {/* Submit button */}
-      <View className="border-t border-gray-100 bg-white px-4 pb-6 pt-3">
+      <View className="border-t border-neutral-border bg-[#F5F0EB] px-4 pb-6 pt-3">
         <Pressable
           className={`flex-row items-center justify-center rounded-2xl py-4 ${
             canSubmit
