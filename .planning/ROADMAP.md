@@ -36,8 +36,8 @@
   - [x] 11-01-PLAN.md — Token foundation: wintergreen palette + AVATAR_COLORS export + Card + Avatar
   - [x] 11-02-PLAN.md — App-wide migration: hardcoded hex cleanup + AVATAR_COLORS consolidation + container restyling
   - [x] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash + visual verification
-- [ ] Phase 12: Empty State Illustrations
-- [ ] Phase 13: Profile Pictures
+- [x] Phase 12: Empty State Illustrations (completed 2026-03-14)
+- [ ] Phase 13: Profile Pictures (3 plans)
 - [ ] Phase 14: Google OAuth
 
 ---
@@ -123,7 +123,12 @@ Plans:
 - Camera/gallery permission denial handled gracefully
 - Works in Expo Go on both iOS and Android
 
-**Estimated plans:** 3-4
+**Plans:** 3 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Foundation: install packages, Supabase Storage bucket + RLS, avatar-upload utility, Avatar component upgrade
+- [ ] 13-02-PLAN.md — Upload UI: AvatarUpload component, settings profile + onboarding profile integration
+- [ ] 13-03-PLAN.md — Progressive adoption: pass avatarUrl to all Avatar usages + visual verification
 
 ---
 
@@ -172,6 +177,6 @@ Plans:
 | 9. Groceries + Chores | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 10. Onboarding Flow | v1.1 | 4/4 | Complete | 2026-03-13 |
 | 11. Visual Foundation | v1.2 | Complete    | 2026-03-14 | 2026-03-14 |
-| 12. Empty State Illustrations | v1.2 | — | Planned | — |
+| 12. Empty State Illustrations | v1.2 | Complete    | 2026-03-14 | — |
 | 13. Profile Pictures | v1.2 | — | Planned | — |
 | 14. Google OAuth | v1.2 | — | Planned | — |
