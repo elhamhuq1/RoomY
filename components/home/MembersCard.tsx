@@ -111,7 +111,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
           /* Compact invite for households with members */
           <View>
             <Text className="text-metadata text-neutral-secondary mb-2">Invite</Text>
-            <View className="flex-row items-center bg-neutral-surface rounded-card px-3 py-2.5">
+            <View className="flex-row items-center bg-neutral-bg rounded-card px-3 py-2.5">
               <Text
                 className="flex-1 text-body text-neutral-text tracking-wider"
                 style={{ fontVariant: ['tabular-nums'] }}
