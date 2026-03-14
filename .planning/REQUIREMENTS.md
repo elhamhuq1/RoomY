@@ -39,8 +39,8 @@
 - [x] **PROF-03**: Image is cropped to square before upload
 - [x] **PROF-04**: Image uploads to Supabase Storage with user-scoped RLS policies
 - [x] **PROF-05**: Avatar component shows uploaded photo when available, falls back to gradient+initials
-- [ ] **PROF-06**: Profile picture can be set during onboarding (display name step)
-- [ ] **PROF-07**: Profile picture can be changed in settings
+- [x] **PROF-06**: Profile picture can be set during onboarding (display name step)
+- [x] **PROF-07**: Profile picture can be changed in settings
 - [x] **PROF-08**: Updated photo appears across all screens without app restart (cache busting)
 - [x] **PROF-09**: Camera/gallery permissions handled gracefully with user-friendly messaging
 
@@ -96,8 +96,8 @@
 | PROF-03 | Phase 13 | Complete |
 | PROF-04 | Phase 13 | Complete |
 | PROF-05 | Phase 13 | Complete |
-| PROF-06 | Phase 13 | Pending |
-| PROF-07 | Phase 13 | Pending |
+| PROF-06 | Phase 13 | Complete |
+| PROF-07 | Phase 13 | Complete |
 | PROF-08 | Phase 13 | Complete |
 | PROF-09 | Phase 13 | Complete |
 | AUTH-01 | Phase 14 | Pending |

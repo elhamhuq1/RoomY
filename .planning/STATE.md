@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 ## Current Position
 
 Phase: 13 of 14 — Profile Pictures
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: Executing Phase 13
-Last activity: 2026-03-14 — Completed 13-01 avatar upload foundation
+Last activity: 2026-03-14 — Completed 13-02 avatar upload UI
 
-Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 1/3 Phase 13) = 39 plans shipped
+Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 2/3 Phase 13) = 40 plans shipped
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 1/3 Phase 13)
 | Phase 11 P02 | 3min | 2 tasks | 17 files |
 | Phase 11 P03 | 2min | 2 tasks | 3 files |
 | Phase 13 P01 | 3min | 2 tasks | 6 files |
+| Phase 13 P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ v1.0 and v1.1 decisions archived — see milestones/v1.1-ROADMAP.md for full his
 - [Phase 13]: Brand ring replaces shadow on Avatar component: wintergreen #2D6A4F ring (2px small, 3px large)
 - [Phase 13]: expo-image with disk cache + timestamp cache buster for avatar URLs
 - [Phase 13]: 512x512 max resize with JPEG at 0.8 quality via expo-image-manipulator
+- [Phase 13]: Action sheet via Alert.alert for native cross-platform look
+- [Phase 13]: Edit sub-menu as separate Alert for UX separation from top-level options
 
 ### Pending Todos
 
@@ -101,5 +104,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 13-01-PLAN.md (avatar upload foundation)
+Stopped at: Completed 13-02-PLAN.md (avatar upload UI)
 Resume file: None
