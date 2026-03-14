@@ -120,15 +120,6 @@ export function ChoreRow({
     <View className={`px-4 py-3 ${rowBg}`}>
       {/* Top row: emoji + name + action buttons */}
       <View className="flex-row items-center">
-        {/* Emoji icon container */}
-        <View
-          className={`h-10 w-10 rounded-xl items-center justify-center mr-3 ${
-            isDisputed ? 'bg-red-100' : 'bg-brand-light'
-          }`}
-        >
-          <Text style={{ fontSize: 20 }}>{emoji}</Text>
-        </View>
-
         {/* Chore name + assignee */}
         <View className="flex-1">
           <Text className="text-card-title font-heading-semi text-neutral-text" numberOfLines={1}>
