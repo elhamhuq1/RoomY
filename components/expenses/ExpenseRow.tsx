@@ -102,7 +102,9 @@ export function ExpenseRow({
                 statusIcon = 'checkmark-circle';
               } else {
                 const shareOwed = Number(split.share_amount);
-                if (shareOwed > 0) {
+                // Use overall balance to determine if settled, but show per-expense share
+                const netOwed = payerBalances?.[split.user_id] ?? 0;
+                if (netOwed > 0 && shareOwed > 0) {
                   statusLabel = `Owes ${formatCurrency(shareOwed)}`;
                   statusColor = colors.semantic.warning;
                   statusIcon = 'time-outline';
