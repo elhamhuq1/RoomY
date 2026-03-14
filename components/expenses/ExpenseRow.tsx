@@ -100,14 +100,10 @@ export function ExpenseRow({
                 statusLabel = 'Paid';
                 statusColor = colors.semantic.success;
                 statusIcon = 'checkmark-circle';
-              } else if (payerBalances) {
-                // payerBalances[user_id] = net balance from payer's perspective
-                // positive = this member still owes the payer overall
-                // zero or absent = settled overall
-                // negative = payer owes them (overpaid)
-                const netOwed = payerBalances[split.user_id] ?? 0;
-                if (netOwed > 0) {
-                  statusLabel = `Owes ${formatCurrency(netOwed)}`;
+              } else {
+                const shareOwed = Number(split.share_amount);
+                if (shareOwed > 0) {
+                  statusLabel = `Owes ${formatCurrency(shareOwed)}`;
                   statusColor = colors.semantic.warning;
                   statusIcon = 'time-outline';
                 } else {
