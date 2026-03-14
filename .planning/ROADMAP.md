@@ -171,7 +171,7 @@ Plans:
 | 8. Expenses Screen | v1.1 | 3/3 | Complete | 2026-03-12 |
 | 9. Groceries + Chores | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 10. Onboarding Flow | v1.1 | 4/4 | Complete | 2026-03-13 |
-| 11. Visual Foundation | v1.2 | 3/3 | Complete | 2026-03-14 |
+| 11. Visual Foundation | v1.2 | Complete    | 2026-03-14 | 2026-03-14 |
 | 12. Empty State Illustrations | v1.2 | — | Planned | — |
 | 13. Profile Pictures | v1.2 | — | Planned | — |
 | 14. Google OAuth | v1.2 | — | Planned | — |
