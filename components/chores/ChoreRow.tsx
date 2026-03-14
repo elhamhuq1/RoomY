@@ -141,12 +141,6 @@ export function ChoreRow({
 
         {/* Action buttons */}
         <View className="flex-row items-center gap-1.5">
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-red-50 active:bg-red-100"
-            onPress={onDelete}
-          >
-            <Ionicons name="trash-outline" size={18} color="#EF4444" />
-          </Pressable>
           {isMyChore && (
             <Pressable
               className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
@@ -194,6 +188,12 @@ export function ChoreRow({
               )}
             </Pressable>
           )}
+          <Pressable
+            className="h-9 w-9 items-center justify-center rounded-full bg-red-50 active:bg-red-100"
+            onPress={onDelete}
+          >
+            <Ionicons name="trash-outline" size={18} color="#EF4444" />
+          </Pressable>
         </View>
       </View>
 
