@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** v1.2 Polish & Identity — Phase 11 Visual Foundation
+**Current focus:** v1.2 Polish & Identity — Phase 13 Profile Pictures
 
 ## Current Position
 
-Phase: 11 of 14 — Visual Foundation (COMPLETE)
-Plan: 3 of 3 (all complete)
-Status: Phase 11 complete, ready for Phase 12
-Last activity: 2026-03-14 — Quick task 5: invite code card wintergreen gradient
+Phase: 13 of 14 — Profile Pictures
+Plan: 1 of 3 complete
+Status: Executing Phase 13
+Last activity: 2026-03-14 — Completed 13-01 avatar upload foundation
 
-Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 plans) = 38 plans shipped
+Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 1/3 Phase 13) = 39 plans shipped
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 plans) = 38 pla
 | Phase 11 P01 | 1min | 2 tasks | 4 files |
 | Phase 11 P02 | 3min | 2 tasks | 17 files |
 | Phase 11 P03 | 2min | 2 tasks | 3 files |
+| Phase 13 P01 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ v1.0 and v1.1 decisions archived — see milestones/v1.1-ROADMAP.md for full his
 - [Phase 11]: Bottom bars use cream #F5F0EB background for seamless integration
 - [Phase 11]: System chrome (tab bar, headers, StatusBar, splash) uses cream #F5F0EB with wintergreen accents
 - [Phase 11 feedback]: User dislikes gradient BalanceSummaryCard looking different from outline-only cards on home page (deferred to future work)
+- [Phase 13]: Brand ring replaces shadow on Avatar component: wintergreen #2D6A4F ring (2px small, 3px large)
+- [Phase 13]: expo-image with disk cache + timestamp cache buster for avatar URLs
+- [Phase 13]: 512x512 max resize with JPEG at 0.8 quality via expo-image-manipulator
 
 ### Pending Todos
 
@@ -97,5 +101,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed quick task 3 (empty state images)
+Stopped at: Completed 13-01-PLAN.md (avatar upload foundation)
 Resume file: None

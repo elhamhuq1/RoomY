@@ -34,15 +34,15 @@
 
 ### Profile Pictures
 
-- [ ] **PROF-01**: User can upload a profile picture from photo library (gallery)
-- [ ] **PROF-02**: User can take a profile picture with camera
-- [ ] **PROF-03**: Image is cropped to square before upload
-- [ ] **PROF-04**: Image uploads to Supabase Storage with user-scoped RLS policies
-- [ ] **PROF-05**: Avatar component shows uploaded photo when available, falls back to gradient+initials
+- [x] **PROF-01**: User can upload a profile picture from photo library (gallery)
+- [x] **PROF-02**: User can take a profile picture with camera
+- [x] **PROF-03**: Image is cropped to square before upload
+- [x] **PROF-04**: Image uploads to Supabase Storage with user-scoped RLS policies
+- [x] **PROF-05**: Avatar component shows uploaded photo when available, falls back to gradient+initials
 - [ ] **PROF-06**: Profile picture can be set during onboarding (display name step)
 - [ ] **PROF-07**: Profile picture can be changed in settings
-- [ ] **PROF-08**: Updated photo appears across all screens without app restart (cache busting)
-- [ ] **PROF-09**: Camera/gallery permissions handled gracefully with user-friendly messaging
+- [x] **PROF-08**: Updated photo appears across all screens without app restart (cache busting)
+- [x] **PROF-09**: Camera/gallery permissions handled gracefully with user-friendly messaging
 
 ### Google OAuth
 
@@ -91,15 +91,15 @@
 | EMPTY-07 | Phase 12 | Pending |
 | EMPTY-08 | Phase 12 | Pending |
 | EMPTY-09 | Phase 12 | Pending |
-| PROF-01 | Phase 13 | Pending |
-| PROF-02 | Phase 13 | Pending |
-| PROF-03 | Phase 13 | Pending |
-| PROF-04 | Phase 13 | Pending |
-| PROF-05 | Phase 13 | Pending |
+| PROF-01 | Phase 13 | Complete |
+| PROF-02 | Phase 13 | Complete |
+| PROF-03 | Phase 13 | Complete |
+| PROF-04 | Phase 13 | Complete |
+| PROF-05 | Phase 13 | Complete |
 | PROF-06 | Phase 13 | Pending |
 | PROF-07 | Phase 13 | Pending |
-| PROF-08 | Phase 13 | Pending |
-| PROF-09 | Phase 13 | Pending |
+| PROF-08 | Phase 13 | Complete |
+| PROF-09 | Phase 13 | Complete |
 | AUTH-01 | Phase 14 | Pending |
 | AUTH-02 | Phase 14 | Pending |
 | AUTH-03 | Phase 14 | Pending |
