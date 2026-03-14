@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
@@ -49,12 +50,16 @@ interface AvatarProps {
   userId: string;
   name: string;
   size?: AvatarSize;
+  avatarUrl?: string | null;
 }
 
-export function Avatar({ userId, name, size = 'md' }: AvatarProps) {
+export function Avatar({ userId, name, size = 'md', avatarUrl }: AvatarProps) {
   const [startColor, endColor] = getGradientForUser(userId);
+  const [imageError, setImageError] = useState(false);
+  const hasImage = !!avatarUrl && !imageError;
   const dim = SIZE_MAP[size];
   const fontSize = FONT_MAP[size];
+  const ringWidth = dim >= 56 ? 3 : 2;
   const initials = name
     .split(' ')
     .map((w) => w[0])
@@ -65,29 +70,45 @@ export function Avatar({ userId, name, size = 'md' }: AvatarProps) {
   return (
     <View
       style={{
-        shadowColor: startColor,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 3,
+        width: dim + ringWidth * 2,
+        height: dim + ringWidth * 2,
+        borderRadius: (dim + ringWidth * 2) / 2,
+        borderWidth: ringWidth,
+        borderColor: '#2D6A4F',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
-      <LinearGradient
-        colors={[startColor, endColor]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          width: dim,
-          height: dim,
-          borderRadius: dim / 2,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Text style={{ color: '#fff', fontSize, fontWeight: '600' }}>
-          {initials}
-        </Text>
-      </LinearGradient>
+      {hasImage ? (
+        <Image
+          source={{ uri: avatarUrl! }}
+          style={{
+            width: dim,
+            height: dim,
+            borderRadius: dim / 2,
+          }}
+          contentFit="cover"
+          cachePolicy="disk"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <LinearGradient
+          colors={[startColor, endColor]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: dim,
+            height: dim,
+            borderRadius: dim / 2,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ color: '#fff', fontSize, fontWeight: '600' }}>
+            {initials}
+          </Text>
+        </LinearGradient>
+      )}
     </View>
   );
 }
