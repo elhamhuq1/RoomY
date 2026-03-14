@@ -178,5 +178,5 @@ Plans:
 | 10. Onboarding Flow | v1.1 | 4/4 | Complete | 2026-03-13 |
 | 11. Visual Foundation | v1.2 | Complete    | 2026-03-14 | 2026-03-14 |
 | 12. Empty State Illustrations | v1.2 | Complete    | 2026-03-14 | — |
-| 13. Profile Pictures | 3/3 | Complete   | 2026-03-14 | — |
+| 13. Profile Pictures | 3/3 | Complete    | 2026-03-14 | — |
 | 14. Google OAuth | v1.2 | — | Planned | — |
