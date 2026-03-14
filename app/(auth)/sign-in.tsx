@@ -13,10 +13,9 @@ import {
   Image,
 } from "react-native";
 import { BlurView } from "expo-blur";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase";
-import { signInWithGoogle, signInWithApple } from "@/lib/auth-utils";
+import { signInWithGoogle } from "@/lib/auth-utils";
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -27,9 +26,7 @@ export default function SignInScreen() {
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(
-    null,
-  );
+  const [socialLoading, setSocialLoading] = useState<"google" | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   function validateEmail(value: string): boolean {
@@ -89,21 +86,6 @@ export default function SignInScreen() {
       }
     } catch {
       setGeneralError("Google sign-in failed. Please try again.");
-    } finally {
-      setSocialLoading(null);
-    }
-  }
-
-  async function handleAppleSignIn() {
-    setGeneralError("");
-    setSocialLoading("apple");
-    try {
-      const { error } = await signInWithApple();
-      if (error) {
-        setGeneralError(error.message);
-      }
-    } catch {
-      setGeneralError("Apple sign-in failed. Please try again.");
     } finally {
       setSocialLoading(null);
     }
@@ -275,9 +257,9 @@ export default function SignInScreen() {
           <View className="h-px flex-1 bg-gray-200" />
         </View>
 
-        {/* Social auth buttons */}
+        {/* Google sign-in button */}
         <Pressable
-          className={`mb-3 flex-row items-center justify-center rounded-2xl border border-gray-200 bg-white py-3.5 ${
+          className={`mb-6 flex-row items-center justify-center rounded-2xl border border-gray-200 bg-white py-3.5 ${
             isDisabled ? "opacity-50" : "active:bg-gray-50"
           }`}
           onPress={handleGoogleSignIn}
@@ -287,46 +269,16 @@ export default function SignInScreen() {
             <ActivityIndicator color="#4285F4" />
           ) : (
             <>
-              <Ionicons
-                name="logo-google"
-                size={20}
-                color="#4285F4"
-                style={{ marginRight: 8 }}
+              <Image
+                source={require("@/assets/google-g-logo.png")}
+                style={{ width: 20, height: 20, marginRight: 8 }}
               />
               <Text className="text-base font-semibold text-gray-700">
-                Continue with Google
+                Sign in with Google
               </Text>
             </>
           )}
         </Pressable>
-
-        {Platform.OS === "ios" ? (
-          <Pressable
-            className={`mb-6 flex-row items-center justify-center rounded-2xl bg-black py-3.5 ${
-              isDisabled ? "opacity-50" : "active:opacity-80"
-            }`}
-            onPress={handleAppleSignIn}
-            disabled={isDisabled}
-          >
-            {socialLoading === "apple" ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <>
-                <Ionicons
-                  name="logo-apple"
-                  size={20}
-                  color="#fff"
-                  style={{ marginRight: 8 }}
-                />
-                <Text className="text-base font-semibold text-white">
-                  Continue with Apple
-                </Text>
-              </>
-            )}
-          </Pressable>
-        ) : (
-          <View className="mb-6" />
-        )}
 
         {/* Footer link */}
         <Pressable
