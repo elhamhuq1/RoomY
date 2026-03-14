@@ -157,7 +157,7 @@ export default function CreateHouseholdScreen() {
 
           {/* Dark gradient invite code card */}
           <LinearGradient
-            colors={["#1E293B", "#0F172A"]}
+            colors={[colors.brand.DEFAULT, colors.brand.dark]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
