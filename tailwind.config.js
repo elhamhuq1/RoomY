@@ -1,5 +1,3 @@
-const { platformSelect } = require("nativewind/theme");
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -11,16 +9,15 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: platformSelect({
-          ios: "SF Pro Rounded",
-          default: "System",
-        }),
+        heading: ["Nunito_700Bold"],
+        "heading-semi": ["Nunito_600SemiBold"],
       },
       colors: {
         brand: {
-          DEFAULT: "#10B981",
-          dark: "#059669",
-          light: "#D1FAE5",
+          DEFAULT: "#2D6A4F",
+          dark: "#1B4332",
+          mid: "#52796F",
+          light: "#D8E8DC",
         },
         semantic: {
           success: "#22C55E",
@@ -32,9 +29,9 @@ module.exports = {
           text: "#0F172A",
           secondary: "#64748B",
           tertiary: "#94A3B8",
-          border: "#E2E8F0",
+          border: "#D6D0C8",
           surface: "#F1F5F9",
-          bg: "#F8FAFC",
+          bg: "#F5F0EB",
         },
       },
       fontSize: {
