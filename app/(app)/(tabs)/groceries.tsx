@@ -435,7 +435,7 @@ export default function GroceriesScreen() {
           {uncheckedItems.length > 0 && (
             <View className="mt-3">
               <SectionHeader label="TO GET" count={uncheckedItems.length} />
-              <View className="mx-4 rounded-card border border-neutral-border">
+              <View className="mx-4 rounded-card border border-neutral-border overflow-hidden">
                 {uncheckedItems.map((item, index) => (
                   <View
                     key={item.id}
@@ -479,7 +479,7 @@ export default function GroceriesScreen() {
                 onToggle={() => setDoneExpanded((prev) => !prev)}
               />
               {doneExpanded && (
-                <View className="mx-4 rounded-card border border-neutral-border">
+                <View className="mx-4 rounded-card border border-neutral-border overflow-hidden">
                   {checkedItems.map((item, index) => (
                     <View
                       key={item.id}

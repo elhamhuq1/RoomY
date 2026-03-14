@@ -19,7 +19,7 @@ interface GroceryItemRowProps {
 function RightSwipeAction({ onDelete }: { onDelete: () => void }) {
   return (
     <Pressable
-      className="w-20 items-center justify-center bg-red-500"
+      className="w-20 items-center justify-center bg-red-500 rounded-r-card"
       onPress={onDelete}
     >
       <Ionicons name="trash" size={22} color="#fff" />
