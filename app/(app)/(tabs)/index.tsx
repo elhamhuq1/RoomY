@@ -179,9 +179,7 @@ export default function DashboardScreen() {
         return {
           userId: b.user_id,
           displayName: member?.display_name ?? 'Unknown',
-          // Negative net_amount = they owe; Positive = they are owed
-          // From current user's perspective, invert: if they owe, it's positive for us
-          amount: -amount,
+          amount,
         };
       })
       .filter((b) => b.amount !== 0);
