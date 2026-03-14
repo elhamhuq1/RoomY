@@ -100,6 +100,7 @@ None yet.
 | 4 | Fix calendar cream background + This Week empty state image | 2026-03-14 | b5dc686 | — |
 | 5 | Change invite code card to wintergreen gradient | 2026-03-14 | 7c5a7af | — |
 | 6 | Redirect to sign-in after email signup with success banner | 2026-03-14 | 88a2596 | [5-redirect-to-login-after-email-signup](./quick/5-redirect-to-login-after-email-signup/) |
+| 7 | Apply Space Grotesk font to all screens and components | 2026-03-14 | f3925ed | [6-apply-space-grotesk-font-to-all-onboardi](./quick/6-apply-space-grotesk-font-to-all-onboardi/) |
 
 ### Blockers/Concerns
 
@@ -108,5 +109,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed quick task 5 (redirect to sign-in after email signup)
+Stopped at: Completed quick task 6 (apply Space Grotesk font to all screens)
 Resume file: None
