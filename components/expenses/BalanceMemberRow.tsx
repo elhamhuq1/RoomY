@@ -12,6 +12,7 @@ const formatCurrency = (amount: number): string =>
 interface BalanceMemberRowProps {
   userId: string;
   displayName: string;
+  avatarUrl?: string | null;
   amount: number;
   isOwedToYou: boolean;
   onAction: () => void;
@@ -20,6 +21,7 @@ interface BalanceMemberRowProps {
 export function BalanceMemberRow({
   userId,
   displayName,
+  avatarUrl,
   amount,
   isOwedToYou,
   onAction,
@@ -27,7 +29,7 @@ export function BalanceMemberRow({
   return (
     <View className="flex-row items-center py-3">
       <View className="flex-row items-center flex-1 mr-2">
-        <Avatar userId={userId} name={displayName} size="md" />
+        <Avatar userId={userId} name={displayName} size="md" avatarUrl={avatarUrl} />
         <View className="ml-3 flex-1">
           <Text className="text-card-title font-heading-semi text-neutral-text">
             {displayName}

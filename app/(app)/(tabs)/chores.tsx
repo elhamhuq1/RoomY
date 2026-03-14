@@ -658,7 +658,7 @@ export default function ChoresScreen() {
                   disabled={swapSubmitting}
                 >
                   <View className="mr-3">
-                    <Avatar userId={member.id} name={member.display_name} size="sm" />
+                    <Avatar userId={member.id} name={member.display_name} size="sm" avatarUrl={member.avatar_url} />
                   </View>
                   <Text className="flex-1 text-base text-gray-800">
                     {member.display_name}

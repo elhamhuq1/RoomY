@@ -35,6 +35,7 @@ type MemberWithProfile = {
   user_id: string;
   role: 'creator' | 'member';
   display_name: string;
+  avatar_url: string | null;
 };
 
 type BalanceRow = {
@@ -98,6 +99,7 @@ export default function DashboardScreen() {
               user_id: member.user_id,
               role: member.role as 'creator' | 'member',
               display_name: p?.display_name ?? 'Unknown',
+              avatar_url: p?.avatar_url ?? null,
             };
           });
         })(),
@@ -156,6 +158,7 @@ export default function DashboardScreen() {
       members.map((m) => ({
         user_id: m.user_id,
         display_name: m.display_name,
+        avatar_url: m.avatar_url,
       })),
     [members]
   );
@@ -239,6 +242,7 @@ export default function DashboardScreen() {
       name: string;
       assigneeId: string;
       assigneeName: string;
+      assigneeAvatarUrl: string | null;
       dueDate: string;
       isCompleted: boolean;
     }[] = [];
@@ -253,6 +257,7 @@ export default function DashboardScreen() {
             name: chore.name,
             assigneeId: chore.current_assignee ?? '',
             assigneeName: assignee?.display_name ?? 'Unassigned',
+            assigneeAvatarUrl: assignee?.avatar_url ?? null,
             dueDate: dateStr,
             isCompleted: chore.last_completed_at
               ? isSameDay(parseISO(chore.last_completed_at), parseISO(dateStr))

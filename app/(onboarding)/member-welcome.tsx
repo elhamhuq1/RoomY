@@ -154,6 +154,7 @@ export default function MemberWelcomeScreen() {
                       userId={member.user_id}
                       name={member.profiles?.display_name ?? "?"}
                       size="md"
+                      avatarUrl={member.profiles?.avatar_url}
                     />
                   </View>
                   <View style={{ flex: 1 }}>

@@ -14,6 +14,7 @@ interface TimelineChore {
   name: string;
   assigneeId: string;
   assigneeName: string;
+  assigneeAvatarUrl?: string | null;
   dueDate: string;
   isCompleted: boolean;
 }
@@ -142,6 +143,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
                           userId={item.assigneeId}
                           name={item.assigneeName}
                           size="xs"
+                          avatarUrl={item.assigneeAvatarUrl}
                         />
                         <Text className="text-metadata text-neutral-secondary ml-2">
                           {item.assigneeName}

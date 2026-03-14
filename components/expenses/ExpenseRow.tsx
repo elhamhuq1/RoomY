@@ -16,7 +16,7 @@ export type SplitWithProfile = {
   id: string;
   user_id: string;
   share_amount: string;
-  profile: { display_name: string } | null;
+  profile: { display_name: string; avatar_url?: string | null } | null;
 };
 
 /** Net balance between the payer and each split member (from payer's perspective). */
@@ -124,6 +124,7 @@ export function ExpenseRow({
                     userId={split.user_id}
                     name={split.profile?.display_name ?? '?'}
                     size="sm"
+                    avatarUrl={split.profile?.avatar_url}
                   />
                   <Text className="ml-2 flex-1 text-metadata text-neutral-secondary">
                     {split.profile?.display_name ?? 'Unknown'}

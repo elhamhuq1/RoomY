@@ -52,7 +52,7 @@ export default function GroceriesScreen() {
   const [loading, setLoading] = useState(true);
   const [doneExpanded, setDoneExpanded] = useState(false);
   const [creatorProfiles, setCreatorProfiles] = useState<
-    Record<string, { id: string; display_name: string }>
+    Record<string, { id: string; display_name: string; avatar_url: string | null }>
   >({});
 
   const inputRef = useRef<TextInput>(null);
@@ -72,13 +72,13 @@ export default function GroceriesScreen() {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, avatar_url")
         .in("id", creatorIds);
 
       if (profiles) {
         const profileMap: Record<
           string,
-          { id: string; display_name: string }
+          { id: string; display_name: string; avatar_url: string | null }
         > = {};
         profiles.forEach((p) => {
           profileMap[p.id] = p;
@@ -147,7 +147,7 @@ export default function GroceriesScreen() {
             if (!creatorProfilesRef.current[newItem.created_by]) {
               supabase
                 .from("profiles")
-                .select("id, display_name")
+                .select("id, display_name, avatar_url")
                 .eq("id", newItem.created_by)
                 .single()
                 .then(({ data }) => {
@@ -452,6 +452,7 @@ export default function GroceriesScreen() {
                         creatorProfiles[item.created_by]?.display_name ?? "?"
                       }
                       creatorId={item.created_by}
+                      creatorAvatarUrl={creatorProfiles[item.created_by]?.avatar_url}
                       onToggle={() => toggleCheck(item)}
                       onEdit={() =>
                         setEditingItem({
@@ -496,6 +497,7 @@ export default function GroceriesScreen() {
                           creatorProfiles[item.created_by]?.display_name ?? "?"
                         }
                         creatorId={item.created_by}
+                        creatorAvatarUrl={creatorProfiles[item.created_by]?.avatar_url}
                         onToggle={() => toggleCheck(item)}
                         onEdit={() =>
                           setEditingItem({

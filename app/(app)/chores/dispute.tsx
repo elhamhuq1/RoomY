@@ -267,6 +267,7 @@ export default function DisputeScreen() {
                         userId={completedByProfile.id}
                         name={completedByProfile.display_name}
                         size="xs"
+                        avatarUrl={completedByProfile.avatar_url}
                       />
                     </View>
                   )}
@@ -297,6 +298,7 @@ export default function DisputeScreen() {
                         userId={disputedByProfile.id}
                         name={disputedByProfile.display_name}
                         size="xs"
+                        avatarUrl={disputedByProfile.avatar_url}
                       />
                     </View>
                   )}

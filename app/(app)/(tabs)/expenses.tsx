@@ -199,13 +199,17 @@ export default function ExpensesScreen() {
         if (memberUserIds.length > 0) {
           const { data: memberProfiles } = await supabase
             .from('profiles')
-            .select('id, display_name')
+            .select('id, display_name, avatar_url')
             .in('id', memberUserIds);
           setMembers(
-            memberUserIds.map(id => ({
-              user_id: id,
-              display_name: memberProfiles?.find(p => p.id === id)?.display_name ?? 'Unknown',
-            }))
+            memberUserIds.map(id => {
+              const mp = memberProfiles?.find(p => p.id === id);
+              return {
+                user_id: id,
+                display_name: mp?.display_name ?? 'Unknown',
+                avatar_url: mp?.avatar_url ?? null,
+              };
+            })
           );
         } else {
           setMembers([]);
@@ -332,13 +336,13 @@ export default function ExpensesScreen() {
             const splitUserIds = splitsData.map((s) => s.user_id);
             const { data: profiles } = await supabase
               .from('profiles')
-              .select('id, display_name')
+              .select('id, display_name, avatar_url')
               .in('id', splitUserIds);
 
-            const profileMap: Record<string, { display_name: string }> = {};
+            const profileMap: Record<string, { display_name: string; avatar_url: string | null }> = {};
             if (profiles) {
               for (const p of profiles) {
-                profileMap[p.id] = { display_name: p.display_name };
+                profileMap[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url };
               }
             }
 

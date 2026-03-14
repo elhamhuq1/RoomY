@@ -216,13 +216,13 @@ export default function MemberHistoryScreen() {
             const splitUserIds = splitsData.map((s) => s.user_id);
             const { data: profiles } = await supabase
               .from('profiles')
-              .select('id, display_name')
+              .select('id, display_name, avatar_url')
               .in('id', splitUserIds);
 
-            const pMap: Record<string, { display_name: string }> = {};
+            const pMap: Record<string, { display_name: string; avatar_url: string | null }> = {};
             if (profiles) {
               for (const p of profiles) {
-                pMap[p.id] = { display_name: p.display_name };
+                pMap[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url };
               }
             }
 

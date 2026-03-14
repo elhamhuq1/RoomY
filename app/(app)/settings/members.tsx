@@ -1,4 +1,4 @@
-import { colors, AVATAR_COLORS } from "@/lib/theme/colors";
+import { colors } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -15,16 +15,7 @@ import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types/database";
 
 import * as Clipboard from "expo-clipboard";
-
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { Avatar } from "@/components/ui";
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
@@ -210,18 +201,13 @@ export default function MembersSettingsScreen() {
               }`}
             >
               {/* Avatar */}
-              <View
-                className="mr-4 h-12 w-12 items-center justify-center rounded-full"
-                style={{
-                  backgroundColor:
-                    AVATAR_COLORS[index % AVATAR_COLORS.length],
-                }}
-              >
-                <Text className="text-sm font-bold text-white">
-                  {getInitials(
-                    member.profiles?.display_name ?? "?"
-                  )}
-                </Text>
+              <View className="mr-4">
+                <Avatar
+                  userId={member.user_id}
+                  name={member.profiles?.display_name ?? "?"}
+                  size="lg"
+                  avatarUrl={member.profiles?.avatar_url}
+                />
               </View>
 
               {/* Name and info */}

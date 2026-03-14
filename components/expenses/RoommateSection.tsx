@@ -8,6 +8,7 @@ import { colors } from '@/lib/theme/colors';
 export interface RoommateMember {
   user_id: string;
   display_name: string;
+  avatar_url?: string | null;
 }
 
 interface RoommateSectionProps {
@@ -33,6 +34,7 @@ export function RoommateSection({ members, onMemberPress }: RoommateSectionProps
             userId={member.user_id}
             name={member.display_name}
             size="sm"
+            avatarUrl={member.avatar_url}
           />
           <Text className="ml-3 flex-1 text-card-title font-heading-semi text-neutral-text">
             {member.display_name}

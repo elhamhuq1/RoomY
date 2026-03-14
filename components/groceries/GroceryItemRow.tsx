@@ -11,6 +11,7 @@ interface GroceryItemRowProps {
   isChecked: boolean;
   creatorName: string;
   creatorId: string;
+  creatorAvatarUrl?: string | null;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -33,6 +34,7 @@ export function GroceryItemRow({
   isChecked,
   creatorName,
   creatorId,
+  creatorAvatarUrl,
   onToggle,
   onEdit,
   onDelete,
@@ -91,7 +93,7 @@ export function GroceryItemRow({
         )}
 
         {/* Creator avatar */}
-        <Avatar userId={creatorId} name={creatorName} size="xs" />
+        <Avatar userId={creatorId} name={creatorName} size="xs" avatarUrl={creatorAvatarUrl} />
       </Pressable>
     </ReanimatedSwipeable>
   );

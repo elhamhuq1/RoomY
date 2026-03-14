@@ -9,6 +9,7 @@ import { colors } from '@/lib/theme/colors';
 interface Member {
   user_id: string;
   display_name: string;
+  avatar_url?: string | null;
 }
 
 interface MembersCardProps {
@@ -55,7 +56,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
       <View className="mt-3 flex-row items-start">
         {members.map((member) => (
           <View key={member.user_id} className="mr-3 items-center" style={{ maxWidth: 56 }}>
-            <Avatar userId={member.user_id} name={member.display_name} size="md" />
+            <Avatar userId={member.user_id} name={member.display_name} size="md" avatarUrl={member.avatar_url} />
             <Text
               className="text-metadata text-neutral-secondary mt-1"
               numberOfLines={1}

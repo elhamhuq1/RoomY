@@ -62,6 +62,7 @@ export function BalanceSection({
                 key={entry.user_id}
                 userId={entry.user_id}
                 displayName={displayName}
+                avatarUrl={entry.profile?.avatar_url}
                 amount={amount}
                 isOwedToYou={isOwedToYou}
                 onAction={() => {
