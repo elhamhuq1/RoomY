@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -148,6 +148,39 @@ export default function DashboardScreen() {
     staleTime: 30_000,
     deps: [household?.id, selectedDate],
   });
+
+  // ---------- Realtime: avatar updates for household members ----------
+
+  useEffect(() => {
+    if (!household?.id) return;
+
+    const channel = supabase
+      .channel(`profiles-avatars-${household.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+        },
+        (payload) => {
+          const updated = payload.new as { id: string; avatar_url: string | null };
+          // Only update if this user is a known household member
+          setMembers((prev) =>
+            prev.map((m) =>
+              m.user_id === updated.id
+                ? { ...m, avatar_url: updated.avatar_url }
+                : m
+            )
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [household?.id]);
 
   // ---------- Derived data ----------
 
