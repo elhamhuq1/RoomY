@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Pressable } from 'react-native';
+import { colors } from '@/lib/theme/colors';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -26,7 +27,7 @@ export function Toggle({ value, onChange, locked = false }: ToggleProps) {
     backgroundColor: interpolateColor(
       progress.value,
       [0, 1],
-      ['#E2E8F0', '#10B981'] // neutral.border -> brand
+      ['#E2E8F0', colors.brand.DEFAULT] // neutral.border -> brand
     ),
   }));
 

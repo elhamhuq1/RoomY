@@ -1,4 +1,4 @@
-import { colors } from "@/lib/theme/colors";
+import { colors, AVATAR_COLORS } from "@/lib/theme/colors";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -16,8 +16,6 @@ import type { Profile } from "@/lib/types/database";
 
 import * as Clipboard from "expo-clipboard";
 
-// Colors for member initials avatars (same as dashboard)
-const AVATAR_COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16'];
 
 function getInitials(name: string): string {
   return name

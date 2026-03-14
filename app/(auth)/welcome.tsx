@@ -183,7 +183,7 @@ export default function WelcomeScreen() {
                 height: 8,
                 borderRadius: 999,
                 backgroundColor:
-                  index === activeIndex ? '#10B981' : '#D1D5DB',
+                  index === activeIndex ? '#2D6A4F' : '#D1D5DB',
               }}
             />
           ))}
@@ -195,7 +195,7 @@ export default function WelcomeScreen() {
         <Pressable
           onPress={() => router.push('/(auth)/sign-up')}
           style={{
-            backgroundColor: '#10B981',
+            backgroundColor: '#2D6A4F',
             borderRadius: 999,
             paddingVertical: 16,
             width: '100%',
@@ -214,7 +214,7 @@ export default function WelcomeScreen() {
         >
           <Text style={{ fontSize: 15, color: '#64748B' }}>
             Already have an account?{' '}
-            <Text style={{ fontWeight: '600', color: '#059669' }}>Log in</Text>
+            <Text style={{ fontWeight: '600', color: '#1B4332' }}>Log in</Text>
           </Text>
         </Pressable>
       </View>

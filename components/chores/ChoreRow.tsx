@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@/lib/theme/colors';
 import type { Chore } from '@/lib/types/database';
 
 // ---------------------------------------------------------------------------
@@ -174,14 +175,14 @@ export function ChoreRow({
           )}
           {isMyChore && (
             <Pressable
-              className="h-9 w-9 items-center justify-center rounded-full bg-brand-light active:bg-emerald-200"
+              className="h-9 w-9 items-center justify-center rounded-full bg-brand-light active:bg-brand-light"
               onPress={onComplete}
               disabled={isCompleting}
             >
               {isCompleting ? (
-                <ActivityIndicator size="small" color="#10B981" />
+                <ActivityIndicator size="small" color={colors.brand.DEFAULT} />
               ) : (
-                <Ionicons name="checkmark" size={20} color="#10B981" />
+                <Ionicons name="checkmark" size={20} color={colors.brand.DEFAULT} />
               )}
             </Pressable>
           )}
@@ -229,7 +230,7 @@ export function ChoreRow({
               <Text className="text-xs font-semibold text-brand mr-0.5">
                 View
               </Text>
-              <Ionicons name="chevron-forward" size={12} color="#10B981" />
+              <Ionicons name="chevron-forward" size={12} color={colors.brand.DEFAULT} />
             </View>
           )}
         </Pressable>
