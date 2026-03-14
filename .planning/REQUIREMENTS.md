@@ -9,7 +9,7 @@
 
 - [x] **VIS-01**: App background is cream (#F5F0EB) on all post-login screens, matching onboarding
 - [x] **VIS-02**: Brand green shifted to wintergreen (#2D6A4F) across entire app — buttons, badges, tab bar, FAB, toggles, spinners
-- [ ] **VIS-03**: All hardcoded emerald hex values (#10B981, #059669, #D1FAE5) replaced with wintergreen equivalents
+- [x] **VIS-03**: All hardcoded emerald hex values (#10B981, #059669, #D1FAE5) replaced with wintergreen equivalents
 - [x] **VIS-04**: Duplicated AVATAR_COLORS arrays consolidated into single shared import
 - [x] **VIS-05**: Avatar gradient pairs updated to wintergreen palette
 - [ ] **VIS-06**: System chrome (status bar area, tab bar, headers, splash) matches cream background with no visible seams
@@ -17,8 +17,8 @@
 ### Card Redesign
 
 - [x] **CARD-01**: Default Card component uses transparent background with gray outline border, no shadow
-- [ ] **CARD-02**: Gradient balance card and dark invite code card retain their distinctive elevated styling
-- [ ] **CARD-03**: No card in the app displays both shadow and outline simultaneously
+- [x] **CARD-02**: Gradient balance card and dark invite code card retain their distinctive elevated styling
+- [x] **CARD-03**: No card in the app displays both shadow and outline simultaneously
 
 ### Empty States
 
@@ -75,13 +75,13 @@
 |-------------|-------|--------|
 | VIS-01 | Phase 11 | Complete |
 | VIS-02 | Phase 11 | Complete |
-| VIS-03 | Phase 11 | Pending |
+| VIS-03 | Phase 11 | Complete |
 | VIS-04 | Phase 11 | Complete |
 | VIS-05 | Phase 11 | Complete |
 | VIS-06 | Phase 11 | Pending |
 | CARD-01 | Phase 11 | Complete |
-| CARD-02 | Phase 11 | Pending |
-| CARD-03 | Phase 11 | Pending |
+| CARD-02 | Phase 11 | Complete |
+| CARD-03 | Phase 11 | Complete |
 | EMPTY-01 | Phase 12 | Pending |
 | EMPTY-02 | Phase 12 | Pending |
 | EMPTY-03 | Phase 12 | Pending |

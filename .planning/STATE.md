@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 ## Current Position
 
 Phase: 11 of 14 — Visual Foundation
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Executing Phase 11 plans
-Last activity: 2026-03-14 — Completed 11-01 (token foundation)
+Last activity: 2026-03-14 — Completed 11-02 (color & container propagation)
 
-Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (1/3 plans) = 36 plans shipped
+Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (2/3 plans) = 37 plans shipped
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (1/3 plans) = 36 plans shippe
 | Phase 10 P03 | 2min | 2 tasks | 3 files |
 | Phase 10 P04 | 4min | 2 tasks | 4 files |
 | Phase 11 P01 | 1min | 2 tasks | 4 files |
+| Phase 11 P02 | 3min | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 v1.0 and v1.1 decisions archived — see milestones/v1.1-ROADMAP.md for full history.
 - [Phase 11]: Wintergreen #2D6A4F as primary brand color replacing emerald #10B981
 - [Phase 11]: Cards are transparent outline zones on cream background (no shadow, no elevation)
+- [Phase 11]: Welcome screen uses wintergreen #2D6A4F for CTA and #1B4332 for login link
+- [Phase 11]: Bottom bars use cream #F5F0EB background for seamless integration
 
 ### Pending Todos
 
@@ -88,5 +91,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 11-01-PLAN.md
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
