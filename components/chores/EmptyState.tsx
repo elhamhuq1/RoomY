@@ -5,16 +5,16 @@ import { Card } from '@/components/ui/Card';
 import { colors } from '@/lib/theme/colors';
 
 // ---------------------------------------------------------------------------
-// Suggested chores (emoji-based)
+// Suggested chores (icon-based)
 // ---------------------------------------------------------------------------
 
 const SUGGESTED_CHORES = [
-  { name: 'Dishes', emoji: "\uD83C\uDF7D\uFE0F", frequency: 'daily' },
-  { name: 'Take out trash', emoji: "\uD83D\uDDD1\uFE0F", frequency: 'weekly' },
-  { name: 'Vacuum', emoji: "\uD83E\uDDF9", frequency: 'weekly' },
-  { name: 'Clean bathroom', emoji: "\uD83D\uDEBF", frequency: 'weekly' },
-  { name: 'Mop floors', emoji: "\uD83E\uDDF9", frequency: 'weekly' },
-  { name: 'Wipe counters', emoji: "\u2728", frequency: 'daily' },
+  { name: 'Dishes', icon: require('@/docs/icons/dishes.png'), frequency: 'daily' },
+  { name: 'Take out trash', icon: require('@/docs/icons/take-out-trash.png'), frequency: 'weekly' },
+  { name: 'Vacuum', icon: require('@/docs/icons/vacuum.png'), frequency: 'weekly' },
+  { name: 'Clean bathroom', icon: require('@/docs/icons/clean-bathroom.png'), frequency: 'weekly' },
+  { name: 'Mop floors', icon: require('@/docs/icons/mop-floors.png'), frequency: 'weekly' },
+  { name: 'Wipe counters', icon: require('@/docs/icons/wipe-counters.png'), frequency: 'daily' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -57,7 +57,11 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
             >
               <Card className="flex-row items-center px-3 py-3.5">
                 <View className="h-8 w-8 rounded-xl bg-brand-light items-center justify-center mr-2.5">
-                  <Text style={{ fontSize: 16 }}>{suggestion.emoji}</Text>
+                  <Image
+                    source={suggestion.icon}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text className="flex-1 text-sm font-medium text-neutral-text" numberOfLines={1}>
                   {suggestion.name}
