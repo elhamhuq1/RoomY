@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Roommates can see exactly who owes what and settle up with one tap -- no awkward conversations, no mental math, no forgotten debts.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Polish & Identity — Phase 11 Visual Foundation
 
 ## Current Position
 
 Phase: 11 of 14 — Visual Foundation
-Plan: Not yet planned
-Status: Roadmap defined, ready to plan Phase 11
-Last activity: 2026-03-13 — v1.2 roadmap created
+Plan: 2 of 3
+Status: Executing Phase 11 plans
+Last activity: 2026-03-14 — Completed 11-01 (token foundation)
 
-Progress: v1.0 (18 plans) + v1.1 (17 plans) = 35 plans shipped
+Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (1/3 plans) = 36 plans shipped
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: v1.0 (18 plans) + v1.1 (17 plans) = 35 plans shipped
 | Phase 10 P02 | 4min | 2 tasks | 3 files |
 | Phase 10 P03 | 2min | 2 tasks | 3 files |
 | Phase 10 P04 | 4min | 2 tasks | 4 files |
+| Phase 11 P01 | 1min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Progress: v1.0 (18 plans) + v1.1 (17 plans) = 35 plans shipped
 
 Decisions are logged in PROJECT.md Key Decisions table.
 v1.0 and v1.1 decisions archived — see milestones/v1.1-ROADMAP.md for full history.
+- [Phase 11]: Wintergreen #2D6A4F as primary brand color replacing emerald #10B981
+- [Phase 11]: Cards are transparent outline zones on cream background (no shadow, no elevation)
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None — clean slate for next milestone.
 
 ## Session Continuity
 
-Last session: 2026-03-13
-Stopped at: v1.2 roadmap defined — ready to plan Phase 11
+Last session: 2026-03-14
+Stopped at: Completed 11-01-PLAN.md
 Resume file: None
