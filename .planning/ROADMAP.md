@@ -37,7 +37,7 @@
   - [x] 11-02-PLAN.md — App-wide migration: hardcoded hex cleanup + AVATAR_COLORS consolidation + container restyling
   - [x] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash + visual verification
 - [x] Phase 12: Empty State Illustrations (completed 2026-03-14)
-- [ ] Phase 13: Profile Pictures (3 plans)
+- [x] Phase 13: Profile Pictures (3 plans) (completed 2026-03-14)
 - [ ] Phase 14: Google OAuth
 
 ---
@@ -123,7 +123,7 @@ Plans:
 - Camera/gallery permission denial handled gracefully
 - Works in Expo Go on both iOS and Android
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 13-01-PLAN.md — Foundation: install packages, Supabase Storage bucket + RLS, avatar-upload utility, Avatar component upgrade
@@ -178,5 +178,5 @@ Plans:
 | 10. Onboarding Flow | v1.1 | 4/4 | Complete | 2026-03-13 |
 | 11. Visual Foundation | v1.2 | Complete    | 2026-03-14 | 2026-03-14 |
 | 12. Empty State Illustrations | v1.2 | Complete    | 2026-03-14 | — |
-| 13. Profile Pictures | 2/3 | In Progress|  | — |
+| 13. Profile Pictures | 3/3 | Complete   | 2026-03-14 | — |
 | 14. Google OAuth | v1.2 | — | Planned | — |

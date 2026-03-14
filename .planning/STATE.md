@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 ## Current Position
 
 Phase: 13 of 14 — Profile Pictures
-Plan: 2 of 3 complete
-Status: Executing Phase 13
-Last activity: 2026-03-14 — Completed 13-02 avatar upload UI
+Plan: 3 of 3 complete
+Status: Phase 13 Complete
+Last activity: 2026-03-14 — Completed 13-03 app-wide avatar propagation
 
-Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 2/3 Phase 13) = 40 plans shipped
+Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 3/3 Phase 13) = 41 plans shipped
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 2/3 Phase 13)
 | Phase 11 P03 | 2min | 2 tasks | 3 files |
 | Phase 13 P01 | 3min | 2 tasks | 6 files |
 | Phase 13 P02 | 2min | 2 tasks | 4 files |
+| Phase 13 P03 | 6min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ v1.0 and v1.1 decisions archived — see milestones/v1.1-ROADMAP.md for full his
 - [Phase 13]: 512x512 max resize with JPEG at 0.8 quality via expo-image-manipulator
 - [Phase 13]: Action sheet via Alert.alert for native cross-platform look
 - [Phase 13]: Edit sub-menu as separate Alert for UX separation from top-level options
+- [Phase 13]: Replaced inline initials avatar in settings/members with proper Avatar component
+- [Phase 13]: Realtime subscription for profiles UPDATE events on home screen for live avatar changes
 
 ### Pending Todos
 
@@ -104,5 +107,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 13-02-PLAN.md (avatar upload UI)
+Stopped at: Completed 13-03-PLAN.md (app-wide avatar propagation)
 Resume file: None
