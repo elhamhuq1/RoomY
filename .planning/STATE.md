@@ -99,6 +99,7 @@ None yet.
 | 3 | Update all empty states with illustration images | 2026-03-14 | a9a0c38 | [3-update-all-empty-states-with-images-from](./quick/3-update-all-empty-states-with-images-from/) |
 | 4 | Fix calendar cream background + This Week empty state image | 2026-03-14 | b5dc686 | — |
 | 5 | Change invite code card to wintergreen gradient | 2026-03-14 | 7c5a7af | — |
+| 6 | Redirect to sign-in after email signup with success banner | 2026-03-14 | 88a2596 | [5-redirect-to-login-after-email-signup](./quick/5-redirect-to-login-after-email-signup/) |
 
 ### Blockers/Concerns
 
@@ -107,5 +108,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 13-03-PLAN.md (app-wide avatar propagation)
+Stopped at: Completed quick task 5 (redirect to sign-in after email signup)
 Resume file: None
