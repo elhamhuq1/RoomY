@@ -88,9 +88,11 @@ export default function SignUpScreen() {
 
       if (error) {
         setGeneralError(error.message);
+      } else {
+        // Redirect to sign-in so user can log in (especially if email confirmation is enabled)
+        router.replace("/(auth)/sign-in?registered=true");
+        return;
       }
-      // On success, onAuthStateChange in auth-context fires and
-      // Stack.Protected redirects to onboarding automatically
     } catch {
       setGeneralError("Something went wrong. Please try again.");
     } finally {

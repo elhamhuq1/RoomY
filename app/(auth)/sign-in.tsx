@@ -14,12 +14,13 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { signInWithGoogle, signInWithApple } from "@/lib/auth-utils";
 
 export default function SignInScreen() {
   const router = useRouter();
+  const { registered } = useLocalSearchParams<{ registered?: string }>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -173,6 +174,15 @@ export default function SignInScreen() {
             Log in to your account
           </Text>
         </View>
+
+        {/* Success banner after registration */}
+        {registered === "true" ? (
+          <View className="mb-4 rounded-xl bg-green-50 px-4 py-3">
+            <Text className="text-sm text-green-700">
+              Account created successfully! Please log in.
+            </Text>
+          </View>
+        ) : null}
 
         {/* General error */}
         {generalError ? (
