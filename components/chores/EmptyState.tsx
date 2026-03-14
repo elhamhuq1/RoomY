@@ -56,13 +56,11 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
               onPress={() => onSelectSuggestion(suggestion.name, suggestion.frequency)}
             >
               <Card className="flex-row items-center px-3 py-3.5">
-                <View className="h-8 w-8 rounded-xl bg-brand-light items-center justify-center mr-2.5">
-                  <Image
-                    source={suggestion.icon}
-                    style={{ width: 20, height: 20 }}
-                    resizeMode="contain"
-                  />
-                </View>
+                <Image
+                  source={suggestion.icon}
+                  style={{ width: 28, height: 28, marginRight: 10 }}
+                  resizeMode="contain"
+                />
                 <Text className="flex-1 text-sm font-medium text-neutral-text" numberOfLines={1}>
                   {suggestion.name}
                 </Text>
