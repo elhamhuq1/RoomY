@@ -91,7 +91,7 @@ export default function DashboardScreen() {
   const [period, setPeriod] = useState<TimePeriod>("week");
   const [memberStats, setMemberStats] = useState<MemberStats[]>([]);
   const [totalCompletions, setTotalCompletions] = useState(0);
-  const [totalActiveChores, setTotalActiveChores] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
   // -------------------------------------------------------------------------
@@ -118,21 +118,12 @@ export default function DashboardScreen() {
       if (!choresData || choresData.length === 0) {
         setMemberStats([]);
         setTotalCompletions(0);
-        setTotalActiveChores(0);
+
         setLoading(false);
         return;
       }
 
       const choreIds = choresData.map((c) => c.id);
-
-      // Fetch active chore count
-      const { count: activeCount } = await supabase
-        .from("chores")
-        .select("*", { count: "exact", head: true })
-        .eq("household_id", household.id)
-        .eq("is_active", true);
-
-      setTotalActiveChores(activeCount ?? 0);
 
       // Fetch completions within date range (non-reverted)
       const { data: completionsData } = await supabase
@@ -259,10 +250,6 @@ export default function DashboardScreen() {
     ...memberStats.map((s) => s.completionCount),
     1
   );
-  const avgCompletions =
-    memberStats.length > 0
-      ? (totalCompletions / memberStats.length).toFixed(1)
-      : "0";
   const periodLabel = period === "week" ? "week" : "month";
 
   // -------------------------------------------------------------------------
@@ -340,28 +327,6 @@ export default function DashboardScreen() {
               This Month
             </Text>
           </Pressable>
-        </View>
-
-        {/* Household totals row */}
-        <View className="mt-4 flex-row gap-3 px-4">
-          <View className="flex-1 items-center rounded-xl bg-brand-light py-3">
-            <Text className="text-xl font-bold text-brand-dark">
-              {totalCompletions}
-            </Text>
-            <Text className="text-xs text-brand-dark">Completed</Text>
-          </View>
-          <View className="flex-1 items-center rounded-xl bg-blue-100 py-3">
-            <Text className="text-xl font-bold text-blue-700">
-              {totalActiveChores}
-            </Text>
-            <Text className="text-xs text-blue-600">Active Chores</Text>
-          </View>
-          <View className="flex-1 items-center rounded-xl bg-green-100 py-3">
-            <Text className="text-xl font-bold text-green-700">
-              {avgCompletions}
-            </Text>
-            <Text className="text-xs text-green-600">Avg/Member</Text>
-          </View>
         </View>
 
         {/* Empty state */}
