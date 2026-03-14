@@ -28,7 +28,7 @@ export function Badge({ label, variant = 'neutral' }: BadgeProps) {
 
   return (
     <View className={`${styles.bg} rounded-full px-2.5 py-0.5`}>
-      <Text className={`${styles.text} text-badge`}>{label}</Text>
+      <Text className={`${styles.text} font-sans text-badge`}>{label}</Text>
     </View>
   );
 }

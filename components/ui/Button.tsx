@@ -43,7 +43,7 @@ export function Button({
         />
       ) : (
         <Text
-          className={`text-body font-semibold ${
+          className={`text-body font-heading-semi ${
             isPrimary ? 'text-white' : 'text-brand'
           }`}
         >

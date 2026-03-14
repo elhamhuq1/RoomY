@@ -61,11 +61,11 @@ export function ExpenseRow({
           <Text className="text-card-title font-heading-semi text-neutral-text">
             {expense.description}
           </Text>
-          <Text className="text-metadata text-neutral-secondary">
+          <Text className="font-sans text-metadata text-neutral-secondary">
             Paid by {payerName} - {dateStr}
           </Text>
         </View>
-        <Text className="text-body font-bold text-neutral-text">
+        <Text className="text-body font-heading text-neutral-text">
           {formatCurrency(Number(expense.amount))}
         </Text>
         <View className="ml-2">
@@ -126,10 +126,10 @@ export function ExpenseRow({
                     size="sm"
                     avatarUrl={split.profile?.avatar_url}
                   />
-                  <Text className="ml-2 flex-1 text-metadata text-neutral-secondary">
+                  <Text className="font-sans ml-2 flex-1 text-metadata text-neutral-secondary">
                     {split.profile?.display_name ?? 'Unknown'}
                   </Text>
-                  <Text className="text-metadata font-semibold text-neutral-text">
+                  <Text className="text-metadata font-heading-semi text-neutral-text">
                     {formatCurrency(Number(split.share_amount))}
                   </Text>
                   {statusLabel && (
@@ -140,7 +140,7 @@ export function ExpenseRow({
                         color={statusColor}
                       />
                       <Text
-                        className="ml-1 text-metadata font-semibold"
+                        className="ml-1 text-metadata font-heading-semi"
                         style={{ color: statusColor }}
                       >
                         {statusLabel}

@@ -29,7 +29,7 @@ export function SectionHeader({
       onPress={collapsible ? handleToggle : undefined}
       disabled={!collapsible}
     >
-      <Text className="text-overline text-neutral-secondary uppercase">
+      <Text className="font-sans text-overline text-neutral-secondary uppercase">
         {label} ({count})
       </Text>
       {collapsible && (

@@ -35,7 +35,7 @@ export function BalanceMemberRow({
             {displayName}
           </Text>
           <Text
-            className={`text-body font-bold ${
+            className={`text-body font-heading ${
               isOwedToYou ? 'text-semantic-success' : 'text-semantic-error'
             }`}
           >

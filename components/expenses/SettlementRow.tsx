@@ -36,7 +36,7 @@ export function SettlementRow({
           {paidByName} paid {paidToName}
         </Text>
       </View>
-      <Text className="text-body text-neutral-secondary">
+      <Text className="font-sans text-body text-neutral-secondary">
         {formatCurrency(Number(settlement.amount))}
       </Text>
     </View>

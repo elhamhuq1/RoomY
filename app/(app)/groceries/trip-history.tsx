@@ -120,10 +120,10 @@ export default function TripHistoryScreen() {
           style={{ width: 140, height: 140, marginBottom: 24 }}
           resizeMode="contain"
         />
-        <Text className="text-2xl font-bold text-gray-800">
+        <Text className="text-2xl font-heading text-gray-800">
           No completed trips yet
         </Text>
-        <Text className="mt-3 text-center text-base leading-6 text-gray-500">
+        <Text className="font-sans mt-3 text-center text-base leading-6 text-gray-500">
           Complete a grocery trip to see it here
         </Text>
       </View>
@@ -153,10 +153,10 @@ export default function TripHistoryScreen() {
                   <Ionicons name="cart" size={20} color={colors.brand.DEFAULT} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-base font-semibold text-gray-800">
+                  <Text className="text-base font-heading-semi text-gray-800">
                     {formatCurrency(Number(trip.total_amount))}
                   </Text>
-                  <Text className="text-sm text-gray-400">
+                  <Text className="font-sans text-sm text-gray-400">
                     {formatDate(trip.completed_at)}
                     {" \u00B7 "}
                     {trip.items.length} item{trip.items.length !== 1 ? "s" : ""}
@@ -183,11 +183,11 @@ export default function TripHistoryScreen() {
                         color={colors.neutral.tertiary}
                         style={{ marginRight: 8 }}
                       />
-                      <Text className="flex-1 text-sm text-gray-600">
+                      <Text className="font-sans flex-1 text-sm text-gray-600">
                         {item.name}
                       </Text>
                       {item.quantity > 1 && (
-                        <Text className="text-xs text-gray-400">
+                        <Text className="font-sans text-xs text-gray-400">
                           x{item.quantity}
                         </Text>
                       )}

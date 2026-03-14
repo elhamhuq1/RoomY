@@ -175,17 +175,17 @@ export default function MembersSettingsScreen() {
       {/* Error */}
       {error ? (
         <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-          <Text className="text-sm text-red-600">{error}</Text>
+          <Text className="font-sans text-sm text-red-600">{error}</Text>
         </View>
       ) : null}
 
       {/* Members section */}
       <View className="mb-6">
         <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-lg font-semibold text-gray-700">
+          <Text className="text-lg font-heading-semi text-gray-700">
             Household Members
           </Text>
-          <Text className="text-sm text-gray-400">
+          <Text className="font-sans text-sm text-gray-400">
             {members.length}/{maxMembers} members
           </Text>
         </View>
@@ -235,7 +235,7 @@ export default function MembersSettingsScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text className="mt-0.5 text-xs text-gray-400">
+                <Text className="font-sans mt-0.5 text-xs text-gray-400">
                   Joined {formatDate(member.joined_at)}
                 </Text>
               </View>
@@ -246,14 +246,14 @@ export default function MembersSettingsScreen() {
 
       {/* Invite code section */}
       <View>
-        <Text className="mb-3 text-lg font-semibold text-gray-700">
+        <Text className="mb-3 text-lg font-heading-semi text-gray-700">
           Invite Code
         </Text>
 
         <View className="items-center rounded-card bg-transparent border border-neutral-border p-6">
           {/* Code display */}
           <Text
-            className="text-3xl font-bold tracking-widest text-brand-dark"
+            className="text-3xl font-heading tracking-widest text-brand-dark"
             style={{ fontVariant: ["tabular-nums"] }}
           >
             {formattedCode}
@@ -292,7 +292,7 @@ export default function MembersSettingsScreen() {
                 color="#fff"
                 style={{ marginRight: 8 }}
               />
-              <Text className="text-base font-bold text-white">
+              <Text className="text-base font-heading text-white">
                 Share Code
               </Text>
             </Pressable>
@@ -310,7 +310,7 @@ export default function MembersSettingsScreen() {
                   color={colors.brand.DEFAULT}
                   style={{ marginRight: 6 }}
                 />
-                <Text className="text-sm font-bold text-brand-dark">
+                <Text className="text-sm font-heading text-brand-dark">
                   {copied ? "Copied!" : "Copy"}
                 </Text>
               </Pressable>
@@ -335,7 +335,7 @@ export default function MembersSettingsScreen() {
                       color="#6b7280"
                       style={{ marginRight: 6 }}
                     />
-                    <Text className="text-sm font-bold text-gray-600">
+                    <Text className="text-sm font-heading text-gray-600">
                       Regenerate
                     </Text>
                   </>

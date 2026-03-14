@@ -376,7 +376,7 @@ export default function ExpenseDetailScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
         <Ionicons name="alert-circle-outline" size={48} color="#ef5350" />
-        <Text className="mt-3 text-base text-gray-500">{error}</Text>
+        <Text className="font-sans mt-3 text-base text-gray-500">{error}</Text>
       </View>
     );
   }
@@ -393,16 +393,16 @@ export default function ExpenseDetailScreen() {
             <Ionicons name="checkmark-circle" size={36} color={colors.semantic.success} />
           </View>
 
-          <Text className="text-2xl font-bold text-gray-800">
+          <Text className="text-2xl font-heading text-gray-800">
             {formatCurrency(Number(settlement.amount))}
           </Text>
 
-          <Text className="mt-2 text-base text-gray-500">
+          <Text className="font-sans mt-2 text-base text-gray-500">
             {paidByProfile?.display_name ?? "Unknown"} paid{" "}
             {paidToProfile?.display_name ?? "Unknown"}
           </Text>
 
-          <Text className="mt-1 text-sm text-gray-400">
+          <Text className="font-sans mt-1 text-sm text-gray-400">
             {new Date(settlement.created_at).toLocaleDateString("en-US", {
               weekday: "long",
               month: "long",
@@ -412,7 +412,7 @@ export default function ExpenseDetailScreen() {
           </Text>
 
           <View className="mt-1">
-            <Text className="text-xs text-gray-300">Settlement</Text>
+            <Text className="font-sans text-xs text-gray-300">Settlement</Text>
           </View>
         </View>
 
@@ -427,7 +427,7 @@ export default function ExpenseDetailScreen() {
             color="#ef5350"
             style={{ marginRight: 8 }}
           />
-          <Text className="text-base font-semibold text-red-500">
+          <Text className="text-base font-heading-semi text-red-500">
             Delete Settlement
           </Text>
         </Pressable>
@@ -462,7 +462,7 @@ export default function ExpenseDetailScreen() {
             Description
           </Text>
           <TextInput
-            className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
+            className="font-sans mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
             value={editDescription}
             onChangeText={setEditDescription}
             placeholder="Description"
@@ -474,11 +474,11 @@ export default function ExpenseDetailScreen() {
             Amount
           </Text>
           <View className="mb-6 flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3">
-            <Text className="mr-1 text-lg font-semibold text-gray-400">
+            <Text className="mr-1 text-lg font-heading-semi text-gray-400">
               $
             </Text>
             <TextInput
-              className="flex-1 text-lg text-gray-800"
+            className="font-sans flex-1 text-lg text-gray-800"
               keyboardType="decimal-pad"
               value={editAmount}
               onChangeText={handleEditAmountChange}
@@ -516,14 +516,14 @@ export default function ExpenseDetailScreen() {
                         AVATAR_COLORS[index % AVATAR_COLORS.length],
                     }}
                   >
-                    <Text className="text-sm font-bold text-white">
+                    <Text className="text-sm font-heading text-white">
                       {getInitials(member.profile.display_name)}
                     </Text>
                   </View>
                   <Text
                     className={`mt-1 text-xs ${
                       isSelected
-                        ? "font-semibold text-brand-dark"
+                        ? "font-heading-semi text-brand-dark"
                         : "text-gray-500"
                     }`}
                     numberOfLines={1}
@@ -578,11 +578,11 @@ export default function ExpenseDetailScreen() {
                         AVATAR_COLORS[index % AVATAR_COLORS.length],
                     }}
                   >
-                    <Text className="text-xs font-bold text-white">
+                    <Text className="text-xs font-heading text-white">
                       {getInitials(member.profile.display_name)}
                     </Text>
                   </View>
-                  <Text className="flex-1 text-base text-gray-800">
+                  <Text className="font-sans flex-1 text-base text-gray-800">
                     {member.user_id === user?.id
                       ? "You"
                       : member.profile.display_name}
@@ -600,7 +600,7 @@ export default function ExpenseDetailScreen() {
           {/* Error */}
           {error && (
             <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-              <Text className="text-sm text-red-600">{error}</Text>
+              <Text className="font-sans text-sm text-red-600">{error}</Text>
             </View>
           )}
 
@@ -618,7 +618,7 @@ export default function ExpenseDetailScreen() {
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text
-                className={`text-lg font-bold ${
+                className={`text-lg font-heading ${
                   canSave ? "text-white" : "text-gray-400"
                 }`}
               >
@@ -631,7 +631,7 @@ export default function ExpenseDetailScreen() {
             className="flex-row items-center justify-center rounded-2xl border-2 border-gray-200 py-4 active:bg-neutral-surface"
             onPress={handleCancelEdit}
           >
-            <Text className="text-lg font-bold text-gray-500">Cancel</Text>
+            <Text className="text-lg font-heading text-gray-500">Cancel</Text>
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -647,11 +647,11 @@ export default function ExpenseDetailScreen() {
     >
       {/* Header card */}
       <View className="items-center rounded-card bg-transparent border border-neutral-border p-6">
-        <Text className="text-2xl font-bold text-gray-800">
+        <Text className="text-2xl font-heading text-gray-800">
           {expense.description}
         </Text>
 
-        <Text className="mt-2 text-3xl font-bold text-gray-800">
+        <Text className="mt-2 text-3xl font-heading text-gray-800">
           {formatCurrency(Number(expense.amount))}
         </Text>
 
@@ -662,16 +662,16 @@ export default function ExpenseDetailScreen() {
             color={colors.neutral.tertiary}
             style={{ marginRight: 4 }}
           />
-          <Text className="text-sm text-gray-500">
+          <Text className="font-sans text-sm text-gray-500">
             Paid by {payerProfile?.display_name ?? "Unknown"}
           </Text>
         </View>
 
-        <Text className="mt-1 text-xs text-gray-400">{createdDate}</Text>
+        <Text className="font-sans mt-1 text-xs text-gray-400">{createdDate}</Text>
       </View>
 
       {/* Split breakdown */}
-      <Text className="mb-3 mt-6 text-sm font-semibold text-gray-400">
+      <Text className="mb-3 mt-6 text-sm font-heading-semi text-gray-400">
         SPLIT BETWEEN
       </Text>
       <View className="rounded-card bg-transparent border border-neutral-border">
@@ -689,16 +689,16 @@ export default function ExpenseDetailScreen() {
                   AVATAR_COLORS[index % AVATAR_COLORS.length],
               }}
             >
-              <Text className="text-xs font-bold text-white">
+              <Text className="text-xs font-heading text-white">
                 {getInitials(split.profile?.display_name ?? "?")}
               </Text>
             </View>
-            <Text className="flex-1 text-base text-gray-800">
+            <Text className="font-sans flex-1 text-base text-gray-800">
               {split.user_id === user?.id
                 ? "You"
                 : split.profile?.display_name ?? "Unknown"}
             </Text>
-            <Text className="text-base font-semibold text-gray-700">
+            <Text className="text-base font-heading-semi text-gray-700">
               {formatCurrency(Number(split.share_amount))}
             </Text>
           </View>
@@ -716,7 +716,7 @@ export default function ExpenseDetailScreen() {
           color="#fff"
           style={{ marginRight: 8 }}
         />
-        <Text className="text-base font-bold text-white">Edit Expense</Text>
+        <Text className="text-base font-heading text-white">Edit Expense</Text>
       </Pressable>
 
       {/* Delete button */}
@@ -730,14 +730,14 @@ export default function ExpenseDetailScreen() {
           color="#ef5350"
           style={{ marginRight: 8 }}
         />
-        <Text className="text-base font-semibold text-red-500">
+        <Text className="text-base font-heading-semi text-red-500">
           Delete Expense
         </Text>
       </Pressable>
 
       {error && (
         <View className="mt-4 rounded-xl bg-red-50 px-4 py-3">
-          <Text className="text-sm text-red-600">{error}</Text>
+          <Text className="font-sans text-sm text-red-600">{error}</Text>
         </View>
       )}
     </ScrollView>

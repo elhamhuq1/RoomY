@@ -96,7 +96,7 @@ export default function NotificationsSettingsScreen() {
             <Text className="text-base font-medium text-gray-800">
               Expenses
             </Text>
-            <Text className="text-sm text-gray-400">
+            <Text className="font-sans text-sm text-gray-400">
               New expenses added by roommates
             </Text>
           </View>
@@ -115,7 +115,7 @@ export default function NotificationsSettingsScreen() {
           </View>
           <View className="flex-1">
             <Text className="text-base font-medium text-gray-800">Chores</Text>
-            <Text className="text-sm text-gray-400">
+            <Text className="font-sans text-sm text-gray-400">
               Reminders for chores due today
             </Text>
           </View>
@@ -129,7 +129,7 @@ export default function NotificationsSettingsScreen() {
       </View>
 
       {/* Info text */}
-      <Text className="mt-4 px-2 text-sm leading-5 text-gray-400">
+      <Text className="font-sans mt-4 px-2 text-sm leading-5 text-gray-400">
         Notifications are sent to this device only. Use your phone's settings to
         manage Do Not Disturb.
       </Text>

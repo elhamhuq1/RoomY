@@ -289,7 +289,7 @@ export default function DashboardScreen() {
             onPress={() => handlePeriodChange("week")}
           >
             <Text
-              className={`text-sm font-semibold ${
+              className={`text-sm font-heading-semi ${
                 period === "week" ? "text-gray-800" : "text-gray-500"
               }`}
             >
@@ -314,7 +314,7 @@ export default function DashboardScreen() {
             onPress={() => handlePeriodChange("month")}
           >
             <Text
-              className={`text-sm font-semibold ${
+              className={`text-sm font-heading-semi ${
                 period === "month" ? "text-gray-800" : "text-gray-500"
               }`}
             >
@@ -331,10 +331,10 @@ export default function DashboardScreen() {
               style={{ width: 140, height: 140, marginBottom: 12 }}
               resizeMode="contain"
             />
-            <Text className="text-base font-semibold text-gray-700">
+            <Text className="text-base font-heading-semi text-gray-700">
               No chores completed this {periodLabel}
             </Text>
-            <Text className="mt-1 text-center text-sm text-gray-400">
+            <Text className="font-sans mt-1 text-center text-sm text-gray-400">
               Complete some chores to see stats here
             </Text>
           </View>
@@ -371,7 +371,7 @@ export default function DashboardScreen() {
 
                     {/* Name and streak */}
                     <View className="flex-1">
-                      <Text className="text-base font-semibold text-gray-800">
+                      <Text className="text-base font-heading-semi text-gray-800">
                         {member.displayName}
                         {isCurrentUser ? " (you)" : ""}
                       </Text>
@@ -382,7 +382,7 @@ export default function DashboardScreen() {
                             size={14}
                             color="#f97316"
                           />
-                          <Text className="ml-1 text-xs text-orange-500">
+                          <Text className="font-sans ml-1 text-xs text-orange-500">
                             {member.streak} streak
                           </Text>
                         </View>
@@ -390,7 +390,7 @@ export default function DashboardScreen() {
                     </View>
 
                     {/* Completion count */}
-                    <Text className="text-2xl font-bold text-brand-dark">
+                    <Text className="text-2xl font-heading text-brand-dark">
                       {member.completionCount}
                     </Text>
                   </View>

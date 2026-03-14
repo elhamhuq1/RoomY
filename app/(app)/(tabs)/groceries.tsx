@@ -530,7 +530,7 @@ export default function GroceriesScreen() {
               color="#fff"
               style={{ marginRight: 8 }}
             />
-            <Text className="text-lg font-bold text-white">Complete Trip</Text>
+            <Text className="text-lg font-heading text-white">Complete Trip</Text>
           </Pressable>
         </View>
       )}
@@ -554,7 +554,7 @@ export default function GroceriesScreen() {
               className="mx-8 w-full max-w-sm rounded-2xl bg-white p-6"
               onPress={() => {}}
             >
-              <Text className="mb-4 text-lg font-bold text-neutral-text">
+              <Text className="mb-4 text-lg font-heading text-neutral-text">
                 Edit Item
               </Text>
 
@@ -563,7 +563,7 @@ export default function GroceriesScreen() {
                 Name
               </Text>
               <TextInput
-                className="mb-4 rounded-xl border border-neutral-border bg-neutral-bg px-4 py-2.5 text-base text-neutral-text"
+            className="font-sans mb-4 rounded-xl border border-neutral-border bg-neutral-bg px-4 py-2.5 text-base text-neutral-text"
                 value={editingItem?.name ?? ""}
                 onChangeText={(text) =>
                   setEditingItem((prev) =>
@@ -593,7 +593,7 @@ export default function GroceriesScreen() {
                   <Ionicons name="remove" size={20} color={colors.neutral.secondary} />
                 </Pressable>
                 <View className="h-10 items-center justify-center border-y border-neutral-border bg-white px-6">
-                  <Text className="text-lg font-semibold text-neutral-text">
+                  <Text className="text-lg font-heading-semi text-neutral-text">
                     {editingItem?.quantity ?? 1}
                   </Text>
                 </View>
@@ -623,7 +623,7 @@ export default function GroceriesScreen() {
                   className="flex-1 items-center rounded-xl bg-brand py-3 active:bg-brand-dark"
                   onPress={saveEdit}
                 >
-                  <Text className="text-base font-bold text-white">Save</Text>
+                  <Text className="text-base font-heading text-white">Save</Text>
                 </Pressable>
               </View>
             </Pressable>

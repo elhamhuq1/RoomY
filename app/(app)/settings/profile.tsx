@@ -96,7 +96,7 @@ export default function ProfileSettingsScreen() {
             }}
             onError={(msg) => Alert.alert('Error', msg)}
           />
-          <Text className="mt-3 text-sm text-gray-400">
+          <Text className="font-sans mt-3 text-sm text-gray-400">
             Tap to change photo
           </Text>
         </View>
@@ -104,14 +104,14 @@ export default function ProfileSettingsScreen() {
         {/* Error */}
         {error ? (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
+            <Text className="font-sans text-sm text-red-600">{error}</Text>
           </View>
         ) : null}
 
         {/* Saved confirmation */}
         {saved ? (
           <View className="mb-4 rounded-xl bg-green-50 px-4 py-3">
-            <Text className="text-sm text-green-600">
+            <Text className="font-sans text-sm text-green-600">
               Profile saved successfully!
             </Text>
           </View>
@@ -147,7 +147,7 @@ export default function ProfileSettingsScreen() {
             Venmo Username
           </Text>
           <TextInput
-            className="rounded-xl border border-neutral-border bg-white px-4 py-3.5 text-base text-gray-800"
+            className="font-sans rounded-xl border border-neutral-border bg-white px-4 py-3.5 text-base text-gray-800"
             placeholder="@your-venmo (optional)"
             placeholderTextColor={colors.neutral.tertiary}
             value={venmoUsername}
@@ -159,9 +159,6 @@ export default function ProfileSettingsScreen() {
             autoCorrect={false}
             editable={!loading}
           />
-          <Text className="mt-1.5 text-xs text-gray-400">
-            Used for quick payments in Phase 2
-          </Text>
         </View>
 
         {/* Save button */}
@@ -177,7 +174,7 @@ export default function ProfileSettingsScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-lg font-bold text-white">Save</Text>
+            <Text className="text-lg font-heading text-white">Save</Text>
           )}
         </Pressable>
       </ScrollView>

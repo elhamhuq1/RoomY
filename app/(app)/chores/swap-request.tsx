@@ -224,10 +224,10 @@ export default function SwapRequestScreen() {
           style={{ width: 140, height: 140, marginBottom: 16 }}
           resizeMode="contain"
         />
-        <Text className="text-lg font-bold text-gray-800">
+        <Text className="text-lg font-heading text-gray-800">
           No swap requests
         </Text>
-        <Text className="mt-2 text-center text-sm leading-5 text-gray-500">
+        <Text className="font-sans mt-2 text-center text-sm leading-5 text-gray-500">
           When you or a housemate requests to swap a chore, it will appear here.
         </Text>
       </View>
@@ -278,12 +278,12 @@ export default function SwapRequestScreen() {
                       </View>
                       <View className="flex-1">
                         <Text
-                          className="text-base font-semibold text-gray-800"
+                          className="text-base font-heading-semi text-gray-800"
                           numberOfLines={1}
                         >
                           {request.choreName}
                         </Text>
-                        <Text className="mt-0.5 text-xs text-gray-400">
+                        <Text className="font-sans mt-0.5 text-xs text-gray-400">
                           From {request.otherPersonName}
                         </Text>
                       </View>
@@ -301,7 +301,7 @@ export default function SwapRequestScreen() {
                           {isResolving ? (
                             <ActivityIndicator size="small" color="#fff" />
                           ) : (
-                            <Text className="text-sm font-bold text-white">
+                            <Text className="text-sm font-heading text-white">
                               Accept
                             </Text>
                           )}
@@ -314,7 +314,7 @@ export default function SwapRequestScreen() {
                           {isResolving ? (
                             <ActivityIndicator size="small" color="#6b7280" />
                           ) : (
-                            <Text className="text-sm font-bold text-gray-600">
+                            <Text className="text-sm font-heading text-gray-600">
                               Decline
                             </Text>
                           )}
@@ -354,12 +354,12 @@ export default function SwapRequestScreen() {
                   </View>
                   <View className="flex-1">
                     <Text
-                      className="text-base font-semibold text-gray-800"
+                      className="text-base font-heading-semi text-gray-800"
                       numberOfLines={1}
                     >
                       {request.choreName}
                     </Text>
-                    <Text className="mt-0.5 text-xs text-gray-400">
+                    <Text className="font-sans mt-0.5 text-xs text-gray-400">
                       To {request.otherPersonName}
                     </Text>
                   </View>

@@ -41,10 +41,10 @@ export function BalanceSection({
             style={{ width: 140, height: 140 }}
             resizeMode="contain"
           />
-          <Text className="mt-3 text-body text-neutral-text font-semibold">
+          <Text className="mt-3 text-body text-neutral-text font-heading-semi">
             All settled up!
           </Text>
-          <Text className="mt-1 text-metadata text-neutral-secondary">
+          <Text className="font-sans mt-1 text-metadata text-neutral-secondary">
             No outstanding balances with your roommates.
           </Text>
         </View>

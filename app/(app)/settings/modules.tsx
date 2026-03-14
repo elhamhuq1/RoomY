@@ -137,17 +137,17 @@ export default function ModuleSettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header text */}
-        <Text className="mb-2 text-base text-gray-500">
+        <Text className="font-sans mb-2 text-base text-gray-500">
           Toggle modules on or off. Changes apply immediately.
         </Text>
-        <Text className="mb-6 text-sm text-gray-400">
+        <Text className="font-sans mb-6 text-sm text-gray-400">
           Any household member can change these settings.
         </Text>
 
         {/* Error */}
         {error ? (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
+            <Text className="font-sans text-sm text-red-600">{error}</Text>
           </View>
         ) : null}
 
@@ -178,10 +178,10 @@ export default function ModuleSettingsScreen() {
 
                 {/* Title + description */}
                 <View className="mr-3 flex-1">
-                  <Text className="text-lg font-bold text-gray-800">
+                  <Text className="text-lg font-heading text-gray-800">
                     {mod.title}
                   </Text>
-                  <Text className="mt-0.5 text-sm text-gray-500">
+                  <Text className="font-sans mt-0.5 text-sm text-gray-500">
                     {mod.description}
                   </Text>
                   {mod.locked ? (

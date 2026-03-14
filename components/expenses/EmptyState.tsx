@@ -18,7 +18,7 @@ export function EmptyState({ onAddExpense }: EmptyStateProps) {
       <Text className="text-section-heading font-heading-semi text-neutral-text">
         No expenses yet
       </Text>
-      <Text className="mt-1 text-center text-body text-neutral-secondary">
+      <Text className="font-sans mt-1 text-center text-body text-neutral-secondary">
         Add your first expense to start tracking
       </Text>
       <View className="mt-4">

@@ -48,7 +48,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
   return (
     <Card className="mx-5 mt-4">
       {/* Household name overline */}
-      <Text className="text-overline text-neutral-secondary uppercase">
+      <Text className="font-sans text-overline text-neutral-secondary uppercase">
         {householdName}
       </Text>
 
@@ -57,8 +57,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
         {members.map((member) => (
           <View key={member.user_id} className="mr-3 items-center" style={{ maxWidth: 56 }}>
             <Avatar userId={member.user_id} name={member.display_name} size="md" avatarUrl={member.avatar_url} />
-            <Text
-              className="text-metadata text-neutral-secondary mt-1"
+            <Text className="font-sans text-metadata text-neutral-secondary mt-1"
               numberOfLines={1}
             >
               {member.display_name.split(' ')[0]}
@@ -74,7 +73,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
           <View className="items-center">
             <View className="flex-row items-center mb-2">
               <Ionicons name="people-outline" size={18} color={colors.brand.DEFAULT} />
-              <Text className="text-body text-neutral-text font-semibold ml-2">
+              <Text className="text-body text-neutral-text font-heading-semi ml-2">
                 Invite your roommates
               </Text>
             </View>
@@ -90,7 +89,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
                 onPress={handleShare}
               >
                 <Ionicons name="share-outline" size={16} color="#fff" style={{ marginRight: 6 }} />
-                <Text className="text-metadata text-white font-semibold">Share</Text>
+                <Text className="text-metadata text-white font-heading-semi">Share</Text>
               </Pressable>
               <Pressable
                 className="flex-1 flex-row items-center justify-center rounded-full border-2 border-brand py-2.5 px-4"
@@ -102,7 +101,7 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
                   color={colors.brand.DEFAULT}
                   style={{ marginRight: 6 }}
                 />
-                <Text className="text-metadata text-brand font-semibold">
+                <Text className="text-metadata text-brand font-heading-semi">
                   {copied ? 'Copied!' : 'Copy'}
                 </Text>
               </Pressable>
@@ -111,10 +110,9 @@ export function MembersCard({ members, householdName, inviteCode }: MembersCardP
         ) : (
           /* Compact invite for households with members */
           <View>
-            <Text className="text-metadata text-neutral-secondary mb-2">Invite</Text>
+            <Text className="font-sans text-metadata text-neutral-secondary mb-2">Invite</Text>
             <View className="flex-row items-center bg-neutral-bg rounded-card px-3 py-2.5">
-              <Text
-                className="flex-1 text-body text-neutral-text tracking-wider"
+              <Text className="font-sans flex-1 text-body text-neutral-text tracking-wider"
                 style={{ fontVariant: ['tabular-nums'] }}
               >
                 {formattedCode}

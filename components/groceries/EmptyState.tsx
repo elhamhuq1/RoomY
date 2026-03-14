@@ -12,7 +12,7 @@ export function EmptyState() {
       <Text className="text-section-heading font-heading-semi text-neutral-text">
         Your grocery list is empty
       </Text>
-      <Text className="text-body text-neutral-secondary mt-3 text-center">
+      <Text className="font-sans text-body text-neutral-secondary mt-3 text-center">
         Add items above to get started
       </Text>
     </View>

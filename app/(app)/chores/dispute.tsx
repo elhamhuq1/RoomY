@@ -205,10 +205,10 @@ export default function DisputeScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
         <Ionicons name="alert-circle" size={48} color={colors.semantic.error} />
-        <Text className="text-lg font-bold text-gray-800 mt-3">
+        <Text className="text-lg font-heading text-gray-800 mt-3">
           Dispute not found
         </Text>
-        <Text className="text-sm text-gray-500 mt-1 text-center">
+        <Text className="font-sans text-sm text-gray-500 mt-1 text-center">
           This dispute may have already been resolved.
         </Text>
       </View>
@@ -240,8 +240,8 @@ export default function DisputeScreen() {
             <View className="h-14 w-14 rounded-full bg-red-100 items-center justify-center mb-3">
               <Ionicons name="flag" size={28} color="#EF4444" />
             </View>
-            <Text className="text-xl font-bold text-gray-800">{choreName}</Text>
-            <Text className="text-sm text-gray-400 mt-1">Dispute Details</Text>
+            <Text className="text-xl font-heading text-gray-800">{choreName}</Text>
+            <Text className="font-sans text-sm text-gray-400 mt-1">Dispute Details</Text>
           </View>
         </Card>
 
@@ -257,7 +257,7 @@ export default function DisputeScreen() {
                 <Ionicons name="checkmark" size={16} color="#22C55E" />
               </View>
               <View className="flex-1">
-                <Text className="text-sm font-semibold text-gray-800">
+                <Text className="text-sm font-heading-semi text-gray-800">
                   Marked as complete
                 </Text>
                 <View className="flex-row items-center mt-1">
@@ -271,7 +271,7 @@ export default function DisputeScreen() {
                       />
                     </View>
                   )}
-                  <Text className="text-xs text-gray-500">
+                  <Text className="font-sans text-xs text-gray-500">
                     {isCompletedByMe
                       ? "You"
                       : completedByProfile?.display_name ?? "Unknown"}
@@ -288,7 +288,7 @@ export default function DisputeScreen() {
                 <Ionicons name="flag" size={16} color="#EF4444" />
               </View>
               <View className="flex-1">
-                <Text className="text-sm font-semibold text-gray-800">
+                <Text className="text-sm font-heading-semi text-gray-800">
                   Disputed
                 </Text>
                 <View className="flex-row items-center mt-1">
@@ -302,7 +302,7 @@ export default function DisputeScreen() {
                       />
                     </View>
                   )}
-                  <Text className="text-xs text-gray-500">
+                  <Text className="font-sans text-xs text-gray-500">
                     {isDisputedByMe
                       ? "You"
                       : disputedByProfile?.display_name ?? "Unknown"}
@@ -330,11 +330,11 @@ export default function DisputeScreen() {
                   color="#6B7280"
                   style={{ marginRight: 10, marginTop: 2 }}
                 />
-                <Text className="text-sm text-gray-700 flex-1 leading-5">
+                <Text className="font-sans text-sm text-gray-700 flex-1 leading-5">
                   {completion.dispute_reason}
                 </Text>
               </View>
-              <Text className="text-xs text-gray-400 mt-2">
+              <Text className="font-sans text-xs text-gray-400 mt-2">
                 {isDisputedByMe
                   ? "You"
                   : disputedByProfile?.display_name ?? "Unknown"}{" "}
@@ -376,7 +376,7 @@ export default function DisputeScreen() {
             <Text className="text-sm font-medium uppercase tracking-wide text-gray-400 mb-3 px-1">
               Your Response
             </Text>
-            <Text className="text-sm text-gray-500 mb-4 px-1">
+            <Text className="font-sans text-sm text-gray-500 mb-4 px-1">
               Your completion was disputed. You can accept the dispute (completion
               will be reverted) or dismiss it (completion stands).
             </Text>
@@ -391,7 +391,7 @@ export default function DisputeScreen() {
                 ) : (
                   <View className="flex-row items-center">
                     <Ionicons name="checkmark-circle" size={18} color="#fff" />
-                    <Text className="text-sm font-bold text-white ml-1.5">
+                    <Text className="text-sm font-heading text-white ml-1.5">
                       Accept Dispute
                     </Text>
                   </View>
@@ -407,7 +407,7 @@ export default function DisputeScreen() {
                 ) : (
                   <View className="flex-row items-center">
                     <Ionicons name="close-circle" size={18} color="#6B7280" />
-                    <Text className="text-sm font-bold text-gray-600 ml-1.5">
+                    <Text className="text-sm font-heading text-gray-600 ml-1.5">
                       Dismiss
                     </Text>
                   </View>
@@ -423,7 +423,7 @@ export default function DisputeScreen() {
             <Card className="bg-blue-50 border-blue-200">
               <View className="flex-row items-center">
                 <Ionicons name="information-circle" size={20} color="#3B82F6" />
-                <Text className="ml-2 text-sm text-blue-700 flex-1">
+                <Text className="font-sans ml-2 text-sm text-blue-700 flex-1">
                   Waiting for{" "}
                   {completedByProfile?.display_name ?? "the other person"} to
                   respond. If unresolved within 24 hours, the completion will be
@@ -454,7 +454,7 @@ export default function DisputeScreen() {
                 color={completion.is_reverted ? "#EF4444" : "#22C55E"}
               />
               <Text
-                className={`text-base font-bold mt-2 ${
+                className={`text-base font-heading mt-2 ${
                   completion.is_reverted ? "text-red-700" : "text-green-700"
                 }`}
               >
@@ -462,7 +462,7 @@ export default function DisputeScreen() {
                   ? "Completion Reverted"
                   : "Dispute Dismissed"}
               </Text>
-              <Text className="text-sm text-gray-500 mt-1 text-center">
+              <Text className="font-sans text-sm text-gray-500 mt-1 text-center">
                 {completion.is_reverted
                   ? "The dispute was accepted and the completion was reverted."
                   : "The dispute was dismissed. The completion stands as valid."}

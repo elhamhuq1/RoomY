@@ -17,7 +17,7 @@ export function QuickAddInput({ value, onChangeText, onSubmit }: QuickAddInputPr
     <Card className="mx-4 mt-4 p-0">
       <View className="flex-row items-center p-2">
         <TextInput
-          className="flex-1 px-3 py-2 text-body text-neutral-text"
+            className="font-sans flex-1 px-3 py-2 text-body text-neutral-text"
           placeholder="Add an item..."
           placeholderTextColor={colors.neutral.tertiary}
           value={value}

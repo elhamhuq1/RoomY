@@ -19,7 +19,7 @@ export function GreetingHeader({ userName }: GreetingHeaderProps) {
       <Text className="text-page-title font-heading text-neutral-text">
         {getGreeting()}, {userName}
       </Text>
-      <Text className="text-metadata text-neutral-secondary mt-1">
+      <Text className="font-sans text-metadata text-neutral-secondary mt-1">
         {format(new Date(), 'EEEE, MMMM d')}
       </Text>
     </View>

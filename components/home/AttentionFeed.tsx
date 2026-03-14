@@ -128,7 +128,7 @@ export function AttentionFeed(props: AttentionFeedProps) {
           <Text className="text-section-heading font-heading-semi text-neutral-text mt-3">
             All caught up!
           </Text>
-          <Text className="text-body text-neutral-secondary mt-1">
+          <Text className="font-sans text-body text-neutral-secondary mt-1">
             Nothing needs your attention right now
           </Text>
         </View>
@@ -148,7 +148,7 @@ export function AttentionFeed(props: AttentionFeedProps) {
                   >
                     {item.title}
                   </Text>
-                  <Text className="text-metadata text-neutral-secondary mt-0.5">
+                  <Text className="font-sans text-metadata text-neutral-secondary mt-0.5">
                     {item.metadata}
                   </Text>
                 </View>

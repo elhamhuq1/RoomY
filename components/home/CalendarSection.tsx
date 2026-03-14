@@ -120,7 +120,7 @@ export default function CalendarSection({
     <View>
       {/* Header with month label and expand/collapse toggle */}
       <View className="mb-2 flex-row items-center justify-between">
-        <Text className="text-lg font-semibold text-neutral-text">
+        <Text className="text-lg font-heading-semi text-neutral-text">
           {monthLabel}
         </Text>
         <Pressable
@@ -171,7 +171,7 @@ export default function CalendarSection({
                   style={{ flex: 1 }}
                 >
                   {/* Day label */}
-                  <Text className="text-xs text-neutral-secondary">
+                  <Text className="font-sans text-xs text-neutral-secondary">
                     {DAY_LABELS[index]}
                   </Text>
 
@@ -222,14 +222,14 @@ export default function CalendarSection({
             className="mr-2 h-3 w-3 rounded-full"
             style={{ backgroundColor: CHORE_DOT.color }}
           />
-          <Text className="text-xs text-neutral-secondary">Chores</Text>
+          <Text className="font-sans text-xs text-neutral-secondary">Chores</Text>
         </View>
         <View className="flex-row items-center">
           <View
             className="mr-2 h-3 w-3 rounded-full"
             style={{ backgroundColor: EXPENSE_DOT.color }}
           />
-          <Text className="text-xs text-neutral-secondary">Expenses</Text>
+          <Text className="font-sans text-xs text-neutral-secondary">Expenses</Text>
         </View>
       </View>
     </View>

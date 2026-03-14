@@ -18,13 +18,13 @@ export function StatsRow({ pendingCount, disputedCount, streak, personalBest }: 
       {/* Pending */}
       <Card className="flex-1 items-center py-3">
         <Text className="text-key-number font-heading text-brand">{pendingCount}</Text>
-        <Text className="text-metadata text-neutral-secondary">Pending</Text>
+        <Text className="font-sans text-metadata text-neutral-secondary">Pending</Text>
       </Card>
 
       {/* Disputed */}
       <Card className="flex-1 items-center py-3">
         <Text className="text-key-number font-heading text-semantic-error">{disputedCount}</Text>
-        <Text className="text-metadata text-neutral-secondary">Disputed</Text>
+        <Text className="font-sans text-metadata text-neutral-secondary">Disputed</Text>
       </Card>
 
       {/* Streak */}
@@ -33,7 +33,7 @@ export function StatsRow({ pendingCount, disputedCount, streak, personalBest }: 
           <Text className="text-key-number font-heading text-brand">{displayStreak}</Text>
           <Text style={{ fontSize: 20, marginLeft: 4 }}>{"🔥"}</Text>
         </View>
-        <Text className="text-metadata text-neutral-secondary">{displayBest}</Text>
+        <Text className="font-sans text-metadata text-neutral-secondary">{displayBest}</Text>
       </Card>
     </View>
   );

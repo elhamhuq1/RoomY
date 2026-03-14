@@ -248,7 +248,7 @@ export default function AddExpenseScreen() {
           Description
         </Text>
         <TextInput
-          className="mb-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
+            className="font-sans mb-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
           placeholder="What's the expense for?"
           placeholderTextColor={colors.neutral.tertiary}
           value={description}
@@ -270,7 +270,7 @@ export default function AddExpenseScreen() {
                 className="rounded-full border border-gray-200 bg-white px-3 py-1.5 active:bg-brand-light"
                 onPress={() => setDescription(s)}
               >
-                <Text className="text-sm text-gray-600">{s}</Text>
+                <Text className="font-sans text-sm text-gray-600">{s}</Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -280,9 +280,9 @@ export default function AddExpenseScreen() {
         {/* Amount */}
         <Text className="mb-2 text-sm font-medium text-gray-500">Amount</Text>
         <View className="mb-6 flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3">
-          <Text className="mr-1 text-lg text-gray-400">$</Text>
+          <Text className="font-sans mr-1 text-lg text-gray-400">$</Text>
           <TextInput
-            className="flex-1 text-lg text-gray-800"
+            className="font-sans flex-1 text-lg text-gray-800"
             style={{ paddingVertical: 0 }}
             placeholder="0.00"
             placeholderTextColor={colors.neutral.tertiary}
@@ -319,13 +319,13 @@ export default function AddExpenseScreen() {
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                   }}
                 >
-                  <Text className="text-sm font-bold text-white">
+                  <Text className="text-sm font-heading text-white">
                     {getInitials(member.profile.display_name)}
                   </Text>
                 </View>
                 <Text
                   className={`mt-1 text-xs ${
-                    isSelected ? "font-semibold text-brand-dark" : "text-gray-500"
+                    isSelected ? "font-heading-semi text-brand-dark" : "text-gray-500"
                   }`}
                   numberOfLines={1}
                 >
@@ -380,13 +380,13 @@ export default function AddExpenseScreen() {
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                   }}
                 >
-                  <Text className="text-xs font-bold text-white">
+                  <Text className="text-xs font-heading text-white">
                     {getInitials(member.profile.display_name)}
                   </Text>
                 </View>
 
                 {/* Name */}
-                <Text className="flex-1 text-base text-gray-800">
+                <Text className="font-sans flex-1 text-base text-gray-800">
                   {member.user_id === user?.id
                     ? "You"
                     : member.profile.display_name}
@@ -406,7 +406,7 @@ export default function AddExpenseScreen() {
         {/* Error message */}
         {error && (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
+            <Text className="font-sans text-sm text-red-600">{error}</Text>
           </View>
         )}
 
@@ -424,7 +424,7 @@ export default function AddExpenseScreen() {
             <ActivityIndicator size="small" color="#fff" />
           ) : (
             <Text
-              className={`text-lg font-bold ${
+              className={`text-lg font-heading ${
                 canSubmit ? "text-white" : "text-gray-400"
               }`}
             >

@@ -38,14 +38,14 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
         <Text className="text-section-heading font-heading-semi text-neutral-text">
           No chores yet!
         </Text>
-        <Text className="mt-2 text-center text-body text-neutral-secondary leading-6">
+        <Text className="font-sans mt-2 text-center text-body text-neutral-secondary leading-6">
           Add some chores to keep your home running smoothly
         </Text>
       </View>
 
       {/* Suggested chores grid */}
       <View className="mt-8 px-4">
-        <Text className="text-overline text-neutral-secondary uppercase mb-3">
+        <Text className="font-sans text-overline text-neutral-secondary uppercase mb-3">
           Suggested Chores
         </Text>
         <View className="flex-row flex-wrap gap-3">
@@ -75,7 +75,7 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
           onPress={onCreateCustom}
         >
           <Ionicons name="add" size={20} color={colors.neutral.tertiary} />
-          <Text className="ml-2 text-metadata text-neutral-secondary">
+          <Text className="font-sans ml-2 text-metadata text-neutral-secondary">
             Create custom chore
           </Text>
         </Pressable>

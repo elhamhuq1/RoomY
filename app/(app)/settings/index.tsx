@@ -80,10 +80,10 @@ export default function SettingsScreen() {
           />
         </View>
         <View className="flex-1">
-          <Text className="text-lg font-semibold text-gray-800">
+          <Text className="text-lg font-heading-semi text-gray-800">
             {profile?.display_name ?? "Your Profile"}
           </Text>
-          <Text className="text-sm text-gray-400">
+          <Text className="font-sans text-sm text-gray-400">
             {household?.name ?? "No household"}
           </Text>
         </View>
@@ -125,7 +125,7 @@ export default function SettingsScreen() {
                 {row.title}
               </Text>
               {row.subtitle ? (
-                <Text className="text-sm text-gray-400">{row.subtitle}</Text>
+                <Text className="font-sans text-sm text-gray-400">{row.subtitle}</Text>
               ) : null}
             </View>
             {!row.destructive && (

@@ -157,10 +157,10 @@ export default function SettleScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
         <Ionicons name="checkmark-circle" size={72} color={colors.semantic.success} />
-        <Text className="mt-4 text-xl font-bold text-gray-800">
+        <Text className="mt-4 text-xl font-heading text-gray-800">
           Payment Recorded!
         </Text>
-        <Text className="mt-2 text-base text-gray-500">
+        <Text className="font-sans mt-2 text-base text-gray-500">
           {formatCurrency(parsedAmount)} settled with {otherName}
         </Text>
       </View>
@@ -184,21 +184,21 @@ export default function SettleScreen() {
             className="mb-3 h-20 w-20 items-center justify-center rounded-full"
             style={{ backgroundColor: AVATAR_COLORS[0] }}
           >
-            <Text className="text-2xl font-bold text-white">
+            <Text className="text-2xl font-heading text-white">
               {getInitials(otherName)}
             </Text>
           </View>
-          <Text className="text-xl font-bold text-gray-800">{otherName}</Text>
+          <Text className="text-xl font-heading text-gray-800">{otherName}</Text>
         </View>
 
         {/* Direction label */}
         <View className="mb-6 items-center">
-          <Text className="text-base text-gray-500">
+          <Text className="font-sans text-base text-gray-500">
             {direction === "you_owe"
               ? `You owe ${otherName}`
               : `${otherName} owes you`}
           </Text>
-          <Text className="mt-1 text-sm text-gray-400">
+          <Text className="font-sans mt-1 text-sm text-gray-400">
             Original balance: {formatCurrency(originalAmount)}
           </Text>
         </View>
@@ -209,9 +209,9 @@ export default function SettleScreen() {
             Settlement Amount
           </Text>
           <View className="flex-row items-center">
-            <Text className="mr-1 text-3xl font-bold text-gray-800">$</Text>
+            <Text className="mr-1 text-3xl font-heading text-gray-800">$</Text>
             <TextInput
-              className="flex-1 text-3xl font-bold text-gray-800"
+              className="flex-1 text-3xl font-heading text-gray-800"
               value={amountText}
               onChangeText={handleAmountChange}
               keyboardType="decimal-pad"
@@ -221,7 +221,7 @@ export default function SettleScreen() {
             />
           </View>
           {exceedsOriginal && (
-            <Text className="mt-2 text-xs text-yellow-600">
+            <Text className="font-sans mt-2 text-xs text-yellow-600">
               This exceeds the outstanding balance of{" "}
               {formatCurrency(originalAmount)}. You can still proceed if
               pre-paying.
@@ -232,7 +232,7 @@ export default function SettleScreen() {
         {/* Error message */}
         {error && (
           <View className="mb-4 rounded-xl bg-red-50 p-3">
-            <Text className="text-sm text-red-600">{error}</Text>
+            <Text className="font-sans text-sm text-red-600">{error}</Text>
           </View>
         )}
 
@@ -258,7 +258,7 @@ export default function SettleScreen() {
                   color="#fff"
                   style={{ marginRight: 8 }}
                 />
-                <Text className="text-lg font-bold text-white">
+                <Text className="text-lg font-heading text-white">
                   {venmoSent ? "Mark as Settled" : "Record Payment"}
                 </Text>
               </>
@@ -279,13 +279,13 @@ export default function SettleScreen() {
                 color="#fff"
                 style={{ marginRight: 8 }}
               />
-              <Text className="text-lg font-bold text-white">
+              <Text className="text-lg font-heading text-white">
                 {direction === "you_owe" ? "Pay via Venmo" : "Request via Venmo"}
               </Text>
             </Pressable>
           ) : (
             <View className="items-center rounded-2xl border border-dashed border-gray-200 py-4">
-              <Text className="text-sm text-gray-400">
+              <Text className="font-sans text-sm text-gray-400">
                 {otherName} hasn&apos;t added their Venmo username yet
               </Text>
             </View>
@@ -295,7 +295,7 @@ export default function SettleScreen() {
         {/* Venmo return state */}
         {venmoSent && (
           <View className="mt-4 rounded-2xl bg-blue-50 p-4">
-            <Text className="text-center text-sm text-blue-700">
+            <Text className="font-sans text-center text-sm text-blue-700">
               Returned from Venmo? Tap &quot;Mark as Settled&quot; above to
               record the payment in RoomY.
             </Text>

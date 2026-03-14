@@ -36,7 +36,7 @@ export function HistorySection({
     <View>
       {groups.map((group) => (
         <View key={group.label} className="mb-4">
-          <Text className="text-overline text-neutral-secondary uppercase mb-2">
+          <Text className="font-sans text-overline text-neutral-secondary uppercase mb-2">
             {group.label}
           </Text>
           <Card className="p-0">

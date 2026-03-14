@@ -137,7 +137,7 @@ export function ChoreRow({
           <Text className="text-card-title font-heading-semi text-neutral-text" numberOfLines={1}>
             {chore.name}
           </Text>
-          <Text className="text-metadata text-neutral-secondary mt-0.5">
+          <Text className="font-sans text-metadata text-neutral-secondary mt-0.5">
             {isMyChore ? 'You' : assigneeName}
           </Text>
         </View>
@@ -209,17 +209,17 @@ export function ChoreRow({
         </View>
         {isDisputed && (
           <View className="rounded-full bg-red-100 px-2 py-0.5">
-            <Text className="text-xs font-semibold text-red-600">Disputed</Text>
+            <Text className="text-xs font-heading-semi text-red-600">Disputed</Text>
           </View>
         )}
         {isOverdue ? (
           <View className="rounded-full bg-amber-100 px-2 py-0.5">
-            <Text className="text-xs font-semibold text-amber-700">
+            <Text className="text-xs font-heading-semi text-amber-700">
               {overdueDays}d overdue
             </Text>
           </View>
         ) : (
-          <Text className="text-metadata text-neutral-tertiary">
+          <Text className="font-sans text-metadata text-neutral-tertiary">
             {formatDueDate(chore.next_due_at)}
           </Text>
         )}
@@ -231,14 +231,14 @@ export function ChoreRow({
           onPress={onViewDispute}
           disabled={!onViewDispute}
         >
-          <Text className="text-xs text-red-600 flex-1" numberOfLines={2}>
+          <Text className="font-sans text-xs text-red-600 flex-1" numberOfLines={2}>
             {isDisputedByMe
               ? `Your completion was disputed${disputeReason ? `: "${disputeReason}"` : ''}`
               : `You disputed this${disputeReason ? `: "${disputeReason}"` : ''}`}
           </Text>
           {onViewDispute && (
             <View className="flex-row items-center ml-2">
-              <Text className="text-xs font-semibold text-brand mr-0.5">
+              <Text className="text-xs font-heading-semi text-brand mr-0.5">
                 View
               </Text>
               <Ionicons name="chevron-forward" size={12} color={colors.brand.DEFAULT} />

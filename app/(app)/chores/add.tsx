@@ -211,7 +211,7 @@ export default function AddChoreScreen() {
             Chore Name
           </Text>
           <TextInput
-            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
+            className="font-sans rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
             placeholder="Chore name"
             placeholderTextColor={colors.neutral.tertiary}
             value={name}
@@ -251,15 +251,15 @@ export default function AddChoreScreen() {
           {/* Custom interval input */}
           {frequency === "custom" && (
             <View className="mt-3 flex-row items-center gap-2">
-              <Text className="text-sm text-gray-500">Every</Text>
+              <Text className="font-sans text-sm text-gray-500">Every</Text>
               <TextInput
-                className="w-16 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-base text-gray-800"
+            className="font-sans w-16 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-base text-gray-800"
                 value={customDays}
                 onChangeText={setCustomDays}
                 keyboardType="number-pad"
                 maxLength={3}
               />
-              <Text className="text-sm text-gray-500">days</Text>
+              <Text className="font-sans text-sm text-gray-500">days</Text>
             </View>
           )}
         </View>
@@ -296,13 +296,13 @@ export default function AddChoreScreen() {
                         ],
                     }}
                   >
-                    <Text className="text-xs font-bold text-white">
+                    <Text className="text-xs font-heading text-white">
                       {getInitials(member.profile.display_name)}
                     </Text>
                   </View>
 
                   {/* Name */}
-                  <Text className="flex-1 text-base text-gray-800">
+                  <Text className="font-sans flex-1 text-base text-gray-800">
                     {member.profile.display_name}
                     {member.userId === user?.id ? " (you)" : ""}
                   </Text>
@@ -342,7 +342,7 @@ export default function AddChoreScreen() {
                 style={{ marginRight: 8 }}
               />
               <Text
-                className={`text-lg font-bold ${
+                className={`text-lg font-heading ${
                   canSubmit ? "text-white" : "text-gray-400"
                 }`}
               >

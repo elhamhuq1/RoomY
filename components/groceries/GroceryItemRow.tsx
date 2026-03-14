@@ -87,7 +87,7 @@ export function GroceryItemRow({
 
         {/* Quantity badge for checked items with qty > 1 */}
         {isChecked && item.quantity > 1 && (
-          <Text className="mx-2 text-sm text-neutral-tertiary">
+          <Text className="font-sans mx-2 text-sm text-neutral-tertiary">
             x{item.quantity}
           </Text>
         )}

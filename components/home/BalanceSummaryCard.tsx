@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
+import { colors } from '@/lib/theme/colors';
 
 interface BalanceSummaryCardProps {
   netAmount: number;
@@ -24,10 +24,10 @@ export function BalanceSummaryCard({
   const formattedAmount = Math.abs(netAmount).toFixed(2);
 
   const amountColor = isOwed
-    ? '#22C55E' // semantic success green
+    ? colors.brand.DEFAULT
     : isOwe
-      ? '#EF4444' // semantic error red
-      : '#FFFFFF'; // white for settled
+      ? colors.semantic.error
+      : colors.brand.DEFAULT;
 
   const amountText = isOwed
     ? `You're owed $${formattedAmount}`
@@ -37,16 +37,10 @@ export function BalanceSummaryCard({
 
   return (
     <Pressable onPress={onCardPress} className="mx-5 mt-4">
-      <LinearGradient
-        colors={['#1E293B', '#0F172A']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{ borderRadius: 16, padding: 20 }}
-      >
+      <View className="bg-transparent rounded-card border border-neutral-border p-5">
         {/* Balance label */}
-        <Text
-          className="text-overline uppercase"
-          style={{ color: '#94A3B8' }}
+        <Text className="font-sans text-overline uppercase"
+          style={{ color: colors.neutral.secondary }}
         >
           YOUR BALANCE
         </Text>
@@ -57,7 +51,7 @@ export function BalanceSummaryCard({
             <Ionicons
               name="checkmark-circle"
               size={28}
-              color="#FFFFFF"
+              color={colors.brand.DEFAULT}
               style={{ marginRight: 8 }}
             />
           )}
@@ -84,13 +78,13 @@ export function BalanceSummaryCard({
           <View className="mt-4">
             <Button
               title="Request"
-              variant="outline"
+              variant="primary"
               onPress={onRequest}
               className="w-full"
             />
           </View>
         )}
-      </LinearGradient>
+      </View>
     </Pressable>
   );
 }

@@ -79,12 +79,12 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
             style={{ width: 140, height: 140 }}
             resizeMode="contain"
           />
-          <Text className="text-body text-neutral-secondary mt-3">
+          <Text className="font-sans text-body text-neutral-secondary mt-3">
             No chores scheduled
           </Text>
         </View>
       ) : !hasVisibleItems ? (
-        <Text className="text-body text-neutral-secondary">
+        <Text className="font-sans text-body text-neutral-secondary">
           No chores on this day
         </Text>
       ) : (
@@ -92,7 +92,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
           {dayGroups.map((group, groupIndex) => (
             <View key={group.dateString}>
               {/* Day header */}
-              <Text className="text-overline text-neutral-secondary mb-2">
+              <Text className="font-sans text-overline text-neutral-secondary mb-2">
                 {group.dayLabel}
               </Text>
 
@@ -145,7 +145,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
                           size="xs"
                           avatarUrl={item.assigneeAvatarUrl}
                         />
-                        <Text className="text-metadata text-neutral-secondary ml-2">
+                        <Text className="font-sans text-metadata text-neutral-secondary ml-2">
                           {item.assigneeName}
                         </Text>
                         {item.isCompleted ? (
@@ -155,12 +155,12 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
                               size={14}
                               color={colors.brand.DEFAULT}
                             />
-                            <Text className="text-metadata text-brand ml-0.5">
+                            <Text className="font-sans text-metadata text-brand ml-0.5">
                               Done
                             </Text>
                           </View>
                         ) : (
-                          <Text className="text-metadata text-neutral-tertiary ml-2">
+                          <Text className="font-sans text-metadata text-neutral-tertiary ml-2">
                             Pending
                           </Text>
                         )}

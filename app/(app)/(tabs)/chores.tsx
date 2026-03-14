@@ -516,7 +516,7 @@ export default function ChoresScreen() {
         {/* YOUR CHORES section */}
         {myChores.length > 0 && (
           <View className="mt-4">
-            <Text className="text-overline text-neutral-secondary uppercase mb-2 px-4">
+            <Text className="font-sans text-overline text-neutral-secondary uppercase mb-2 px-4">
               YOUR CHORES
             </Text>
             <Card className="mx-4 p-0 overflow-hidden">
@@ -572,7 +572,7 @@ export default function ChoresScreen() {
         {/* HOUSEHOLD section */}
         {othersChores.length > 0 && (
           <View className="mt-6">
-            <Text className="text-overline text-neutral-secondary uppercase mb-2 px-4">
+            <Text className="font-sans text-overline text-neutral-secondary uppercase mb-2 px-4">
               HOUSEHOLD
             </Text>
             <Card className="mx-4 p-0 overflow-hidden">
@@ -644,11 +644,11 @@ export default function ChoresScreen() {
             <View className="mb-4 items-center">
               <View className="h-1 w-10 rounded-full bg-gray-300" />
             </View>
-            <Text className="mb-4 px-6 text-lg font-bold text-gray-800">
+            <Text className="mb-4 px-6 text-lg font-heading text-gray-800">
               Request Swap With
             </Text>
             {swapEligibleMembers.length === 0 ? (
-              <Text className="px-6 py-4 text-center text-gray-500">
+              <Text className="font-sans px-6 py-4 text-center text-gray-500">
                 No other members in this chore's rotation
               </Text>
             ) : (
@@ -662,7 +662,7 @@ export default function ChoresScreen() {
                   <View className="mr-3">
                     <Avatar userId={member.id} name={member.display_name} size="sm" avatarUrl={member.avatar_url} />
                   </View>
-                  <Text className="flex-1 text-base text-gray-800">
+                  <Text className="font-sans flex-1 text-base text-gray-800">
                     {member.display_name}
                   </Text>
                   {swapSubmitting ? (
@@ -712,10 +712,10 @@ export default function ChoresScreen() {
                     <Ionicons name="flag" size={20} color="#EF4444" />
                   </View>
                   <View>
-                    <Text className="text-lg font-bold text-gray-800">
+                    <Text className="text-lg font-heading text-gray-800">
                       Dispute Completion
                     </Text>
-                    <Text className="text-xs text-gray-400 mt-0.5">
+                    <Text className="font-sans text-xs text-gray-400 mt-0.5">
                       If unresolved within 24h, the completion is auto-reverted
                     </Text>
                   </View>
@@ -725,7 +725,7 @@ export default function ChoresScreen() {
                   Why are you disputing this?
                 </Text>
                 <TextInput
-                  className="border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 min-h-[80px]"
+            className="font-sans border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 min-h-[80px]"
                   placeholder="e.g. The dishes were still dirty..."
                   placeholderTextColor="#9CA3AF"
                   multiline
@@ -743,7 +743,7 @@ export default function ChoresScreen() {
                       setDisputeReason("");
                     }}
                   >
-                    <Text className="text-sm font-bold text-gray-600">Cancel</Text>
+                    <Text className="text-sm font-heading text-gray-600">Cancel</Text>
                   </Pressable>
                   <Pressable
                     className="flex-1 items-center rounded-xl bg-red-500 py-3 active:bg-red-600"
@@ -754,7 +754,7 @@ export default function ChoresScreen() {
                     {disputeSubmitting ? (
                       <ActivityIndicator size="small" color="#fff" />
                     ) : (
-                      <Text className="text-sm font-bold text-white">Submit Dispute</Text>
+                      <Text className="text-sm font-heading text-white">Submit Dispute</Text>
                     )}
                   </Pressable>
                 </View>

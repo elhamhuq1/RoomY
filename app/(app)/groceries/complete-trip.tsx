@@ -227,9 +227,9 @@ export default function CompleteTripScreen() {
           Receipt Total
         </Text>
         <View className="mb-6 flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3">
-          <Text className="mr-1 text-lg text-gray-400">$</Text>
+          <Text className="font-sans mr-1 text-lg text-gray-400">$</Text>
           <TextInput
-            className="flex-1 text-lg text-gray-800"
+            className="font-sans flex-1 text-lg text-gray-800"
             style={{ paddingVertical: 0 }}
             placeholder="0.00"
             placeholderTextColor={colors.neutral.tertiary}
@@ -267,14 +267,14 @@ export default function CompleteTripScreen() {
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                   }}
                 >
-                  <Text className="text-sm font-bold text-white">
+                  <Text className="text-sm font-heading text-white">
                     {getInitials(member.profile.display_name)}
                   </Text>
                 </View>
                 <Text
                   className={`mt-1 text-xs ${
                     isSelected
-                      ? "font-semibold text-brand-dark"
+                      ? "font-heading-semi text-brand-dark"
                       : "text-gray-500"
                   }`}
                   numberOfLines={1}
@@ -330,13 +330,13 @@ export default function CompleteTripScreen() {
                       AVATAR_COLORS[index % AVATAR_COLORS.length],
                   }}
                 >
-                  <Text className="text-xs font-bold text-white">
+                  <Text className="text-xs font-heading text-white">
                     {getInitials(member.profile.display_name)}
                   </Text>
                 </View>
 
                 {/* Name */}
-                <Text className="flex-1 text-base text-gray-800">
+                <Text className="font-sans flex-1 text-base text-gray-800">
                   {member.user_id === user?.id
                     ? "You"
                     : member.profile.display_name}
@@ -356,10 +356,10 @@ export default function CompleteTripScreen() {
         {/* Per-person split summary */}
         {isValidAmount && selectedMembers.length > 0 && (
           <View className="mb-6 rounded-xl bg-neutral-surface px-4 py-3">
-            <Text className="text-center text-sm text-gray-500">
+            <Text className="font-sans text-center text-sm text-gray-500">
               {formatCurrency(parsedAmount)} split {selectedMembers.length} way
               {selectedMembers.length !== 1 ? "s" : ""} ={" "}
-              <Text className="font-semibold text-gray-700">
+              <Text className="font-heading-semi text-gray-700">
                 {formatCurrency(splits[0] ?? 0)}
               </Text>{" "}
               each
@@ -370,7 +370,7 @@ export default function CompleteTripScreen() {
         {/* Error message */}
         {error && (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{error}</Text>
+            <Text className="font-sans text-sm text-red-600">{error}</Text>
           </View>
         )}
 
@@ -395,7 +395,7 @@ export default function CompleteTripScreen() {
                 style={{ marginRight: 8 }}
               />
               <Text
-                className={`text-lg font-bold ${
+                className={`text-lg font-heading ${
                   canSubmit ? "text-white" : "text-gray-400"
                 }`}
               >

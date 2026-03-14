@@ -314,7 +314,7 @@ export default function MemberHistoryScreen() {
               style={{ width: 140, height: 140, marginBottom: 16 }}
               resizeMode="contain"
             />
-            <Text className="text-body text-neutral-secondary">
+            <Text className="font-sans text-body text-neutral-secondary">
               No expenses with {memberName || 'this member'} yet
             </Text>
           </View>
@@ -322,7 +322,7 @@ export default function MemberHistoryScreen() {
           <View>
             {groupedHistory.map((group) => (
               <View key={group.label} className="mb-4">
-                <Text className="text-overline text-neutral-secondary uppercase mb-2">
+                <Text className="font-sans text-overline text-neutral-secondary uppercase mb-2">
                   {group.label}
                 </Text>
                 <Card className="p-0">
