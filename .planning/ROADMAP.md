@@ -38,7 +38,8 @@
   - [x] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash + visual verification
 - [x] Phase 12: Empty State Illustrations (completed 2026-03-14)
 - [x] Phase 13: Profile Pictures (3 plans) (completed 2026-03-14)
-- [ ] Phase 14: Google OAuth
+- [ ] Phase 14: Google OAuth (1 plan)
+  - [ ] 14-01-PLAN.md — Replace native Google Sign-In with browser OAuth, remove Apple sign-in, add branded Google button
 
 ---
 
@@ -126,9 +127,9 @@ Plans:
 **Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 13-01-PLAN.md — Foundation: install packages, Supabase Storage bucket + RLS, avatar-upload utility, Avatar component upgrade
-- [ ] 13-02-PLAN.md — Upload UI: AvatarUpload component, settings profile + onboarding profile integration
-- [ ] 13-03-PLAN.md — Progressive adoption: pass avatarUrl to all Avatar usages + visual verification
+- [x] 13-01-PLAN.md — Foundation: install packages, Supabase Storage bucket + RLS, avatar-upload utility, Avatar component upgrade
+- [x] 13-02-PLAN.md — Upload UI: AvatarUpload component, settings profile + onboarding profile integration
+- [x] 13-03-PLAN.md — Progressive adoption: pass avatarUrl to all Avatar usages + visual verification
 
 ---
 
@@ -140,12 +141,13 @@ Plans:
 **Why last:** Changes auth flow. All other features should be stable first. Independent of visual/profile work.
 
 **Scope:**
-1. Install `expo-web-browser`
+1. Install `expo-web-browser` and `expo-auth-session`
 2. Replace `signInWithGoogle()` in `lib/auth-utils.ts` with expo-web-browser + `signInWithOAuth` flow
-3. Configure Supabase Dashboard: add Expo redirect URL to allowlist, verify Google provider settings
-4. Add timeout wrapper around `setSession()` for known hang issue
-5. Google-authenticated users automatically get avatar from Google metadata (already handled by DB trigger)
-6. Test full flow: button tap → browser → Google consent → redirect → session established
+3. Remove all Apple sign-in code and packages
+4. Update auth screen UI with Google branded button
+5. Configure Supabase Dashboard: add Expo redirect URL to allowlist, verify Google provider settings
+6. Add timeout wrapper around `setSession()` for known hang issue
+7. Google-authenticated users automatically get avatar from Google metadata (already handled by DB trigger)
 
 **Success criteria:**
 - User can sign in with Google and land in onboarding or home screen
@@ -153,7 +155,10 @@ Plans:
 - Email/password auth continues to work as before
 - Google users get their Google profile picture automatically
 
-**Estimated plans:** 1-2
+**Plans:** 1 plan
+
+Plans:
+- [ ] 14-01-PLAN.md — Replace native Google Sign-In with browser OAuth, remove Apple sign-in, add branded Google button
 
 ---
 
@@ -179,4 +184,4 @@ Plans:
 | 11. Visual Foundation | v1.2 | Complete    | 2026-03-14 | 2026-03-14 |
 | 12. Empty State Illustrations | v1.2 | Complete    | 2026-03-14 | — |
 | 13. Profile Pictures | 3/3 | Complete    | 2026-03-14 | — |
-| 14. Google OAuth | v1.2 | — | Planned | — |
+| 14. Google OAuth | v1.2 | 0/1 | Planned | — |
