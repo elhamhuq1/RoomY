@@ -51,7 +51,7 @@ export function GroceryItemRow({
       rightThreshold={80}
     >
       <Pressable
-        className={`flex-row items-center bg-white px-4 py-3 ${
+        className={`flex-row items-center bg-neutral-bg px-4 py-3 ${
           isChecked ? 'opacity-60' : ''
         }`}
         onPress={onEdit}
