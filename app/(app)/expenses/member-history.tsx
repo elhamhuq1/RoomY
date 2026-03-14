@@ -5,6 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useSession } from '@/lib/auth-context';
@@ -308,6 +309,11 @@ export default function MemberHistoryScreen() {
       >
         {groupedHistory.length === 0 ? (
           <View className="items-center justify-center py-20">
+            <Image
+              source={require('@/docs/empty-state-images/expense-member-history.png')}
+              style={{ width: 140, height: 140, marginBottom: 16 }}
+              resizeMode="contain"
+            />
             <Text className="text-body text-neutral-secondary">
               No expenses with {memberName || 'this member'} yet
             </Text>

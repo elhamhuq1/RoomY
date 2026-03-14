@@ -7,8 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
@@ -224,9 +224,11 @@ export default function SwapRequestScreen() {
   if (hasNoRequests) {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
-        <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-          <Ionicons name="swap-horizontal" size={32} color="#9333ea" />
-        </View>
+        <Image
+          source={require('@/docs/empty-state-images/chore-swap-request.png')}
+          style={{ width: 140, height: 140, marginBottom: 16 }}
+          resizeMode="contain"
+        />
         <Text className="text-lg font-bold text-gray-800">
           No swap requests
         </Text>

@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSession } from "@/lib/auth-context";
@@ -366,9 +367,11 @@ export default function DashboardScreen() {
         {/* Empty state */}
         {totalCompletions === 0 && (
           <View className="mx-4 mt-8 items-center rounded-card bg-transparent border border-neutral-border px-6 py-8">
-            <View className="mb-3 h-14 w-14 items-center justify-center rounded-full bg-gray-100">
-              <Ionicons name="bar-chart-outline" size={28} color={colors.neutral.tertiary} />
-            </View>
+            <Image
+              source={require('@/docs/empty-state-images/chore-dashboard-stats.png')}
+              style={{ width: 140, height: 140, marginBottom: 12 }}
+              resizeMode="contain"
+            />
             <Text className="text-base font-semibold text-gray-700">
               No chores completed this {periodLabel}
             </Text>

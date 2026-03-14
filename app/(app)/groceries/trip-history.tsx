@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Pressable,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSession } from "@/lib/auth-context";
@@ -114,9 +115,11 @@ export default function TripHistoryScreen() {
   if (trips.length === 0) {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
-        <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-brand-light">
-          <Ionicons name="time-outline" size={48} color={colors.brand.DEFAULT} />
-        </View>
+        <Image
+          source={require('@/docs/empty-state-images/grocery-trip-history.png')}
+          style={{ width: 140, height: 140, marginBottom: 24 }}
+          resizeMode="contain"
+        />
         <Text className="text-2xl font-bold text-gray-800">
           No completed trips yet
         </Text>
