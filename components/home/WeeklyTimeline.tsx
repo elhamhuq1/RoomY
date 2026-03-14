@@ -62,7 +62,8 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
     return result;
   }, [chores, selectedDate]);
 
-  const hasItems = dayGroups.some((g) => g.items.length > 0);
+  const hasWeekItems = chores.length > 0;
+  const hasVisibleItems = dayGroups.some((g) => g.items.length > 0);
 
   return (
     <View className="mt-4 px-5 pb-8">
@@ -70,7 +71,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
         This Week
       </Text>
 
-      {!hasItems ? (
+      {!hasWeekItems ? (
         <View className="items-center py-6">
           <Image
             source={require('@/docs/empty-state-images/chore-main-empty-state.png')}
@@ -81,6 +82,10 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
             No chores scheduled
           </Text>
         </View>
+      ) : !hasVisibleItems ? (
+        <Text className="text-body text-neutral-secondary">
+          No chores on this day
+        </Text>
       ) : (
         <View className="ml-2">
           {dayGroups.map((group, groupIndex) => (
