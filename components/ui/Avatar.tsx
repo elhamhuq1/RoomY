@@ -23,14 +23,14 @@ const FONT_MAP: Record<AvatarSize, number> = {
 };
 
 const GRADIENT_PAIRS: [string, string][] = [
-  ['#10B981', '#059669'], // emerald
-  ['#3B82F6', '#2563EB'], // blue
-  ['#8B5CF6', '#7C3AED'], // violet
-  ['#EC4899', '#DB2777'], // pink
-  ['#F59E0B', '#D97706'], // amber
-  ['#EF4444', '#DC2626'], // red
-  ['#06B6D4', '#0891B2'], // cyan
-  ['#84CC16', '#65A30D'], // lime
+  ['#2D6A4F', '#1B4332'], // wintergreen (default/fallback)
+  ['#C17F59', '#A3654A'], // terracotta
+  ['#D4A24E', '#B8893D'], // amber
+  ['#5A6872', '#44535C'], // slate
+  ['#7B5E7B', '#634B63'], // plum
+  ['#3D7A8A', '#2E6270'], // ocean
+  ['#A0705A', '#8A5E4A'], // clay
+  ['#8FA38B', '#738A6F'], // sage
 ];
 
 function hashString(str: string): number {
