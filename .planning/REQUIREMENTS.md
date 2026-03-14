@@ -12,7 +12,7 @@
 - [x] **VIS-03**: All hardcoded emerald hex values (#10B981, #059669, #D1FAE5) replaced with wintergreen equivalents
 - [x] **VIS-04**: Duplicated AVATAR_COLORS arrays consolidated into single shared import
 - [x] **VIS-05**: Avatar gradient pairs updated to wintergreen palette
-- [ ] **VIS-06**: System chrome (status bar area, tab bar, headers, splash) matches cream background with no visible seams
+- [x] **VIS-06**: System chrome (status bar area, tab bar, headers, splash) matches cream background with no visible seams
 
 ### Card Redesign
 
@@ -78,7 +78,7 @@
 | VIS-03 | Phase 11 | Complete |
 | VIS-04 | Phase 11 | Complete |
 | VIS-05 | Phase 11 | Complete |
-| VIS-06 | Phase 11 | Pending |
+| VIS-06 | Phase 11 | Complete |
 | CARD-01 | Phase 11 | Complete |
 | CARD-02 | Phase 11 | Complete |
 | CARD-03 | Phase 11 | Complete |

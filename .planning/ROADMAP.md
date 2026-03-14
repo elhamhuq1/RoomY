@@ -32,10 +32,10 @@
 
 ### v1.2 Polish & Identity (Phases 11-14)
 
-- [ ] Phase 11: Visual Foundation (3 plans)
-  - [ ] 11-01-PLAN.md — Token foundation: wintergreen palette + AVATAR_COLORS export + Card + Avatar
-  - [ ] 11-02-PLAN.md — App-wide migration: hardcoded hex cleanup + AVATAR_COLORS consolidation + container restyling
-  - [ ] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash + visual verification
+- [x] Phase 11: Visual Foundation (3 plans) (completed 2026-03-14)
+  - [x] 11-01-PLAN.md — Token foundation: wintergreen palette + AVATAR_COLORS export + Card + Avatar
+  - [x] 11-02-PLAN.md — App-wide migration: hardcoded hex cleanup + AVATAR_COLORS consolidation + container restyling
+  - [x] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash + visual verification
 - [ ] Phase 12: Empty State Illustrations
 - [ ] Phase 13: Profile Pictures
 - [ ] Phase 14: Google OAuth
@@ -65,12 +65,12 @@
 - No card shows both shadow and outline simultaneously
 - App looks cohesive on cream background with wintergreen accents
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 11-01-PLAN.md — Token foundation: wintergreen palette, AVATAR_COLORS export, Card + Avatar components
-- [ ] 11-02-PLAN.md — App-wide migration: hardcoded hex replacement, AVATAR_COLORS consolidation, container restyling
-- [ ] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash background + visual verification
+- [x] 11-01-PLAN.md — Token foundation: wintergreen palette, AVATAR_COLORS export, Card + Avatar components
+- [x] 11-02-PLAN.md — App-wide migration: hardcoded hex replacement, AVATAR_COLORS consolidation, container restyling
+- [x] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash background + visual verification
 
 ---
 
@@ -171,7 +171,7 @@ Plans:
 | 8. Expenses Screen | v1.1 | 3/3 | Complete | 2026-03-12 |
 | 9. Groceries + Chores | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 10. Onboarding Flow | v1.1 | 4/4 | Complete | 2026-03-13 |
-| 11. Visual Foundation | 2/3 | In Progress|  | — |
+| 11. Visual Foundation | v1.2 | 3/3 | Complete | 2026-03-14 |
 | 12. Empty State Illustrations | v1.2 | — | Planned | — |
 | 13. Profile Pictures | v1.2 | — | Planned | — |
 | 14. Google OAuth | v1.2 | — | Planned | — |
