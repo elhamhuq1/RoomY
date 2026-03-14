@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 Phase: 11 of 14 — Visual Foundation (COMPLETE)
 Plan: 3 of 3 (all complete)
 Status: Phase 11 complete, ready for Phase 12
-Last activity: 2026-03-14 — Completed 11-03 (system chrome + visual verification)
+Last activity: 2026-03-14 — Quick task 4: calendar cream bg + This Week empty state
 
 Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 plans) = 38 plans shipped
 
@@ -87,6 +87,7 @@ None yet.
 | 1 | Add RoomY logo as app icon and splash screen | 2026-03-12 | 8a6885d | [1-add-roomy-logo-as-app-icon-and-splash-sc](./quick/1-add-roomy-logo-as-app-icon-and-splash-sc/) |
 | 2 | Change app font to SF Pro Rounded for bold headings | 2026-03-13 | 6b98101 | [2-change-app-font-to-sf-pro-rounded-for-bo](./quick/2-change-app-font-to-sf-pro-rounded-for-bo/) |
 | 3 | Update all empty states with illustration images | 2026-03-14 | a9a0c38 | [3-update-all-empty-states-with-images-from](./quick/3-update-all-empty-states-with-images-from/) |
+| 4 | Fix calendar cream background + This Week empty state image | 2026-03-14 | b5dc686 | — |
 
 ### Blockers/Concerns
 
