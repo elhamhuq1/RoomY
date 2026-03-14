@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Card } from '@/components/ui/Card';
@@ -120,10 +120,10 @@ export function AttentionFeed(props: AttentionFeedProps) {
 
       {isEmpty ? (
         <View className="items-center py-6">
-          <Ionicons
-            name="checkmark-circle"
-            size={48}
-            color={colors.brand.DEFAULT}
+          <Image
+            source={require('@/docs/empty-state-images/attention-feed-all-caught-up.png')}
+            style={{ width: 140, height: 140 }}
+            resizeMode="contain"
           />
           <Text className="text-section-heading font-heading-semi text-neutral-text mt-3">
             All caught up!

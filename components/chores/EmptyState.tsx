@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { colors } from '@/lib/theme/colors';
@@ -30,9 +30,11 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
   return (
     <View className="flex-1 bg-neutral-bg">
       <View className="items-center px-8 pt-12">
-        <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-light">
-          <Ionicons name="checkbox" size={40} color={colors.brand.DEFAULT} />
-        </View>
+        <Image
+          source={require('@/docs/empty-state-images/chore-main-empty-state.png')}
+          style={{ width: 140, height: 140, marginBottom: 16 }}
+          resizeMode="contain"
+        />
         <Text className="text-section-heading font-heading-semi text-neutral-text">
           No chores yet!
         </Text>

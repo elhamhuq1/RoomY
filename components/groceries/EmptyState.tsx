@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/lib/theme/colors';
+import { View, Text, Image } from 'react-native';
 
 export function EmptyState() {
   return (
     <View className="flex-1 items-center justify-center px-8">
-      <View className="h-24 w-24 rounded-full bg-brand-light items-center justify-center mb-6">
-        <Ionicons name="cart" size={48} color={colors.brand.DEFAULT} />
-      </View>
+      <Image
+        source={require('@/docs/empty-state-images/grocery-empty-list.png')}
+        style={{ width: 140, height: 140, marginBottom: 24 }}
+        resizeMode="contain"
+      />
       <Text className="text-section-heading font-heading-semi text-neutral-text">
         Your grocery list is empty
       </Text>

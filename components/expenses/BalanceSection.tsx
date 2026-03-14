@@ -1,9 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Image } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import { BalanceMemberRow } from './BalanceMemberRow';
-import { colors } from '@/lib/theme/colors';
 import type { Profile } from '@/lib/types/database';
 
 export type BalanceEntry = {
@@ -38,10 +36,10 @@ export function BalanceSection({
 
       {visibleBalances.length === 0 ? (
         <View className="items-center py-6">
-          <Ionicons
-            name="checkmark-circle"
-            size={48}
-            color={colors.semantic.success}
+          <Image
+            source={require('@/docs/empty-state-images/balance-all-settled.png')}
+            style={{ width: 140, height: 140 }}
+            resizeMode="contain"
           />
           <Text className="mt-3 text-body text-neutral-text font-semibold">
             All settled up!
