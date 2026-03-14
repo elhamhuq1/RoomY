@@ -172,10 +172,10 @@ export default function SignUpScreen() {
 
         {/* Header */}
         <View className="mb-8 items-center">
-          <Text className="text-3xl font-bold text-gray-800">
+          <Text className="text-3xl font-heading text-gray-800">
             Create Account
           </Text>
-          <Text className="mt-2 text-base text-neutral-secondary">
+          <Text className="mt-2 font-sans text-base text-neutral-secondary">
             Start managing your household
           </Text>
         </View>
@@ -183,14 +183,14 @@ export default function SignUpScreen() {
         {/* General error */}
         {generalError ? (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{generalError}</Text>
+            <Text className="font-sans text-sm text-red-600">{generalError}</Text>
           </View>
         ) : null}
 
         {/* Email input */}
         <View className="mb-4">
           <TextInput
-            className={inputStyle("email", !!emailError)}
+            className={`${inputStyle("email", !!emailError)} font-sans`}
             placeholder="Email"
             placeholderTextColor={colors.neutral.tertiary}
             value={email}
@@ -210,14 +210,14 @@ export default function SignUpScreen() {
             editable={!isDisabled}
           />
           {emailError ? (
-            <Text className="mt-1 text-sm text-red-500">{emailError}</Text>
+            <Text className="mt-1 font-sans text-sm text-red-500">{emailError}</Text>
           ) : null}
         </View>
 
         {/* Password input */}
         <View className="mb-4">
           <TextInput
-            className={inputStyle("password", !!passwordError)}
+            className={`${inputStyle("password", !!passwordError)} font-sans`}
             placeholder="Password"
             placeholderTextColor={colors.neutral.tertiary}
             value={password}
@@ -235,14 +235,14 @@ export default function SignUpScreen() {
             editable={!isDisabled}
           />
           {passwordError ? (
-            <Text className="mt-1 text-sm text-red-500">{passwordError}</Text>
+            <Text className="mt-1 font-sans text-sm text-red-500">{passwordError}</Text>
           ) : null}
         </View>
 
         {/* Confirm Password input */}
         <View className="mb-6">
           <TextInput
-            className={inputStyle("confirmPassword", !!confirmPasswordError)}
+            className={`${inputStyle("confirmPassword", !!confirmPasswordError)} font-sans`}
             placeholder="Confirm Password"
             placeholderTextColor={colors.neutral.tertiary}
             value={confirmPassword}
@@ -260,7 +260,7 @@ export default function SignUpScreen() {
             editable={!isDisabled}
           />
           {confirmPasswordError ? (
-            <Text className="mt-1 text-sm text-red-500">
+            <Text className="mt-1 font-sans text-sm text-red-500">
               {confirmPasswordError}
             </Text>
           ) : null}
@@ -277,14 +277,14 @@ export default function SignUpScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-lg font-bold text-white">Create Account</Text>
+            <Text className="text-lg font-heading text-white">Create Account</Text>
           )}
         </Pressable>
 
         {/* Divider */}
         <View className="mb-6 flex-row items-center">
           <View className="h-px flex-1 bg-gray-200" />
-          <Text className="mx-4 text-sm text-gray-400">or</Text>
+          <Text className="mx-4 font-sans text-sm text-gray-400">or</Text>
           <View className="h-px flex-1 bg-gray-200" />
         </View>
 
@@ -304,7 +304,7 @@ export default function SignUpScreen() {
                 source={require("@/assets/google-g-logo.png")}
                 style={{ width: 20, height: 20, marginRight: 8 }}
               />
-              <Text className="text-base font-semibold text-gray-700">
+              <Text className="text-base font-heading-semi text-gray-700">
                 Sign in with Google
               </Text>
             </>
@@ -316,9 +316,9 @@ export default function SignUpScreen() {
           className="items-center py-3"
           onPress={() => router.replace("/(auth)/sign-in")}
         >
-          <Text className="text-base text-gray-500">
+          <Text className="font-sans text-base text-gray-500">
             Already have an account?{" "}
-            <Text className="font-semibold text-brand-dark">Log in</Text>
+            <Text className="font-heading-semi text-brand-dark">Log in</Text>
           </Text>
         </Pressable>
       </ScrollView>

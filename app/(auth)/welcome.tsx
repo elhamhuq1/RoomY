@@ -90,7 +90,7 @@ export default function WelcomeScreen() {
         <Text
           style={{
             fontSize: 32,
-            fontWeight: '700',
+            fontFamily: 'SpaceGrotesk_700Bold',
             color: '#1E293B',
             marginTop: 12,
           }}
@@ -100,6 +100,7 @@ export default function WelcomeScreen() {
         <Text
           style={{
             fontSize: 16,
+            fontFamily: 'SpaceGrotesk_400Regular',
             color: '#64748B',
             marginTop: 4,
           }}
@@ -137,7 +138,7 @@ export default function WelcomeScreen() {
               <Text
                 style={{
                   fontSize: 22,
-                  fontWeight: '700',
+                  fontFamily: 'SpaceGrotesk_700Bold',
                   color: '#1E293B',
                   textAlign: 'center',
                   marginTop: 16,
@@ -150,6 +151,7 @@ export default function WelcomeScreen() {
               <Text
                 style={{
                   fontSize: 15,
+                  fontFamily: 'SpaceGrotesk_400Regular',
                   color: '#64748B',
                   textAlign: 'center',
                   marginTop: 8,
@@ -203,7 +205,7 @@ export default function WelcomeScreen() {
             marginBottom: 16,
           }}
         >
-          <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
+          <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFFFFF' }}>
             Get Started
           </Text>
         </Pressable>
@@ -212,9 +214,9 @@ export default function WelcomeScreen() {
           onPress={() => router.push('/(auth)/sign-in')}
           style={{ alignItems: 'center', paddingVertical: 12 }}
         >
-          <Text style={{ fontSize: 15, color: '#64748B' }}>
+          <Text style={{ fontSize: 15, fontFamily: 'SpaceGrotesk_400Regular', color: '#64748B' }}>
             Already have an account?{' '}
-            <Text style={{ fontWeight: '600', color: '#1B4332' }}>Log in</Text>
+            <Text style={{ fontFamily: 'SpaceGrotesk_600SemiBold', color: '#1B4332' }}>Log in</Text>
           </Text>
         </Pressable>
       </View>

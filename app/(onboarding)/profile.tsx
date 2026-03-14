@@ -97,7 +97,7 @@ export default function ProfileSetupScreen() {
               }}
               onError={(msg) => Alert.alert('Error', msg)}
             />
-            <Text style={{ fontSize: 13, color: colors.neutral.secondary, marginTop: 8 }}>
+            <Text style={{ fontSize: 13, fontFamily: 'SpaceGrotesk_400Regular', color: colors.neutral.secondary, marginTop: 8 }}>
               Add a profile photo (optional)
             </Text>
           </View>
@@ -107,7 +107,7 @@ export default function ProfileSetupScreen() {
             <Text
               style={{
                 fontSize: 26,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.neutral.text,
                 textAlign: "center",
               }}
@@ -117,6 +117,7 @@ export default function ProfileSetupScreen() {
             <Text
               style={{
                 fontSize: 15,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.secondary,
                 textAlign: "center",
                 marginTop: 6,
@@ -129,14 +130,14 @@ export default function ProfileSetupScreen() {
           {/* Error */}
           {error ? (
             <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-              <Text className="text-sm text-red-600">{error}</Text>
+              <Text className="font-sans text-sm text-red-600">{error}</Text>
             </View>
           ) : null}
 
           {/* Display name input */}
           <View style={{ marginBottom: 24 }}>
             <TextInput
-              className={`rounded-2xl px-4 py-3.5 text-base text-neutral-text ${
+              className={`rounded-2xl px-4 py-3.5 text-base text-neutral-text font-sans ${
                 error
                   ? "border-2 border-semantic-error bg-white"
                   : focused
@@ -173,7 +174,7 @@ export default function ProfileSetupScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="text-lg font-bold text-white">Continue</Text>
+              <Text className="text-lg font-heading text-white">Continue</Text>
             )}
           </Pressable>
         </ScrollView>

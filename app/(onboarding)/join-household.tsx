@@ -113,7 +113,7 @@ export default function JoinHouseholdScreen() {
             <Text
               style={{
                 fontSize: 26,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.neutral.text,
                 textAlign: "center",
               }}
@@ -123,6 +123,7 @@ export default function JoinHouseholdScreen() {
             <Text
               style={{
                 fontSize: 15,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.secondary,
                 textAlign: "center",
                 marginTop: 6,
@@ -135,14 +136,14 @@ export default function JoinHouseholdScreen() {
           {/* Error */}
           {error ? (
             <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-              <Text className="text-sm text-red-600">{error}</Text>
+              <Text className="font-sans text-sm text-red-600">{error}</Text>
             </View>
           ) : null}
 
           {/* Code input -- inset style */}
           <View style={{ marginBottom: 8 }}>
             <TextInput
-              className={`rounded-2xl px-4 py-4 text-center text-2xl font-bold tracking-widest text-neutral-text ${
+              className={`rounded-2xl px-4 py-4 text-center text-2xl font-heading tracking-widest text-neutral-text ${
                 error
                   ? "border-2 border-semantic-error bg-white"
                   : focused
@@ -164,6 +165,7 @@ export default function JoinHouseholdScreen() {
             <Text
               style={{
                 fontSize: 12,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.tertiary,
                 textAlign: "center",
                 marginTop: 8,
@@ -187,7 +189,7 @@ export default function JoinHouseholdScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-lg font-bold text-white">
+                <Text className="text-lg font-heading text-white">
                   Join Household
                 </Text>
               )}

@@ -85,7 +85,7 @@ export default function MemberWelcomeScreen() {
           <Text
             style={{
               fontSize: 36,
-              fontWeight: "800",
+              fontFamily: 'SpaceGrotesk_700Bold',
               color: colors.neutral.text,
               textAlign: "center",
             }}
@@ -95,7 +95,7 @@ export default function MemberWelcomeScreen() {
           <Text
             style={{
               fontSize: 20,
-              fontWeight: "600",
+              fontFamily: 'SpaceGrotesk_600SemiBold',
               color: colors.brand.dark,
               textAlign: "center",
               marginTop: 8,
@@ -106,6 +106,7 @@ export default function MemberWelcomeScreen() {
           <Text
             style={{
               fontSize: 15,
+              fontFamily: 'SpaceGrotesk_400Regular',
               color: colors.neutral.secondary,
               textAlign: "center",
               marginTop: 4,
@@ -127,7 +128,7 @@ export default function MemberWelcomeScreen() {
           <Text
             style={{
               fontSize: 11,
-              fontWeight: "600",
+              fontFamily: 'SpaceGrotesk_600SemiBold',
               letterSpacing: 1,
               color: colors.neutral.tertiary,
               textTransform: "uppercase",
@@ -161,7 +162,7 @@ export default function MemberWelcomeScreen() {
                     <Text
                       style={{
                         fontSize: 16,
-                        fontWeight: "600",
+                        fontFamily: 'SpaceGrotesk_600SemiBold',
                         color: colors.neutral.text,
                       }}
                     >
@@ -171,6 +172,7 @@ export default function MemberWelcomeScreen() {
                       <Text
                         style={{
                           fontSize: 12,
+                          fontFamily: 'SpaceGrotesk_400Regular',
                           color: colors.neutral.tertiary,
                         }}
                       >
@@ -197,7 +199,7 @@ export default function MemberWelcomeScreen() {
           <Text
             style={{
               fontSize: 17,
-              fontWeight: "700",
+              fontFamily: 'SpaceGrotesk_700Bold',
               color: "#FFFFFF",
             }}
           >

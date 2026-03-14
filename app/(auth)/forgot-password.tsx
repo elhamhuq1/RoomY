@@ -78,18 +78,18 @@ export default function ForgotPasswordScreen() {
         <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-semantic-success/20">
           <Ionicons name="mail-outline" size={40} color={colors.semantic.success} />
         </View>
-        <Text className="mb-3 text-center text-2xl font-bold text-gray-800">
+        <Text className="mb-3 text-center text-2xl font-heading text-gray-800">
           Check Your Email
         </Text>
-        <Text className="mb-8 text-center text-base leading-6 text-gray-500">
+        <Text className="mb-8 font-sans text-center text-base leading-6 text-gray-500">
           We sent a password reset link to{"\n"}
-          <Text className="font-semibold text-gray-700">{email}</Text>
+          <Text className="font-heading-semi text-gray-700">{email}</Text>
         </Text>
         <Pressable
           className="w-full items-center rounded-2xl bg-brand py-3.5 active:bg-brand-dark"
           onPress={() => router.replace("/(auth)/sign-in")}
         >
-          <Text className="text-lg font-bold text-white">Back to Log In</Text>
+          <Text className="text-lg font-heading text-white">Back to Log In</Text>
         </Pressable>
       </View>
     );
@@ -148,10 +148,10 @@ export default function ForgotPasswordScreen() {
 
         {/* Header */}
         <View className="mb-8 items-center">
-          <Text className="text-2xl font-bold text-gray-800">
+          <Text className="text-2xl font-heading text-gray-800">
             Reset Password
           </Text>
-          <Text className="mt-2 text-center text-base text-neutral-secondary">
+          <Text className="mt-2 font-sans text-center text-base text-neutral-secondary">
             Enter your email and we'll send you a reset link
           </Text>
         </View>
@@ -159,14 +159,14 @@ export default function ForgotPasswordScreen() {
         {/* General error */}
         {generalError ? (
           <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-            <Text className="text-sm text-red-600">{generalError}</Text>
+            <Text className="font-sans text-sm text-red-600">{generalError}</Text>
           </View>
         ) : null}
 
         {/* Email input */}
         <View className="mb-6">
           <TextInput
-            className={inputStyle("email", !!emailError)}
+            className={`${inputStyle("email", !!emailError)} font-sans`}
             placeholder="Email"
             placeholderTextColor={colors.neutral.tertiary}
             value={email}
@@ -186,7 +186,7 @@ export default function ForgotPasswordScreen() {
             editable={!loading}
           />
           {emailError ? (
-            <Text className="mt-1 text-sm text-red-500">{emailError}</Text>
+            <Text className="mt-1 font-sans text-sm text-red-500">{emailError}</Text>
           ) : null}
         </View>
 
@@ -201,7 +201,7 @@ export default function ForgotPasswordScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-lg font-bold text-white">
+            <Text className="text-lg font-heading text-white">
               Send Reset Link
             </Text>
           )}
@@ -212,9 +212,9 @@ export default function ForgotPasswordScreen() {
           className="items-center py-3"
           onPress={() => router.replace("/(auth)/sign-in")}
         >
-          <Text className="text-base text-gray-500">
+          <Text className="font-sans text-base text-gray-500">
             Back to{" "}
-            <Text className="font-semibold text-brand-dark">Log In</Text>
+            <Text className="font-heading-semi text-brand-dark">Log In</Text>
           </Text>
         </Pressable>
       </View>

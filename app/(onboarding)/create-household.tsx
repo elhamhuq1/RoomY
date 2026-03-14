@@ -136,7 +136,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 28,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.neutral.text,
                 textAlign: "center",
               }}
@@ -146,6 +146,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 15,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.secondary,
                 textAlign: "center",
                 marginTop: 6,
@@ -170,7 +171,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 11,
-                fontWeight: "600",
+                fontFamily: 'SpaceGrotesk_600SemiBold',
                 letterSpacing: 1.1,
                 color: "#94A3B8",
                 textTransform: "uppercase",
@@ -182,7 +183,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 36,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 letterSpacing: 4,
                 color: "#FFFFFF",
                 fontVariant: ["tabular-nums"],
@@ -214,7 +215,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 17,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: "#FFFFFF",
               }}
             >
@@ -234,7 +235,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 15,
-                fontWeight: "600",
+                fontFamily: 'SpaceGrotesk_600SemiBold',
                 color: colors.brand.DEFAULT,
               }}
             >
@@ -256,7 +257,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 17,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.brand.dark,
               }}
             >
@@ -304,7 +305,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 26,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.neutral.text,
                 textAlign: "center",
               }}
@@ -314,6 +315,7 @@ export default function CreateHouseholdScreen() {
             <Text
               style={{
                 fontSize: 15,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.secondary,
                 textAlign: "center",
                 marginTop: 6,
@@ -326,14 +328,14 @@ export default function CreateHouseholdScreen() {
           {/* Error */}
           {error ? (
             <View className="mb-4 rounded-xl bg-red-50 px-4 py-3">
-              <Text className="text-sm text-red-600">{error}</Text>
+              <Text className="font-sans text-sm text-red-600">{error}</Text>
             </View>
           ) : null}
 
           {/* Household name input */}
           <View style={{ marginBottom: 24 }}>
             <TextInput
-              className={`rounded-2xl px-4 py-3.5 text-base text-neutral-text ${
+              className={`rounded-2xl px-4 py-3.5 text-base text-neutral-text font-sans ${
                 error
                   ? "border-2 border-semantic-error bg-white"
                   : focused
@@ -368,7 +370,7 @@ export default function CreateHouseholdScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="text-lg font-bold text-white">
+              <Text className="text-lg font-heading text-white">
                 Create Household
               </Text>
             )}

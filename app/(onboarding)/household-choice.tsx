@@ -31,7 +31,7 @@ export default function HouseholdChoiceScreen() {
           <Text
             style={{
               fontSize: 26,
-              fontWeight: "700",
+              fontFamily: 'SpaceGrotesk_700Bold',
               color: colors.neutral.text,
               textAlign: "center",
             }}
@@ -41,6 +41,7 @@ export default function HouseholdChoiceScreen() {
           <Text
             style={{
               fontSize: 15,
+              fontFamily: 'SpaceGrotesk_400Regular',
               color: colors.neutral.secondary,
               textAlign: "center",
               marginTop: 6,
@@ -72,7 +73,7 @@ export default function HouseholdChoiceScreen() {
             <Text
               style={{
                 fontSize: 17,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.neutral.text,
                 marginBottom: 4,
               }}
@@ -82,6 +83,7 @@ export default function HouseholdChoiceScreen() {
             <Text
               style={{
                 fontSize: 14,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.secondary,
                 textAlign: "center",
               }}
@@ -110,7 +112,7 @@ export default function HouseholdChoiceScreen() {
             <Text
               style={{
                 fontSize: 17,
-                fontWeight: "700",
+                fontFamily: 'SpaceGrotesk_700Bold',
                 color: colors.neutral.text,
                 marginBottom: 4,
               }}
@@ -120,6 +122,7 @@ export default function HouseholdChoiceScreen() {
             <Text
               style={{
                 fontSize: 14,
+                fontFamily: 'SpaceGrotesk_400Regular',
                 color: colors.neutral.secondary,
                 textAlign: "center",
               }}
