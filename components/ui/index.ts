@@ -1,4 +1,5 @@
 export { Avatar, getGradientForUser } from './Avatar';
+export { AvatarUpload } from './AvatarUpload';
 export { Card } from './Card';
 export { Badge } from './Badge';
 export { Button } from './Button';
