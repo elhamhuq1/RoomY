@@ -362,6 +362,32 @@ export default function ChoresScreen() {
     [disputeDetails, router]
   );
 
+  const handleDelete = useCallback(
+    (choreId: string, choreName: string) => {
+      Alert.alert(
+        "Delete Chore?",
+        `"${choreName}" will be removed for everyone in the household.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              const { error } = await supabase
+                .from("chores")
+                .update({ is_active: false })
+                .eq("id", choreId);
+              if (!error) {
+                refreshChores();
+              }
+            },
+          },
+        ]
+      );
+    },
+    [refreshChores]
+  );
+
   const handleSwapRequest = useCallback(
     async (targetUserId: string) => {
       if (!user?.id || !swapModalChoreId) return;
@@ -532,6 +558,7 @@ export default function ChoresScreen() {
                       onClaim={() => handleClaim(chore.id)}
                       onDispute={() => handleDispute(chore.id)}
                       onSwap={() => setSwapModalChoreId(chore.id)}
+                      onDelete={() => handleDelete(chore.id, chore.name)}
                       onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
                     />
                   </View>
@@ -586,6 +613,7 @@ export default function ChoresScreen() {
                       onClaim={() => handleClaim(chore.id)}
                       onDispute={() => handleDispute(chore.id)}
                       onSwap={() => setSwapModalChoreId(chore.id)}
+                      onDelete={() => handleDelete(chore.id, chore.name)}
                       onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
                     />
                   </View>
