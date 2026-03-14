@@ -148,7 +148,7 @@ export default function CalendarSection({
             onMonthChange={handleMonthChange}
             enableSwipeMonths={true}
             theme={{
-              calendarBackground: "#ffffff",
+              calendarBackground: colors.neutral.bg,
               todayTextColor: colors.brand.DEFAULT,
               selectedDayBackgroundColor: colors.brand.DEFAULT,
               selectedDayTextColor: "#ffffff",

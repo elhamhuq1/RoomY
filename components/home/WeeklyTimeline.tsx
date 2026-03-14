@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   format,
@@ -71,9 +71,16 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
       </Text>
 
       {!hasItems ? (
-        <Text className="text-body text-neutral-secondary">
-          No chores scheduled
-        </Text>
+        <View className="items-center py-6">
+          <Image
+            source={require('@/docs/empty-state-images/chore-main-empty-state.png')}
+            style={{ width: 140, height: 140 }}
+            resizeMode="contain"
+          />
+          <Text className="text-body text-neutral-secondary mt-3">
+            No chores scheduled
+          </Text>
+        </View>
       ) : (
         <View className="ml-2">
           {dayGroups.map((group, groupIndex) => (
