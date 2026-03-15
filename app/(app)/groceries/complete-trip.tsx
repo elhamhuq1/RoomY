@@ -42,6 +42,8 @@ type MemberWithProfile = {
   profile: Profile;
 };
 
+type SplitMode = 'even' | 'custom';
+
 export default function CompleteTripScreen() {
   const router = useRouter();
   const { user, household } = useSession();
@@ -56,6 +58,8 @@ export default function CompleteTripScreen() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [splitMode, setSplitMode] = useState<SplitMode>('even');
+  const [customAmounts, setCustomAmounts] = useState<Record<string, string>>({});
 
   // Fetch household members (same pattern as expenses/add.tsx)
   const fetchMembers = useCallback(async () => {
@@ -127,10 +131,20 @@ export default function CompleteTripScreen() {
     ? calculateEqualSplits(parsedAmount, selectedMembers.length)
     : [];
 
+  // Custom mode validation
+  const customTotal = splitMode === 'custom'
+    ? members.reduce((sum, m) => {
+        const val = parseFloat(customAmounts[m.user_id] || '0');
+        return sum + (isNaN(val) ? 0 : val);
+      }, 0)
+    : 0;
+  const remaining = isValidAmount ? parsedAmount - customTotal : 0;
+  const customSplitsValid = Math.abs(remaining) < 0.01;
+
   const canSubmit =
     isValidAmount &&
     payerId !== null &&
-    selectedMembers.length > 0 &&
+    (splitMode === 'even' ? selectedMembers.length > 0 : customSplitsValid) &&
     !submitting;
 
   function handleAmountChange(text: string) {
@@ -140,6 +154,40 @@ export default function CompleteTripScreen() {
     if (parts.length > 2) return; // multiple dots
     if (parts[1] && parts[1].length > 2) return; // more than 2 decimals
     setAmount(cleaned);
+  }
+
+  function handleCustomAmountChange(userId: string, text: string) {
+    const cleaned = text.replace(/[^0-9.]/g, "");
+    const parts = cleaned.split(".");
+    if (parts.length > 2) return;
+    if (parts[1] && parts[1].length > 2) return;
+    setCustomAmounts((prev) => ({ ...prev, [userId]: cleaned }));
+  }
+
+  function handleSplitModeChange(mode: SplitMode) {
+    if (mode === splitMode) return;
+    setSplitMode(mode);
+    if (mode === 'custom') {
+      // Pre-fill with even split values if amount is valid
+      if (isValidAmount && members.length > 0) {
+        const evenSplits = calculateEqualSplits(parsedAmount, members.length);
+        const amounts: Record<string, string> = {};
+        members.forEach((m, i) => {
+          amounts[m.user_id] = evenSplits[i].toFixed(2);
+        });
+        setCustomAmounts(amounts);
+      } else {
+        const amounts: Record<string, string> = {};
+        members.forEach((m) => {
+          amounts[m.user_id] = '';
+        });
+        setCustomAmounts(amounts);
+      }
+    } else {
+      // Switching back to even: clear custom amounts, select all members
+      setCustomAmounts({});
+      setSelectedMemberIds(new Set(members.map((m) => m.user_id)));
+    }
   }
 
   function toggleMember(userId: string) {
@@ -164,16 +212,85 @@ export default function CompleteTripScreen() {
     setError(null);
 
     try {
-      const { error: rpcError } = await supabase.rpc("complete_grocery_trip", {
-        p_household_id: household.id,
-        p_total_amount: parsedAmount,
-        p_paid_by: payerId!,
-        p_split_user_ids: Array.from(selectedMemberIds),
-        p_created_by: user.id,
-      });
+      if (splitMode === 'even') {
+        // Even mode: use existing RPC
+        const { error: rpcError } = await supabase.rpc("complete_grocery_trip", {
+          p_household_id: household.id,
+          p_total_amount: parsedAmount,
+          p_paid_by: payerId!,
+          p_split_user_ids: Array.from(selectedMemberIds),
+          p_created_by: user.id,
+        });
 
-      if (rpcError) {
-        throw new Error(rpcError.message);
+        if (rpcError) {
+          throw new Error(rpcError.message);
+        }
+      } else {
+        // Custom mode: client-side inserts
+        // 1. Create grocery trip
+        const { data: trip, error: tripError } = await supabase
+          .from("grocery_trips")
+          .insert({
+            household_id: household.id,
+            total_amount: parsedAmount,
+            paid_by: payerId!,
+            created_by: user.id,
+          })
+          .select()
+          .single();
+
+        if (tripError || !trip) {
+          throw new Error(tripError?.message ?? "Failed to create grocery trip");
+        }
+
+        // 2. Update checked grocery items with trip_id
+        const { error: itemsError } = await supabase
+          .from("grocery_items")
+          .update({ trip_id: trip.id })
+          .eq("household_id", household.id)
+          .eq("is_checked", true)
+          .is("trip_id", null);
+
+        if (itemsError) {
+          throw new Error(itemsError.message);
+        }
+
+        // 3. Create expense
+        const { data: expense, error: expenseError } = await supabase
+          .from("expenses")
+          .insert({
+            household_id: household.id,
+            description: "Grocery Trip",
+            amount: parsedAmount,
+            paid_by: payerId!,
+            created_by: user.id,
+          })
+          .select()
+          .single();
+
+        if (expenseError || !expense) {
+          throw new Error(expenseError?.message ?? "Failed to create expense");
+        }
+
+        // 4. Create expense_splits from custom amounts
+        const splitRows = members
+          .map((member) => {
+            const val = parseFloat(customAmounts[member.user_id] || '0');
+            return {
+              expense_id: expense.id,
+              user_id: member.user_id,
+              share_amount: isNaN(val) ? 0 : val,
+            };
+          })
+          .filter((row) => row.share_amount > 0);
+
+        const { error: splitsError } = await supabase
+          .from("expense_splits")
+          .insert(splitRows);
+
+        if (splitsError) {
+          throw new Error(splitsError.message);
+        }
       }
 
       // Success - go back to grocery list (realtime will clear archived items)
@@ -279,36 +396,97 @@ export default function CompleteTripScreen() {
         <Text className="mb-2 text-sm font-medium text-gray-500">
           Split between
         </Text>
-        <View className="mb-6 rounded-xl bg-white">
-          {members.map((member, index) => {
-            const isChecked = selectedMemberIds.has(member.user_id);
-            const splitIndex = selectedMembers.findIndex(
-              (m) => m.user_id === member.user_id
-            );
-            const shareAmount =
-              isChecked && splitIndex >= 0 ? splits[splitIndex] : 0;
 
+        {/* Split mode toggle */}
+        <View className="mb-3 flex-row rounded-full border border-gray-200 bg-white p-1">
+          <Pressable
+            className={`flex-1 items-center rounded-full py-2 ${
+              splitMode === 'even' ? 'bg-brand' : ''
+            }`}
+            onPress={() => handleSplitModeChange('even')}
+          >
+            <Text className={`font-sans text-sm ${
+              splitMode === 'even' ? 'font-medium text-white' : 'text-gray-600'
+            }`}>Even</Text>
+          </Pressable>
+          <Pressable
+            className={`flex-1 items-center rounded-full py-2 ${
+              splitMode === 'custom' ? 'bg-brand' : ''
+            }`}
+            onPress={() => handleSplitModeChange('custom')}
+          >
+            <Text className={`font-sans text-sm ${
+              splitMode === 'custom' ? 'font-medium text-white' : 'text-gray-600'
+            }`}>Custom</Text>
+          </Pressable>
+        </View>
+
+        <View className="mb-2 rounded-xl bg-white">
+          {members.map((member, index) => {
+            if (splitMode === 'even') {
+              const isChecked = selectedMemberIds.has(member.user_id);
+              const splitIndex = selectedMembers.findIndex(
+                (m) => m.user_id === member.user_id
+              );
+              const shareAmount =
+                isChecked && splitIndex >= 0 ? splits[splitIndex] : 0;
+
+              return (
+                <Pressable
+                  key={member.user_id}
+                  className={`flex-row items-center px-4 py-3 ${
+                    index < members.length - 1 ? "border-b border-gray-100" : ""
+                  }`}
+                  onPress={() => toggleMember(member.user_id)}
+                >
+                  {/* Checkbox */}
+                  <View
+                    className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
+                      isChecked
+                        ? "bg-brand"
+                        : "border-2 border-gray-300 bg-white"
+                    }`}
+                  >
+                    {isChecked && (
+                      <Ionicons name="checkmark" size={16} color="#fff" />
+                    )}
+                  </View>
+
+                  {/* Avatar */}
+                  <View className="mr-3">
+                    <Avatar
+                      userId={member.user_id}
+                      name={member.profile.display_name}
+                      size="md"
+                      avatarUrl={member.profile.avatar_url}
+                    />
+                  </View>
+
+                  {/* Name */}
+                  <Text className="font-sans flex-1 text-base text-gray-800">
+                    {member.user_id === user?.id
+                      ? "You"
+                      : member.profile.display_name}
+                  </Text>
+
+                  {/* Share amount */}
+                  {isChecked && isValidAmount && (
+                    <Text className="text-sm font-medium text-gray-500">
+                      {formatCurrency(shareAmount)}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            }
+
+            // Custom mode
             return (
-              <Pressable
+              <View
                 key={member.user_id}
                 className={`flex-row items-center px-4 py-3 ${
                   index < members.length - 1 ? "border-b border-gray-100" : ""
                 }`}
-                onPress={() => toggleMember(member.user_id)}
               >
-                {/* Checkbox */}
-                <View
-                  className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
-                    isChecked
-                      ? "bg-brand"
-                      : "border-2 border-gray-300 bg-white"
-                  }`}
-                >
-                  {isChecked && (
-                    <Ionicons name="checkmark" size={16} color="#fff" />
-                  )}
-                </View>
-
                 {/* Avatar */}
                 <View className="mr-3">
                   <Avatar
@@ -326,19 +504,45 @@ export default function CompleteTripScreen() {
                     : member.profile.display_name}
                 </Text>
 
-                {/* Share amount */}
-                {isChecked && isValidAmount && (
-                  <Text className="text-sm font-medium text-gray-500">
-                    {formatCurrency(shareAmount)}
-                  </Text>
-                )}
-              </Pressable>
+                {/* Custom amount input */}
+                <View className="flex-row items-center rounded-lg border border-gray-200 px-2 py-1">
+                  <Text className="font-sans text-sm text-gray-400">$</Text>
+                  <TextInput
+                    className="font-sans w-20 text-right text-sm text-gray-800"
+                    style={{ paddingVertical: 0 }}
+                    placeholder="0.00"
+                    placeholderTextColor={colors.neutral.tertiary}
+                    keyboardType="decimal-pad"
+                    value={customAmounts[member.user_id] || ''}
+                    onChangeText={(text) => handleCustomAmountChange(member.user_id, text)}
+                  />
+                </View>
+              </View>
             );
           })}
         </View>
 
-        {/* Per-person split summary */}
-        {isValidAmount && selectedMembers.length > 0 && (
+        {/* Custom mode validation */}
+        {splitMode === 'custom' && isValidAmount && (
+          <View className="mb-4">
+            {customSplitsValid ? (
+              <Text className="font-sans text-center text-sm text-brand">
+                Splits add up
+              </Text>
+            ) : remaining > 0 ? (
+              <Text className="font-sans text-center text-sm text-amber-500">
+                Remaining: {formatCurrency(remaining)}
+              </Text>
+            ) : (
+              <Text className="font-sans text-center text-sm text-red-500">
+                Over by: {formatCurrency(Math.abs(remaining))}
+              </Text>
+            )}
+          </View>
+        )}
+
+        {/* Per-person split summary (even mode only) */}
+        {splitMode === 'even' && isValidAmount && selectedMembers.length > 0 && (
           <View className="mb-6 rounded-xl bg-neutral-surface px-4 py-3">
             <Text className="font-sans text-center text-sm text-gray-500">
               {formatCurrency(parsedAmount)} split {selectedMembers.length} way
@@ -350,6 +554,8 @@ export default function CompleteTripScreen() {
             </Text>
           </View>
         )}
+
+        {splitMode === 'custom' && !isValidAmount && <View className="mb-4" />}
 
         {/* Error message */}
         {error && (
