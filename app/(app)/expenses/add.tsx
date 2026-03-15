@@ -1,4 +1,5 @@
-import { colors, AVATAR_COLORS } from "@/lib/theme/colors";
+import { colors } from "@/lib/theme/colors";
+import { Avatar } from "@/components/ui/Avatar";
 import { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -17,15 +18,6 @@ import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types/database";
 
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 const formatCurrency = (amount: number): string =>
   new Intl.NumberFormat("en-US", {
@@ -312,17 +304,12 @@ export default function AddExpenseScreen() {
                 }`}
                 onPress={() => setPayerId(member.user_id)}
               >
-                <View
-                  className="h-12 w-12 items-center justify-center rounded-full"
-                  style={{
-                    backgroundColor:
-                      AVATAR_COLORS[index % AVATAR_COLORS.length],
-                  }}
-                >
-                  <Text className="text-sm font-heading text-white">
-                    {getInitials(member.profile.display_name)}
-                  </Text>
-                </View>
+                <Avatar
+                  userId={member.user_id}
+                  name={member.profile.display_name}
+                  size="lg"
+                  avatarUrl={member.profile.avatar_url}
+                />
                 <Text
                   className={`mt-1 text-xs ${
                     isSelected ? "font-heading-semi text-brand-dark" : "text-gray-500"
@@ -373,16 +360,13 @@ export default function AddExpenseScreen() {
                 </View>
 
                 {/* Avatar */}
-                <View
-                  className="mr-3 h-10 w-10 items-center justify-center rounded-full"
-                  style={{
-                    backgroundColor:
-                      AVATAR_COLORS[index % AVATAR_COLORS.length],
-                  }}
-                >
-                  <Text className="text-xs font-heading text-white">
-                    {getInitials(member.profile.display_name)}
-                  </Text>
+                <View className="mr-3">
+                  <Avatar
+                    userId={member.user_id}
+                    name={member.profile.display_name}
+                    size="md"
+                    avatarUrl={member.profile.avatar_url}
+                  />
                 </View>
 
                 {/* Name */}
