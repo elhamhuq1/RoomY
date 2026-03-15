@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 Phase: 13 of 14 — Profile Pictures
 Plan: 3 of 3 complete
 Status: Phase 13 Complete
-Last activity: 2026-03-15 — Quick task 8: Fix profile pictures in Add Expense and Complete Trip
+Last activity: 2026-03-15 — Quick task 9: Add Even/Custom split toggle to expense and grocery trip screens
 
 Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 3/3 Phase 13) = 41 plans shipped
 
@@ -102,6 +102,7 @@ None yet.
 | 6 | Redirect to sign-in after email signup with success banner | 2026-03-14 | 88a2596 | [5-redirect-to-login-after-email-signup](./quick/5-redirect-to-login-after-email-signup/) |
 | 7 | Apply Space Grotesk font to all screens and components | 2026-03-14 | f3925ed | [6-apply-space-grotesk-font-to-all-onboardi](./quick/6-apply-space-grotesk-font-to-all-onboardi/) |
 | 8 | Fix profile pictures not showing in Add Expense and Complete Trip | 2026-03-15 | 6690195 | [7-fix-profile-pictures-not-showing-in-add-](./quick/7-fix-profile-pictures-not-showing-in-add-/) |
+| 9 | Add Even/Custom split toggle to expense and grocery trip screens | 2026-03-15 | 9bdf640 | [8-add-toggle-for-even-vs-custom-split-in-e](./quick/8-add-toggle-for-even-vs-custom-split-in-e/) |
 
 ### Blockers/Concerns
 
@@ -110,5 +111,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed quick task 7 (fix profile pictures in Add Expense and Complete Trip)
+Stopped at: Completed quick task 9 (Even/Custom split toggle on expense and grocery trip screens)
 Resume file: None
