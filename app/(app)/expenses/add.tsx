@@ -144,6 +144,7 @@ export default function AddExpenseScreen() {
   // Custom mode validation
   const customTotal = splitMode === 'custom'
     ? members.reduce((sum, m) => {
+        if (!selectedMemberIds.has(m.user_id)) return sum;
         const val = parseFloat(customAmounts[m.user_id] || '0');
         return sum + (isNaN(val) ? 0 : val);
       }, 0)
@@ -155,7 +156,7 @@ export default function AddExpenseScreen() {
     description.trim().length > 0 &&
     isValidAmount &&
     payerId !== null &&
-    (splitMode === 'even' ? selectedMembers.length > 0 : customSplitsValid) &&
+    (splitMode === 'even' ? selectedMembers.length > 0 : selectedMembers.length > 0 && customSplitsValid) &&
     !submitting;
 
   function handleAmountChange(text: string) {
@@ -179,12 +180,19 @@ export default function AddExpenseScreen() {
     if (mode === splitMode) return;
     setSplitMode(mode);
     if (mode === 'custom') {
-      // Pre-fill with even split values if amount is valid
-      if (isValidAmount && members.length > 0) {
-        const evenSplits = calculateEqualSplits(parsedAmount, members.length);
+      // Pre-fill with even split values only for selected members
+      if (isValidAmount && selectedMemberIds.size > 0) {
+        const selectedCount = selectedMemberIds.size;
+        const evenSplits = calculateEqualSplits(parsedAmount, selectedCount);
         const amounts: Record<string, string> = {};
-        members.forEach((m, i) => {
-          amounts[m.user_id] = evenSplits[i].toFixed(2);
+        let idx = 0;
+        members.forEach((m) => {
+          if (selectedMemberIds.has(m.user_id)) {
+            amounts[m.user_id] = evenSplits[idx].toFixed(2);
+            idx++;
+          } else {
+            amounts[m.user_id] = '';
+          }
         });
         setCustomAmounts(amounts);
       } else {
@@ -213,6 +221,10 @@ export default function AddExpenseScreen() {
       }
       return next;
     });
+    // Clear custom amount when unchecking in custom mode
+    if (splitMode === 'custom' && selectedMemberIds.has(userId)) {
+      setCustomAmounts((prev) => ({ ...prev, [userId]: '' }));
+    }
   }
 
   async function handleSubmit() {
@@ -475,13 +487,28 @@ export default function AddExpenseScreen() {
             }
 
             // Custom mode
+            const isChecked = selectedMemberIds.has(member.user_id);
             return (
-              <View
+              <Pressable
                 key={member.user_id}
                 className={`flex-row items-center px-4 py-3 ${
                   index < members.length - 1 ? "border-b border-gray-100" : ""
                 }`}
+                onPress={() => toggleMember(member.user_id)}
               >
+                {/* Checkbox */}
+                <View
+                  className={`mr-3 h-6 w-6 items-center justify-center rounded-md ${
+                    isChecked
+                      ? "bg-brand"
+                      : "border-2 border-gray-300 bg-white"
+                  }`}
+                >
+                  {isChecked && (
+                    <Ionicons name="checkmark" size={16} color="#fff" />
+                  )}
+                </View>
+
                 {/* Avatar */}
                 <View className="mr-3">
                   <Avatar
@@ -499,20 +526,22 @@ export default function AddExpenseScreen() {
                     : member.profile.display_name}
                 </Text>
 
-                {/* Custom amount input */}
-                <View className="flex-row items-center rounded-lg border border-gray-200 px-2 py-1">
-                  <Text className="font-sans text-sm text-gray-400">$</Text>
-                  <TextInput
-                    className="font-sans w-20 text-right text-sm text-gray-800"
-                    style={{ paddingVertical: 0 }}
-                    placeholder="0.00"
-                    placeholderTextColor={colors.neutral.tertiary}
-                    keyboardType="decimal-pad"
-                    value={customAmounts[member.user_id] || ''}
-                    onChangeText={(text) => handleCustomAmountChange(member.user_id, text)}
-                  />
-                </View>
-              </View>
+                {/* Custom amount input - only when checked */}
+                {isChecked && (
+                  <View className="flex-row items-center rounded-lg border border-gray-200 px-2 py-1">
+                    <Text className="font-sans text-sm text-gray-400">$</Text>
+                    <TextInput
+                      className="font-sans w-20 text-right text-sm text-gray-800"
+                      style={{ paddingVertical: 0 }}
+                      placeholder="0.00"
+                      placeholderTextColor={colors.neutral.tertiary}
+                      keyboardType="decimal-pad"
+                      value={customAmounts[member.user_id] || ''}
+                      onChangeText={(text) => handleCustomAmountChange(member.user_id, text)}
+                    />
+                  </View>
+                )}
+              </Pressable>
             );
           })}
         </View>
