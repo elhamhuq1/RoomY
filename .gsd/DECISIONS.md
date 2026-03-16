@@ -122,3 +122,6 @@
 - "Template batch insert uses Promise.all for parallel individual inserts — consistent with recipe import pattern, 3-5 items completes sub-second"
 - "Room auto-created from template flow if room_type doesn't exist for household — prevents requiring separate room management screen for S02"
 - "Template batch insert changed to single Supabase .insert(array) call instead of Promise.all — one network round-trip vs N, simpler error handling"
+- "Streak badges use emoji text (🔥⭐🥈🏆) instead of Ionicons vector icon — simpler rendering, no icon library dependency for this display"
+- "Two-pass stat computation in dashboard — first pass collects raw per-member values, second pass derives cross-member aggregates (fairness %) after totalEffort is known"
+- "ChoreCompletion Insert type uses Omit + optional re-add pattern for effort_points — keeps it optional since DB DEFAULT handles it"

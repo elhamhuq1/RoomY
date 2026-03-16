@@ -83,7 +83,7 @@ This milestone is complete only when all are true:
 - [x] **S02: Room-Based Chores Tab with Templates & Private Rooms** `risk:medium` `depends:[S01]`
   > After this: chores tab shows collapsible room sections (reusing SectionHeader pattern), users can create chores with room assignment and effort picker, templates populate rooms with one tap, private rooms appear only for their creator — all visible in Expo Go
 
-- [ ] **S03: Effort-Weighted Dashboard, Leaderboard, Fairness & Badges** `risk:medium` `depends:[S01]`
+- [x] **S03: Effort-Weighted Dashboard, Leaderboard, Fairness & Badges** `risk:medium` `depends:[S01]`
   > After this: dashboard shows effort-weighted leaderboard ranking roommates by difficulty contributed, fairness score shows workload distribution percentage, streak badges (7/30/60-day) display for consistent completion, complete_chore RPC stamps effort_points on completions
 
 - [ ] **S04: Smart "My Day" View & Visual Urgency Indicators** `risk:low` `depends:[S01]`
