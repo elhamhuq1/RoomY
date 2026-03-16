@@ -20,10 +20,10 @@ import { Card } from "@/components/ui/Card";
 import {
   QuickAddInput,
   GroceryItemRow,
-  SectionHeader,
   EmptyState,
   CategoryPicker,
 } from "@/components/groceries";
+import { SectionHeader } from "@/components/ui";
 import type { GroceryItem } from "@/lib/types/database";
 import { DEPARTMENTS } from "@/lib/constants/grocery-departments";
 
