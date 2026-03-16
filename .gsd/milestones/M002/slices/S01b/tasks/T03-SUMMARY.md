@@ -7,22 +7,26 @@ provides:
   - scan-receipt → assign-items → complete-trip navigation flow
   - Ownership-based split mode in complete-trip with pre-computed per-member shares
   - RPC called with p_item_assignments for ownership splits
+  - Post-completion navigation to trip-history with clean back-stack
+  - Receipt items inserted as grocery_items for trip history visibility
 key_files:
   - app/(app)/(tabs)/groceries.tsx
   - app/(app)/groceries/scan-receipt.tsx
   - app/(app)/groceries/complete-trip.tsx
+  - supabase/migrations/20260316000012_fix_missing_columns.sql
+  - supabase/migrations/20260316000013_fix_receipt_items_insert.sql
 key_decisions:
   - "By Item" split mode tab appears only when itemAssignments are present — keeps UI clean for non-receipt trips
   - Ownership shares pre-computed client-side for display, but actual split math done server-side in RPC — single source of truth
   - Ownership mode shows read-only per-member totals (no checkboxes) — user already made assignment decisions on prior screen
+  - After completing trip, dismissAll() + push to trip-history — clears scan→assign→complete stack so back goes to groceries tab
+  - RPC inserts scanned receipt items as grocery_items directly when they don't match existing list items — ensures trip history shows all items
 patterns_established:
   - Three-tab split mode toggle (By Item / Even / Custom) when ownership data available; two-tab (Even / Custom) otherwise
-  - Ownership share display uses green accent for non-zero shares, gray for zero — visual weight matches contribution
+  - dismissAll() + push() pattern for post-flow navigation that clears intermediate screens
 observability_surfaces:
-  - Receipt summary card shows assignment count ("3 items assigned to members")
-  - Ownership split summary shows assigned vs shared item breakdown
   - RPC split_mode return field ('ownership' or 'even') logged per trip
-duration: 30m
+duration: 45m
 verification_result: passed
 completed_at: 2026-03-15
 blocker_discovered: false
@@ -30,66 +34,64 @@ blocker_discovered: false
 
 # T03: Rewire navigation and update complete-trip for ownership splits
 
-**Moved "Scan Receipt" to main groceries page, wired scan→assign→complete flow, and added ownership-based split mode to complete-trip.**
+**Moved "Scan Receipt" to main groceries page, wired scan→assign→complete flow, added ownership-based split mode, and fixed post-completion navigation and trip history item display.**
 
 ## What Happened
 
-Three files changed to connect the full receipt-to-ownership-split flow:
+Three app files changed plus two fixup migrations applied during UAT:
 
-1. **scan-receipt.tsx**: Changed confirm navigation from `complete-trip` to `assign-items`. Scan results now flow through the assignment screen before reaching trip completion.
+1. **scan-receipt.tsx**: Changed confirm navigation from `complete-trip` to `assign-items`.
 
-2. **groceries.tsx**: Added "Scan Receipt" button below the quick-add input on the main groceries page. Compact styling (border-2, py-2.5) fits naturally above the item list.
+2. **groceries.tsx**: Added "Scan Receipt" button below the quick-add input.
 
 3. **complete-trip.tsx**: Major update:
    - Removed "Scan Receipt" button (now lives on main page)
+   - Removed receipt summary card and ownership summary card (cleaner UI per user feedback)
    - Added `itemAssignments` route param parsing — auto-sets split mode to 'ownership' when assignments arrive
-   - Added `ownershipShares` useMemo that computes per-member totals from assignments + receipt prices, with unassigned items splitting evenly
-   - Three-tab split mode toggle ("By Item" / "Even" / "Custom") shown when assignments present; two-tab otherwise
-   - Ownership mode renders read-only per-member shares (no toggle checkboxes — assignments already decided)
-   - Ownership summary card shows assigned vs shared item counts
-   - Submit handler calls RPC with `p_item_assignments` in ownership mode
-   - Receipt summary card enhanced to show assignment count when applicable
-   - `canSubmit` updated to allow ownership mode (no custom validation needed)
+   - Added `ownershipShares` useMemo for per-member totals from assignments + receipt prices
+   - Three-tab split mode toggle ("By Item" / "Even" / "Custom") shown when assignments present
+   - Ownership mode renders read-only per-member shares
+   - Submit calls RPC with `p_item_assignments` in ownership mode
+   - Fixed double-serialization bug: JSONB params passed as objects not JSON.stringify'd
+   - Post-completion navigates to trip-history via dismissAll() + push — clean back-stack
+
+4. **Migration 00012**: Applied missing `unit_price` and `source` columns from migration 00010 that were never pushed to remote. Fixed migration history sync (renamed 000XX files to timestamp format, repaired remote migration table).
+
+5. **Migration 00013**: Fixed RPC to insert scanned receipt items as `grocery_items` when they don't already exist on the grocery list. Without this, trip history showed 0 items for receipt-scanned trips.
 
 ## Verification
 
-- `npx tsc --noEmit` passes (only pre-existing Deno/font errors)
-- scan-receipt.tsx: no references to `complete-trip` remain — confirms navigation redirect
-- complete-trip.tsx: no references to `scan-receipt` remain — confirms button removal
-- groceries.tsx: "Scan Receipt" button present with correct route
-- Navigation flow: scan-receipt → assign-items → complete-trip (verified via route paths in code)
-- Even-split path unchanged for non-receipt trips (no `itemAssignments` → `splitMode` stays 'even')
-- Ownership mode calls RPC with both `p_item_prices` and `p_item_assignments`
-
-### Slice-Level Verification (T03 is final task)
-
-- ✅ `npx tsc --noEmit` passes
-- ✅ "Scan Receipt" visible on groceries tab (button added)
-- ✅ Navigation: after confirming scanned items, goes to assign-items (not complete-trip) — no way to re-enter scan-receipt from complete-trip
-- ✅ "Scan Receipt" button removed from complete-trip screen
-- ✅ Ownership split mode pre-fills per-member amounts from item assignments
-- ✅ Even-split still works when no receipt data present (splitMode defaults to 'even')
-- ✅ RPC called with `p_item_assignments` in ownership mode → returns `split_mode: 'ownership'`
-- ✅ Empty receiptItems on assign-items shows empty state with "Go Back" action
-- 🔲 Full Expo Go flow (scan → assign → complete → history) — requires device/simulator testing
+- ✅ `npx tsc --noEmit` passes (only pre-existing Deno/font errors)
+- ✅ Full Expo Go flow: groceries tab → Scan Receipt → scan → review → assign items → complete trip → trip history shows items with prices
+- ✅ "Scan Receipt" on groceries tab, removed from complete-trip
+- ✅ Navigation: scan→assign→complete→trip-history; back from trip-history goes to groceries tab
+- ✅ Even-split still works for non-receipt trips
+- ✅ Ownership splits calculated correctly from item assignments
+- ✅ Trip history shows correct item count and individual items with prices
 
 ## Diagnostics
 
-- Receipt summary card on complete-trip shows "X items assigned to members" when coming from assign-items flow
-- Ownership split summary shows "X assigned · Y shared (split evenly)" breakdown
-- RPC response `split_mode` field available for logging which split algorithm ran
-- Navigation state inspectable via Expo Router devtools — `itemAssignments` param visible
+- RPC response `split_mode` field indicates which split algorithm ran
+- `SELECT name, assigned_to, unit_price FROM grocery_items WHERE trip_id = '<id>'` to audit trip items
+- Navigation stack inspectable via Expo Router devtools
 
 ## Deviations
 
-None.
+- Removed receipt summary card and ownership summary card from complete-trip per user feedback (simpler UI)
+- Fixed double JSON.stringify on JSONB RPC params (was causing "cannot extract elements from a scalar" error)
+- Fixed missing unit_price/source columns on remote DB (migration 00010 was never pushed)
+- Fixed RPC to insert receipt items as grocery_items (scanned items weren't becoming rows)
+- Changed post-completion navigation from router.back() to dismissAll() + push(trip-history) to clear intermediate screens
+- Renamed all migration files from 000XX to timestamp format for supabase CLI compatibility
 
 ## Known Issues
 
-- Pre-existing: `npx tsc --noEmit` reports errors in `supabase/functions/` (Deno types) and `@expo-google-fonts/nunito`. Not related to this task.
+None.
 
 ## Files Created/Modified
 
-- `app/(app)/groceries/scan-receipt.tsx` — changed confirm navigation target from complete-trip to assign-items
-- `app/(app)/(tabs)/groceries.tsx` — added "Scan Receipt" button below quick-add input
-- `app/(app)/groceries/complete-trip.tsx` — removed scan button, added ownership split mode with itemAssignments parsing, three-tab toggle, per-member ownership shares, RPC integration
+- `app/(app)/groceries/scan-receipt.tsx` — changed confirm navigation to assign-items
+- `app/(app)/(tabs)/groceries.tsx` — added "Scan Receipt" button
+- `app/(app)/groceries/complete-trip.tsx` — ownership splits, cleaned UI, fixed serialization, fixed navigation
+- `supabase/migrations/20260316000012_fix_missing_columns.sql` — adds missing unit_price/source columns
+- `supabase/migrations/20260316000013_fix_receipt_items_insert.sql` — fixes RPC to insert receipt items for trip history

@@ -40,7 +40,8 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 
 ### Active
 
-_No active requirements — all v1.0–v1.2 requirements validated._
+- Receipt scanning with Gemini Vision OCR for grocery trip completion (M002/S01)
+- Receipt-based item ownership with per-member smart splitting (M002/S01b)
 
 ## Completed Milestones
 
@@ -54,7 +55,7 @@ Full roommate household management app delivered across 14 slices. Three version
 - Web version — mobile first, web can come later
 - Public app store release — v1 is for personal use
 - Social features beyond the household — this isn't a social network
-- Receipt scanning / OCR — manual entry is fine for small households
+- ~~Receipt scanning / OCR — manual entry is fine for small households~~ (now implemented in M002)
 - Dark mode — doubles design surface area; tokens support it later but not implementing now
 
 ## Context
