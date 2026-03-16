@@ -1,5 +1,5 @@
 import { colors } from "@/lib/theme/colors";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -17,14 +17,15 @@ import { useRouter } from "expo-router";
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
-import { Avatar } from "@/components/ui";
-import { Card } from "@/components/ui";
+import { Avatar, Card, SectionHeader } from "@/components/ui";
 import { StatsRow, ChoreRow, EmptyState } from "@/components/chores";
+import { ROOMS, ROOM_MAP } from "@/lib/constants/chore-rooms";
 import type {
   Chore,
   ChoreCompletion,
   ChoreSwapRequest,
   Profile,
+  Room,
 } from "@/lib/types/database";
 
 // ---------------------------------------------------------------------------
@@ -99,8 +100,10 @@ export default function ChoresScreen() {
 
   // State
   const [chores, setChores] = useState<Chore[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [completions, setCompletions] = useState<ChoreCompletion[]>([]);
+  const [collapsedRooms, setCollapsedRooms] = useState<Set<string>>(new Set());
   const [disputedChoreIds, setDisputedChoreIds] = useState<Set<string>>(new Set());
   const [disputedByMeChoreIds, setDisputedByMeChoreIds] = useState<Set<string>>(new Set());
   // Map chore_id -> completion details for disputed completions
@@ -122,6 +125,18 @@ export default function ChoresScreen() {
   const [disputeSubmitting, setDisputeSubmitting] = useState(false);
 
   // -------------------------------------------------------------------------
+  // Room collapse toggle
+  // -------------------------------------------------------------------------
+
+  const toggleRoom = useCallback((roomId: string) => {
+    setCollapsedRooms(prev => {
+      const next = new Set(prev);
+      next.has(roomId) ? next.delete(roomId) : next.add(roomId);
+      return next;
+    });
+  }, []);
+
+  // -------------------------------------------------------------------------
   // Data fetching
   // -------------------------------------------------------------------------
 
@@ -139,6 +154,13 @@ export default function ChoresScreen() {
     if (choresData) {
       setChores(choresData as Chore[]);
     }
+
+    // Fetch rooms (RLS filters out private rooms the user doesn't own)
+    const { data: roomsData } = await supabase
+      .from("rooms")
+      .select("*")
+      .eq("household_id", household.id);
+    if (roomsData) setRooms(roomsData as Room[]);
 
     // Fetch members + profiles (two-query pattern)
     const { data: membersData } = await supabase
@@ -412,24 +434,45 @@ export default function ChoresScreen() {
   );
 
   // -------------------------------------------------------------------------
-  // Derived data
+  // Derived data — room-grouped
   // -------------------------------------------------------------------------
 
-  const myChores = chores
-    .filter((c) => c.current_assignee === user?.id)
-    .sort(
-      (a, b) =>
-        new Date(a.next_due_at).getTime() - new Date(b.next_due_at).getTime()
-    );
+  // Build room lookup from fetched rooms
+  const roomLookup = useMemo(() => {
+    const map: Record<string, Room> = {};
+    rooms.forEach(r => { map[r.id] = r; });
+    return map;
+  }, [rooms]);
 
-  const othersChores = chores
-    .filter((c) => c.current_assignee !== user?.id)
-    .sort(
-      (a, b) =>
-        new Date(a.next_due_at).getTime() - new Date(b.next_due_at).getTime()
+  // Group chores by room_id
+  const choresByRoom = useMemo(() => {
+    const grouped: Record<string, Chore[]> = {};
+    chores.forEach(c => {
+      const rid = c.room_id;
+      if (!grouped[rid]) grouped[rid] = [];
+      grouped[rid].push(c);
+    });
+    // Sort within each room by next_due_at
+    Object.values(grouped).forEach(list =>
+      list.sort((a, b) => new Date(a.next_due_at).getTime() - new Date(b.next_due_at).getTime())
     );
+    return grouped;
+  }, [chores]);
 
-  const pendingCount = myChores.length;
+  // Order rooms by ROOMS constant order, skip rooms with 0 chores
+  const orderedRoomIds = useMemo(() => {
+    const roomTypeOrder = ROOMS.map(r => r.id);
+    return rooms
+      .filter(r => choresByRoom[r.id]?.length > 0)
+      .sort((a, b) => {
+        const ai = roomTypeOrder.indexOf(a.room_type);
+        const bi = roomTypeOrder.indexOf(b.room_type);
+        return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      })
+      .map(r => r.id);
+  }, [rooms, choresByRoom]);
+
+  const pendingCount = chores.filter(c => c.current_assignee === user?.id).length;
   const streak = calculateStreak(completions);
   const personalBest = calculatePersonalBest(completions);
 
@@ -513,117 +556,76 @@ export default function ChoresScreen() {
           </Pressable>
         )}
 
-        {/* YOUR CHORES section */}
-        {myChores.length > 0 && (
-          <View className="mt-4">
-            <Text className="font-sans text-overline text-neutral-secondary uppercase mb-2 px-4">
-              YOUR CHORES
-            </Text>
-            <Card className="mx-4 p-0 overflow-hidden">
-              {myChores.map((chore, index) => {
-                const overdueDays = getOverdueDays(chore.next_due_at);
-                const assigneeProfile = chore.current_assignee
-                  ? profiles[chore.current_assignee]
-                  : null;
-                const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
-                const isDisputed = disputedChoreIds.has(chore.id);
-                const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
-                const detail = disputeDetails[chore.id];
-                const hasLastCompletion = chore.last_completed_at !== null;
-                const showDisputeButton = hasLastCompletion && !isDisputed && !true; // isMyChore is always true here
+        {/* Room-grouped chore sections */}
+        {orderedRoomIds.map((roomId) => {
+          const room = roomLookup[roomId];
+          const roomChores = choresByRoom[roomId] || [];
+          const roomInfo = room ? ROOM_MAP[room.room_type] : null;
+          const isExpanded = !collapsedRooms.has(roomId);
 
-                return (
-                  <View
-                    key={chore.id}
-                    className={
-                      index < myChores.length - 1 && !isDisputed
-                        ? "border-b border-gray-100"
-                        : ""
-                    }
-                  >
-                    <ChoreRow
-                      chore={chore}
-                      assigneeName={assigneeName}
-                      assigneeId={chore.current_assignee}
-                      assigneeAvatarUrl={assigneeProfile?.avatar_url}
-                      isMyChore={true}
-                      isDisputed={isDisputed}
-                      isDisputedByMe={isDisputedByMe}
-                      disputeReason={detail?.dispute_reason}
-                      overdueDays={overdueDays}
-                      isCompleting={completingId === chore.id}
-                      isClaiming={claimingId === chore.id}
-                      isDisputing={disputingId === chore.id}
-                      showDisputeButton={showDisputeButton}
-                      onComplete={() => handleComplete(chore.id)}
-                      onClaim={() => handleClaim(chore.id)}
-                      onDispute={() => handleDispute(chore.id)}
-                      onSwap={() => setSwapModalChoreId(chore.id)}
-                      onDelete={() => handleDelete(chore.id, chore.name)}
-                      onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
-                    />
-                  </View>
-                );
-              })}
-            </Card>
-          </View>
-        )}
+          return (
+            <View key={roomId} className="mt-4">
+              <SectionHeader
+                label={room?.name || roomInfo?.label || 'Unknown'}
+                count={roomChores.length}
+                icon={roomInfo?.icon}
+                collapsible
+                expanded={isExpanded}
+                onToggle={() => toggleRoom(roomId)}
+              />
+              {isExpanded && (
+                <Card className="mx-4 p-0 overflow-hidden">
+                  {roomChores.map((chore, index) => {
+                    const overdueDays = getOverdueDays(chore.next_due_at);
+                    const assigneeProfile = chore.current_assignee
+                      ? profiles[chore.current_assignee]
+                      : null;
+                    const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
+                    const isMyChore = chore.current_assignee === user?.id;
+                    const isDisputed = disputedChoreIds.has(chore.id);
+                    const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
+                    const detail = disputeDetails[chore.id];
+                    const hasLastCompletion = chore.last_completed_at !== null;
+                    const showDisputeButton = hasLastCompletion && !isDisputed && !isMyChore;
 
-        {/* HOUSEHOLD section */}
-        {othersChores.length > 0 && (
-          <View className="mt-6">
-            <Text className="font-sans text-overline text-neutral-secondary uppercase mb-2 px-4">
-              HOUSEHOLD
-            </Text>
-            <Card className="mx-4 p-0 overflow-hidden">
-              {othersChores.map((chore, index) => {
-                const overdueDays = getOverdueDays(chore.next_due_at);
-                const assigneeProfile = chore.current_assignee
-                  ? profiles[chore.current_assignee]
-                  : null;
-                const assigneeName = assigneeProfile?.display_name ?? "Unassigned";
-                const isDisputed = disputedChoreIds.has(chore.id);
-                const isDisputedByMe = disputedByMeChoreIds.has(chore.id);
-                const detail = disputeDetails[chore.id];
-                const hasLastCompletion = chore.last_completed_at !== null;
-                const showDisputeButton = hasLastCompletion && !isDisputed && !false; // isMyChore is always false here
-
-                return (
-                  <View
-                    key={chore.id}
-                    className={
-                      index < othersChores.length - 1 && !isDisputed
-                        ? "border-b border-gray-100"
-                        : ""
-                    }
-                  >
-                    <ChoreRow
-                      chore={chore}
-                      assigneeName={assigneeName}
-                      assigneeId={chore.current_assignee}
-                      assigneeAvatarUrl={assigneeProfile?.avatar_url}
-                      isMyChore={false}
-                      isDisputed={isDisputed}
-                      isDisputedByMe={isDisputedByMe}
-                      disputeReason={detail?.dispute_reason}
-                      overdueDays={overdueDays}
-                      isCompleting={completingId === chore.id}
-                      isClaiming={claimingId === chore.id}
-                      isDisputing={disputingId === chore.id}
-                      showDisputeButton={showDisputeButton}
-                      onComplete={() => handleComplete(chore.id)}
-                      onClaim={() => handleClaim(chore.id)}
-                      onDispute={() => handleDispute(chore.id)}
-                      onSwap={() => setSwapModalChoreId(chore.id)}
-                      onDelete={() => handleDelete(chore.id, chore.name)}
-                      onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
-                    />
-                  </View>
-                );
-              })}
-            </Card>
-          </View>
-        )}
+                    return (
+                      <View
+                        key={chore.id}
+                        className={
+                          index < roomChores.length - 1 && !isDisputed
+                            ? "border-b border-gray-100"
+                            : ""
+                        }
+                      >
+                        <ChoreRow
+                          chore={chore}
+                          assigneeName={assigneeName}
+                          assigneeId={chore.current_assignee}
+                          assigneeAvatarUrl={assigneeProfile?.avatar_url}
+                          isMyChore={isMyChore}
+                          isDisputed={isDisputed}
+                          isDisputedByMe={isDisputedByMe}
+                          disputeReason={detail?.dispute_reason}
+                          overdueDays={overdueDays}
+                          isCompleting={completingId === chore.id}
+                          isClaiming={claimingId === chore.id}
+                          isDisputing={disputingId === chore.id}
+                          showDisputeButton={showDisputeButton}
+                          onComplete={() => handleComplete(chore.id)}
+                          onClaim={() => handleClaim(chore.id)}
+                          onDispute={() => handleDispute(chore.id)}
+                          onSwap={() => setSwapModalChoreId(chore.id)}
+                          onDelete={() => handleDelete(chore.id, chore.name)}
+                          onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
+                        />
+                      </View>
+                    );
+                  })}
+                </Card>
+              )}
+            </View>
+          );
+        })}
       </ScrollView>
 
       {/* Swap member picker modal */}

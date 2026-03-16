@@ -45,7 +45,7 @@
   - Verify: `npx tsc --noEmit` — no new errors. Groceries tab still renders sections correctly.
   - Done when: SectionHeader importable from `@/components/ui`, ChoreRow renders effort badge for effort > 1, groceries tab unbroken.
 
-- [ ] **T02: Redesign chores tab with room-grouped collapsible sections** `est:1h30m`
+- [x] **T02: Redesign chores tab with room-grouped collapsible sections** `est:1h30m`
   - Why: Core of CHORE-01. Transforms the flat "Your Chores / Household" layout into room-grouped sections. Private rooms auto-filtered by RLS (CHORE-02). This is the largest task — the 768 LOC chores.tsx gets substantial restructuring.
   - Files: `app/(app)/(tabs)/chores.tsx`
   - Do: Fetch rooms from `supabase.from('rooms').select('*').eq('household_id', household.id)` alongside chores. Build a `roomMap: Record<string, Room>` from fetched rooms. Group chores by `room_id`. Render one SectionHeader per room (using ROOM_MAP for icon/label, room record for count), collapsible with `collapsedRooms` state set. Inside each section, render ChoreRows in a Card, preserving all existing props/handlers (complete, claim, swap, dispute, delete). Order rooms by ROOMS constant order. Hide rooms with zero chores. Keep StatsRow and swap-request banner at top. Keep swap modal and dispute modal unchanged.

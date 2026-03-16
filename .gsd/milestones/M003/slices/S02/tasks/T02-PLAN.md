@@ -161,3 +161,10 @@ The chores tab currently splits chores into "Your Chores" and "Household" flat l
 ## Expected Output
 
 - `app/(app)/(tabs)/chores.tsx` — redesigned with room-grouped sections, rooms fetched from Supabase, collapsible via SectionHeader, all existing functionality preserved
+
+## Observability Impact
+
+- **Room fetch failure:** If the rooms query fails or returns empty, `orderedRoomIds` is empty and no room sections render — chores exist but aren't visible. Inspect by checking `rooms` state length in React DevTools or adding a temporary console.log on `roomsData`.
+- **Room grouping mismatch:** If a chore has a `room_id` that doesn't match any fetched room, it won't appear in any section. Inspect via `supabase.from('chores').select('room_id, name')` and cross-reference with `supabase.from('rooms').select('id, name')`.
+- **Private room RLS:** Private rooms are filtered server-side. A non-owner querying rooms won't see private rooms, so chores in those rooms won't have a matching section. This is by design — verify by querying as different users.
+- **No new error paths:** All action handlers (complete, claim, swap, dispute, delete) are unchanged. Existing error alerts and refresh flows remain.
