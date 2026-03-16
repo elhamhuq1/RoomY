@@ -87,6 +87,12 @@ Add the TypeScript interfaces and constants that all downstream slices (S02-S05)
 - Decision: "Fixed room taxonomy (kitchen, bathroom, living_room, bedroom, laundry, outdoor, garage, general) as constant like DEPARTMENTS"
 - Decision: "Room taxonomy as a fixed constant (chore-rooms.ts) with rooms table for household instances"
 
+## Observability Impact
+
+- **No runtime signals change.** This task adds only compile-time types and static constants — no runtime behavior, no logs, no API surfaces.
+- **Inspection:** `npx tsc --noEmit` validates type correctness. Constants can be inspected via `node -e "console.log(require('./lib/constants/chore-rooms').ROOMS.length)"` after build.
+- **Failure visibility:** Type mismatches between these interfaces and the migration schema will surface as runtime Supabase query errors in downstream slices when the migration is applied.
+
 ## Expected Output
 
 - `lib/types/database.ts` — updated with Room, ChoreNudge interfaces; Chore has room_id + effort_points; Database type has rooms + chore_nudges tables
