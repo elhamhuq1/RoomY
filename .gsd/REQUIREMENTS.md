@@ -61,13 +61,6 @@
 - Source: M003-CONTEXT
 - Primary Slice: S03
 
-### CHORE-11 — Peer nudge sends push notification for overdue chores (rate limited: 1 per chore per 24h per sender)
-
-- Status: active
-- Class: core-capability
-- Source: M003-CONTEXT
-- Primary Slice: S05
-
 ### CHORE-12 — Existing chores migrated to default "General" room with effort_points=1, preserving all history
 
 - Status: active
@@ -83,6 +76,14 @@
 - Primary Slice: S03
 
 ## Validated
+
+### CHORE-11 — Peer nudge sends push notification for overdue chores (rate limited: 1 per chore per 24h per sender)
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S05
+- Validated by: S05 — push-chore-nudge Edge Function with 5-phase lifecycle (auth, validation, 24h rate limit, insert, Expo Push); client nudge button conditional on overdue + non-own chore; tsc passes
 
 ### GROC-01 — User can photograph a grocery receipt from the complete-trip screen
 

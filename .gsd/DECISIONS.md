@@ -130,3 +130,4 @@
 - "My Day shows all due/overdue items with no cap — small households have few chores, capping would hide important overdue items (reaffirming earlier decision)"
 - "Nudge rate limiting in Edge Function (not RPC) — Edge Function already needs service-role access for cross-user push token + notification prefs queries, so rate-limit check + nudge insert + push send all happen in one place. One client round-trip, one place for all nudge logic"
 - "Session-level nudgedIds Set for immediate nudge button disable — client-side optimistic disable after successful nudge prevents rapid re-taps without querying server. Edge Function enforces actual 24h rate limit server-side"
+- "Nudge record inserted before push token/prefs lookup — nudge always recorded for rate limiting even if push delivery is skipped due to missing token or disabled prefs. Push failures return 200 with push_sent:false and reason field (non-fatal)"

@@ -89,7 +89,7 @@ This milestone is complete only when all are true:
 - [x] **S04: Smart "My Day" View & Visual Urgency Indicators** `risk:low` `depends:[S01]`
   > After this: "My Day" screen shows personalized daily task list (due today + overdue, sorted by urgency), chore rows display green/yellow/red urgency coloring based on due date proximity — all visible in Expo Go
 
-- [ ] **S05: Peer Nudge System with Push Notifications** `risk:medium` `depends:[S01]`
+- [x] **S05: Peer Nudge System with Push Notifications** `risk:medium` `depends:[S01]`
   > After this: user can tap nudge on an overdue chore assigned to another roommate, push notification delivers via new Edge Function, rate limiting prevents re-nudge within 24h per chore per sender — verified via curl test of Edge Function and in-app UI
 
 ## Boundary Map

@@ -50,6 +50,7 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
   - S02 complete: room-based chores tab with collapsible sections, effort picker, template population, private room filtering
   - S03 complete: effort_points on completions via RPC stamp, effort-weighted dashboard with fairness %, tiered streak badges (7/30/60-day)
   - S04 complete: three-tier urgency coloring (green/yellow/red) on all chore rows, "My Day" screen with personalized due/overdue list, shared useChoreActions hook
+  - S05 complete: peer nudge Edge Function with auth/validation/24h rate limit/push delivery, nudge button on overdue non-own chores with loading + session disable
 
 ## Completed Milestones
 
