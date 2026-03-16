@@ -313,8 +313,8 @@ export default function CompleteTripScreen() {
           p_paid_by: payerId!,
           p_split_user_ids: Array.from(selectedMemberIds),
           p_created_by: user.id,
-          p_item_prices: receiptData ? JSON.stringify(receiptData.items) : null,
-          p_item_assignments: JSON.stringify(itemAssignments),
+          p_item_prices: receiptData ? receiptData.items : null,
+          p_item_assignments: itemAssignments,
         });
 
         if (rpcError) {
@@ -329,7 +329,7 @@ export default function CompleteTripScreen() {
             p_paid_by: payerId!,
             p_split_user_ids: Array.from(selectedMemberIds),
             p_created_by: user.id,
-            p_item_prices: JSON.stringify(receiptData.items),
+            p_item_prices: receiptData.items,
           });
 
           if (rpcError) {
@@ -429,8 +429,10 @@ export default function CompleteTripScreen() {
         }
       }
 
-      // Success - go back to grocery list (realtime will clear archived items)
-      router.back();
+      // Clear the scan→assign→complete stack and land on trip history
+      // Navigate to groceries tab first, then push trip-history on top
+      router.dismissAll();
+      router.push('/(app)/groceries/trip-history');
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setSubmitting(false);
@@ -465,28 +467,6 @@ export default function CompleteTripScreen() {
             <Text className="ml-2 text-sm font-medium text-brand-dark">
               {checkedCount} item{checkedCount !== 1 ? "s" : ""} checked off
             </Text>
-          </View>
-        )}
-
-        {/* Receipt summary card (when receipt data present) */}
-        {receiptData && (
-          <View className="mb-4 rounded-xl bg-green-50 px-4 py-3">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <Text className="mr-2 text-lg">📋</Text>
-                <Text className="text-sm font-medium text-green-800">
-                  {receiptData.items.length} item{receiptData.items.length !== 1 ? 's' : ''} scanned
-                </Text>
-              </View>
-              <Text className="text-sm font-heading-semi text-green-800">
-                {formatCurrency(receiptData.total)}
-              </Text>
-            </View>
-            {itemAssignments.length > 0 && (
-              <Text className="mt-1 text-xs text-green-700">
-                {itemAssignments.length} item{itemAssignments.length !== 1 ? 's' : ''} assigned to members
-              </Text>
-            )}
           </View>
         )}
 
@@ -762,32 +742,6 @@ export default function CompleteTripScreen() {
                 Over by: {formatCurrency(Math.abs(remaining))}
               </Text>
             )}
-          </View>
-        )}
-
-        {/* Ownership mode summary */}
-        {splitMode === 'ownership' && isValidAmount && (
-          <View className="mb-6 rounded-xl bg-green-50 px-4 py-3">
-            <View className="flex-row items-center justify-center mb-1">
-              <Ionicons name="people" size={16} color="#166534" />
-              <Text className="font-sans ml-1.5 text-sm font-medium text-green-800">
-                Split by item ownership
-              </Text>
-            </View>
-            {(() => {
-              const assignedCount = itemAssignments.length;
-              const totalItems = receiptData?.items.length ?? 0;
-              const sharedCount = totalItems - assignedCount;
-              return sharedCount > 0 ? (
-                <Text className="font-sans text-center text-xs text-green-700">
-                  {assignedCount} assigned · {sharedCount} shared (split evenly)
-                </Text>
-              ) : (
-                <Text className="font-sans text-center text-xs text-green-700">
-                  All {assignedCount} items assigned
-                </Text>
-              );
-            })()}
           </View>
         )}
 

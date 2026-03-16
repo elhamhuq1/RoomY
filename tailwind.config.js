@@ -9,8 +9,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: ["Nunito_700Bold"],
-        "heading-semi": ["Nunito_600SemiBold"],
+        sans: ["SpaceGrotesk_400Regular"],
+        medium: ["SpaceGrotesk_500Medium"],
+        "heading-semi": ["SpaceGrotesk_600SemiBold"],
+        heading: ["SpaceGrotesk_700Bold"],
       },
       colors: {
         brand: {
@@ -46,6 +48,9 @@ module.exports = {
           { lineHeight: "14px", fontWeight: "600", letterSpacing: "0.1em" },
         ],
         badge: ["11px", { lineHeight: "14px", fontWeight: "500" }],
+        // Override default text-lg/text-base to prevent Space Grotesk Bold clipping
+        lg: ["18px", { lineHeight: "26px" }],
+        base: ["16px", { lineHeight: "24px" }],
       },
       boxShadow: {
         DEFAULT:

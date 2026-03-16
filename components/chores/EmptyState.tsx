@@ -5,16 +5,16 @@ import { Card } from '@/components/ui/Card';
 import { colors } from '@/lib/theme/colors';
 
 // ---------------------------------------------------------------------------
-// Suggested chores (icon-based)
+// Suggested chores (Ionicons-based — original icon PNGs never shipped)
 // ---------------------------------------------------------------------------
 
-const SUGGESTED_CHORES = [
-  { name: 'Dishes', icon: require('@/docs/icons/dishes.png'), frequency: 'daily' },
-  { name: 'Take out trash', icon: require('@/docs/icons/take-out-trash.png'), frequency: 'weekly' },
-  { name: 'Vacuum', icon: require('@/docs/icons/vacuum.png'), frequency: 'weekly' },
-  { name: 'Clean bathroom', icon: require('@/docs/icons/clean-bathroom.png'), frequency: 'weekly' },
-  { name: 'Mop floors', icon: require('@/docs/icons/mop-floors.png'), frequency: 'weekly' },
-  { name: 'Wipe counters', icon: require('@/docs/icons/wipe-counters.png'), frequency: 'daily' },
+const SUGGESTED_CHORES: { name: string; icon: keyof typeof Ionicons.glyphMap; frequency: string }[] = [
+  { name: 'Dishes', icon: 'water-outline', frequency: 'daily' },
+  { name: 'Take out trash', icon: 'trash-outline', frequency: 'weekly' },
+  { name: 'Vacuum', icon: 'home-outline', frequency: 'weekly' },
+  { name: 'Clean bathroom', icon: 'sparkles-outline', frequency: 'weekly' },
+  { name: 'Mop floors', icon: 'resize-outline', frequency: 'weekly' },
+  { name: 'Wipe counters', icon: 'hand-left-outline', frequency: 'daily' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -56,10 +56,11 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
               onPress={() => onSelectSuggestion(suggestion.name, suggestion.frequency)}
             >
               <Card className="flex-row items-center px-3 py-3.5">
-                <Image
-                  source={suggestion.icon}
-                  style={{ width: 28, height: 28, marginRight: 10 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name={suggestion.icon}
+                  size={24}
+                  color={colors.brand.DEFAULT}
+                  style={{ marginRight: 10 }}
                 />
                 <Text className="flex-1 text-sm font-medium text-neutral-text" numberOfLines={1}>
                   {suggestion.name}

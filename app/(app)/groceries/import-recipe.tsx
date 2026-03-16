@@ -185,6 +185,7 @@ export default function ImportRecipeScreen() {
             quantity: 1,
             created_by: user.id,
             source: 'recipe',
+            category: 'other',
           })
           .select()
       )

@@ -9,6 +9,7 @@ import { supabase } from "./supabase";
 WebBrowser.maybeCompleteAuthSession();
 
 const redirectTo = makeRedirectUri();
+console.log("[OAuth] redirectTo:", redirectTo);
 
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   const timeout = new Promise<never>((_, reject) =>

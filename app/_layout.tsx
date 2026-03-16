@@ -9,7 +9,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useSession } from "@/lib/auth-context";
-import { useFonts, Nunito_600SemiBold, Nunito_700Bold } from "@expo-google-fonts/nunito";
+import {
+  useFonts,
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_600SemiBold,
+  SpaceGrotesk_700Bold,
+} from "@expo-google-fonts/space-grotesk";
 import {
   registerForPushNotifications,
   setupNotificationChannels,
@@ -101,8 +107,10 @@ function RootNavigator() {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Nunito_600SemiBold,
-    Nunito_700Bold,
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
+    SpaceGrotesk_700Bold,
   });
 
   if (!fontsLoaded) {

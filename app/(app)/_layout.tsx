@@ -54,6 +54,7 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Settings",
+          headerBackTitle: "Back",
           headerTintColor: colors.neutral.text,
           headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
