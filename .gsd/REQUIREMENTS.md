@@ -40,20 +40,6 @@
 - Source: M003-CONTEXT
 - Primary Slice: S02
 
-### CHORE-06 — "My Day" view shows personalized daily task list (due today + overdue)
-
-- Status: active
-- Class: core-capability
-- Source: M003-CONTEXT
-- Primary Slice: S04
-
-### CHORE-07 — Visual urgency indicators (green/yellow/red) on each chore based on due date
-
-- Status: active
-- Class: core-capability
-- Source: M003-CONTEXT
-- Primary Slice: S04
-
 ### CHORE-08 — Weekly leaderboard ranked by effort points with leader highlighted
 
 - Status: active
@@ -475,6 +461,22 @@
 - Source: inferred
 - Primary Slice: S13
 - Validated by: S13 Plan 02 — AvatarUpload handles permission denial with messaging
+
+### CHORE-06 — "My Day" view shows personalized daily task list (due today + overdue)
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — My Day screen filters to current_assignee + due/overdue, sorts overdue-first, all chore actions work via shared useChoreActions hook
+
+### CHORE-07 — Visual urgency indicators (green/yellow/red) on each chore based on due date
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — getUrgencyLevel helper computes green (2+ days), yellow (today/tomorrow), red (overdue); ChoreRow renders urgency-colored left borders and due-date pills; disputed rows retain precedence
 
 ## Deferred
 

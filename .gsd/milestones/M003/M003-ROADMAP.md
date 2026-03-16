@@ -86,7 +86,7 @@ This milestone is complete only when all are true:
 - [x] **S03: Effort-Weighted Dashboard, Leaderboard, Fairness & Badges** `risk:medium` `depends:[S01]`
   > After this: dashboard shows effort-weighted leaderboard ranking roommates by difficulty contributed, fairness score shows workload distribution percentage, streak badges (7/30/60-day) display for consistent completion, complete_chore RPC stamps effort_points on completions
 
-- [ ] **S04: Smart "My Day" View & Visual Urgency Indicators** `risk:low` `depends:[S01]`
+- [x] **S04: Smart "My Day" View & Visual Urgency Indicators** `risk:low` `depends:[S01]`
   > After this: "My Day" screen shows personalized daily task list (due today + overdue, sorted by urgency), chore rows display green/yellow/red urgency coloring based on due date proximity — all visible in Expo Go
 
 - [ ] **S05: Peer Nudge System with Push Notifications** `risk:medium` `depends:[S01]`
