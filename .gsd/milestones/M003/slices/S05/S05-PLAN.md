@@ -40,7 +40,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build push-chore-nudge Edge Function** `est:45m`
+- [x] **T01: Build push-chore-nudge Edge Function** `est:45m`
   - Why: Core backend for CHORE-11 — rate-limited nudge with push notification delivery. Must be independently verifiable via curl before wiring the client.
   - Files: `supabase/functions/push-chore-nudge/index.ts`
   - Do: Create Edge Function following `push-chore-reminder` pattern (Deno, esm.sh imports, service-role client). Steps: extract sender from Authorization header via `supabase.auth.getUser(token)`, fetch chore (validate exists, is overdue, sender ≠ assignee), rate-limit check (`SELECT FROM chore_nudges WHERE chore_id = $1 AND sender_id = $2 AND created_at > now() - interval '24 hours'`), insert nudge record, fetch recipient push token + notification prefs, send Expo Push (title "Gentle Nudge", body `"{senderName} thinks the {choreName} could use some love 🧹"`). CORS headers on all responses including OPTIONS preflight per `search-products` pattern. Return structured JSON with phase-specific error messages. Log each phase for diagnostics. Handle missing push token gracefully (record nudge, skip push, return note).
