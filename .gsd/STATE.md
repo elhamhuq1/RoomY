@@ -1,7 +1,7 @@
 # GSD State
 
 **Active Milestone:** M003: Chore System Overhaul
-**Active Slice:** S03: Effort-Weighted Dashboard, Leaderboard, Fairness & Badges
+**Active Slice:** S04: Smart "My Day" View & Visual Urgency Indicators
 **Phase:** executing
 **Requirements Status:** 13 active · 47 validated · 1 deferred · 0 out of scope
 
@@ -11,10 +11,11 @@
 - 🔄 **M003:** Chore System Overhaul
 
 ## Recent Decisions
-- None recorded
+- Chore action handlers extracted into shared useChoreActions hook
+- My Day renders flat list (no room grouping)
 
 ## Blockers
 - None
 
 ## Next Action
-Execute T01: Migration & Types — effort_points on chore_completions + RPC update.
+Execute T01 (urgency color system + ChoreRow visual update).

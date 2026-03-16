@@ -125,3 +125,6 @@
 - "Streak badges use emoji text (🔥⭐🥈🏆) instead of Ionicons vector icon — simpler rendering, no icon library dependency for this display"
 - "Two-pass stat computation in dashboard — first pass collects raw per-member values, second pass derives cross-member aggregates (fairness %) after totalEffort is known"
 - "ChoreCompletion Insert type uses Omit + optional re-add pattern for effort_points — keeps it optional since DB DEFAULT handles it"
+- "Chore action handlers (complete, claim, dispute, delete) extracted into useChoreActions hook shared by chores tab and My Day — prevents ~150 LOC duplication and keeps behavior in sync"
+- "My Day screen renders flat list without room grouping — room context is secondary for a personal daily view; main chores tab already provides room-based organization"
+- "My Day shows all due/overdue items with no cap — small households have few chores, capping would hide important overdue items (reaffirming earlier decision)"
