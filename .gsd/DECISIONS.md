@@ -116,3 +116,8 @@
 - "Default General room inserted per household using households.created_by as room creator -- avoids nullable created_by on system-generated rooms"
 - "chore_nudges rate-limit index on (chore_id, sender_id, created_at DESC) for efficient RPC-side rate limiting queries"
 - "ON DELETE SET NULL on chores.room_id FK — room deletion should reassign chores, not cascade-delete them. Note: this creates a tension with NOT NULL constraint; room deletion must reassign chores first"
+- "SectionHeader moved from components/groceries/ to components/ui/ — generic collapsible section header reused across groceries and chores, avoids cross-domain import"
+- "Effort badge hidden for effort_points=1 (default) — only shows ⚡×2 or ⚡×3 to reduce visual noise on standard chores"
+- "Chores tab grouped by room (not by 'your chores / household') — room is the primary organizational axis, assignee visible on each ChoreRow"
+- "Template batch insert uses Promise.all for parallel individual inserts — consistent with recipe import pattern, 3-5 items completes sub-second"
+- "Room auto-created from template flow if room_type doesn't exist for household — prevents requiring separate room management screen for S02"
