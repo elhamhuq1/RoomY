@@ -104,6 +104,17 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="groceries/import-recipe"
+        options={{
+          headerShown: true,
+          title: "Shop by Recipe",
+          headerBackTitle: "Groceries",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="groceries/assign-items"
         options={{
           headerShown: true,
