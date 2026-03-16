@@ -107,6 +107,9 @@ interface ChoreRowProps {
   onSwap: () => void;
   onDelete: () => void;
   onViewDispute?: () => void;
+  onNudge?: () => void;
+  isNudging?: boolean;
+  nudgeDisabled?: boolean;
 }
 
 export function ChoreRow({
@@ -129,6 +132,9 @@ export function ChoreRow({
   onSwap,
   onDelete,
   onViewDispute,
+  onNudge,
+  isNudging = false,
+  nudgeDisabled = false,
 }: ChoreRowProps) {
   const emoji = getChoreEmoji(chore.name);
   const isOverdue = overdueDays !== null;
@@ -191,6 +197,20 @@ export function ChoreRow({
                 <ActivityIndicator size="small" color="#EF4444" />
               ) : (
                 <Ionicons name="flag-outline" size={18} color="#EF4444" />
+              )}
+            </Pressable>
+          )}
+          {!isMyChore && isOverdue && onNudge && (
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+              onPress={onNudge}
+              disabled={isNudging || nudgeDisabled}
+              style={{ opacity: nudgeDisabled ? 0.4 : 1 }}
+            >
+              {isNudging ? (
+                <ActivityIndicator size="small" color="#64748B" />
+              ) : (
+                <Ionicons name="notifications-outline" size={18} color="#64748B" />
               )}
             </Pressable>
           )}

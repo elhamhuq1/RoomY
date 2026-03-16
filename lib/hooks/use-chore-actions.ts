@@ -22,6 +22,10 @@ export function useChoreActions(refreshFn: () => void) {
   // Loading states
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const [nudgingId, setNudgingId] = useState<string | null>(null);
+
+  // Session-level set: disables nudge button after successful nudge (prevents rapid re-taps)
+  const [nudgedIds, setNudgedIds] = useState<Set<string>>(new Set());
 
   // Dispute modal state
   const [disputeReasonModal, setDisputeReasonModal] = useState<DisputeReasonModal>({
@@ -143,6 +147,30 @@ export function useChoreActions(refreshFn: () => void) {
     }
   }, [user?.id, disputeReasonModal, disputeReason, refreshFn]);
 
+  const handleNudge = useCallback(
+    async (choreId: string) => {
+      setNudgingId(choreId);
+      try {
+        const { data, error } = await supabase.functions.invoke("push-chore-nudge", {
+          body: { chore_id: choreId },
+        });
+        if (error) {
+          const message =
+            (data as { error?: string } | null)?.error ?? error.message ?? "Something went wrong.";
+          Alert.alert("Nudge Failed", message);
+        } else {
+          setNudgedIds((prev) => new Set(prev).add(choreId));
+          Alert.alert("Nudge Sent", "Your roommate will get a notification.");
+        }
+      } catch {
+        Alert.alert("Nudge Failed", "Could not reach the server.");
+      } finally {
+        setNudgingId(null);
+      }
+    },
+    []
+  );
+
   const handleDelete = useCallback(
     (choreId: string, choreName: string) => {
       Alert.alert(
@@ -174,9 +202,12 @@ export function useChoreActions(refreshFn: () => void) {
     handleClaim,
     handleDispute,
     handleDisputeSubmit,
+    handleNudge,
     handleDelete,
     completingId,
     claimingId,
+    nudgingId,
+    nudgedIds,
     disputeReasonModal,
     setDisputeReasonModal,
     disputeReason,

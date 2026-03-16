@@ -47,7 +47,7 @@
   - Verify: `npx tsc --noEmit` passes (Edge Function is Deno so just verify no new TS errors in app code). Function file exists with correct structure.
   - Done when: Edge Function file complete with all validation, rate limiting, nudge insert, push send, CORS, and structured error responses.
 
-- [ ] **T02: Wire nudge button into ChoreRow and chores tab** `est:30m`
+- [x] **T02: Wire nudge button into ChoreRow and chores tab** `est:30m`
   - Why: Client-side integration — makes the nudge feature accessible to users via the existing chore UI.
   - Files: `lib/hooks/use-chore-actions.ts`, `components/chores/ChoreRow.tsx`, `app/(app)/(tabs)/chores.tsx`
   - Do: (1) In `useChoreActions`, add `handleNudge(choreId: string)` that calls `supabase.functions.invoke('push-chore-nudge', { body: { chore_id: choreId } })`, manages `nudgingId` loading state (same pattern as `completingId`/`claimingId`), shows `Alert.alert` for success ("Nudge sent!") and error (including rate-limit message). Add `nudgedIds` Set state to track which chores have been nudged this session for immediate UI feedback. (2) In `ChoreRow`, add props `onNudge: () => void`, `isNudging: boolean`, `nudgeDisabled: boolean`. Render nudge button (Ionicons `notifications-outline`, 18px, gray bg like claim button) conditionally when `!isMyChore && overdueDays !== null`. Position before the claim button. Disable when `isNudging || nudgeDisabled`. Show ActivityIndicator when `isNudging`. (3) In `chores.tsx`, destructure new `handleNudge`, `nudgingId`, `nudgedIds` from hook. Pass `onNudge`, `isNudging`, `nudgeDisabled` props to each ChoreRow.

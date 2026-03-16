@@ -59,3 +59,10 @@ Add the client-side nudge feature: extend `useChoreActions` hook with `handleNud
 - `lib/hooks/use-chore-actions.ts` — extended with `handleNudge`, `nudgingId`, `nudgedIds`
 - `components/chores/ChoreRow.tsx` — nudge button added to action row with conditional visibility
 - `app/(app)/(tabs)/chores.tsx` — new props threaded through to ChoreRow
+
+## Observability Impact
+
+- **Nudge loading state**: `nudgingId` is non-null while the Edge Function call is in flight — visible as ActivityIndicator on the button. A future agent debugging stuck UI can check if `nudgingId` is stuck (indicates Edge Function timeout or network issue).
+- **Session nudge tracking**: `nudgedIds` Set persists for the app session. After a successful nudge, the button dims (opacity 0.4) and is disabled. This is client-only — a page refresh resets it. Server-side 24h rate limiting (T01) is the durable guard.
+- **Alert feedback**: Success and error paths both surface `Alert.alert` dialogs. Error alerts include the server-returned message (including phase info from T01's structured error responses), so users and testers see which phase failed (auth, validation, rate_limit, push).
+- **Edge Function network call**: `supabase.functions.invoke('push-chore-nudge', ...)` — inspectable in device network logs or Supabase Edge Function logs dashboard.

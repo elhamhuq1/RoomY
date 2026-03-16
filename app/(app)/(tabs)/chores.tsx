@@ -267,9 +267,12 @@ export default function ChoresScreen() {
     handleClaim,
     handleDispute,
     handleDisputeSubmit,
+    handleNudge,
     handleDelete,
     completingId,
     claimingId,
+    nudgingId,
+    nudgedIds,
     disputeReasonModal,
     setDisputeReasonModal,
     disputeReason,
@@ -595,6 +598,9 @@ export default function ChoresScreen() {
                           onSwap={() => setSwapModalChoreId(chore.id)}
                           onDelete={() => handleDelete(chore.id, chore.name)}
                           onViewDispute={isDisputed ? () => handleViewDispute(chore.id) : undefined}
+                          onNudge={() => handleNudge(chore.id)}
+                          isNudging={nudgingId === chore.id}
+                          nudgeDisabled={nudgedIds.has(chore.id)}
                         />
                       </View>
                     );
