@@ -118,3 +118,10 @@ Delivers CHORE-05 (templates). Redesigns the empty state from a flat suggestion 
 
 - `components/chores/EmptyState.tsx` — redesigned with room-based template cards
 - `app/(app)/(tabs)/chores.tsx` — template selection modal added, EmptyState wiring updated, "Browse Templates" entry point added
+
+## Observability Impact
+
+- **Console logging:** Room creation failure logs `[chores] room creation failed: <message>`. Template insert failure logs `[chores] template insert failed: <message>`. General catch logs `[chores] template add error: <err>`.
+- **User-facing signals:** Loading spinner on "Add Selected" button during batch insert. Alert dialog on any failure path.
+- **Inspection:** Template insertion results visible immediately in the room-grouped chore list after refresh. Room auto-creation verifiable via `supabase.from('rooms').select('*')`. Chore count per room visible in SectionHeader badges.
+- **Failure visibility:** If room creation fails, alert shown and no chores inserted (atomic guard). If chore insert fails, alert shown. No silent failures — all error paths produce either console.error or Alert.alert.

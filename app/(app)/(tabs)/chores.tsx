@@ -20,6 +20,7 @@ import { supabase } from "@/lib/supabase";
 import { Avatar, Card, SectionHeader } from "@/components/ui";
 import { StatsRow, ChoreRow, EmptyState } from "@/components/chores";
 import { ROOMS, ROOM_MAP } from "@/lib/constants/chore-rooms";
+import { CHORE_TEMPLATES } from "@/lib/constants/chore-templates";
 import type {
   Chore,
   ChoreCompletion,
@@ -123,6 +124,11 @@ export default function ChoresScreen() {
   }>({ visible: false, choreId: null, completionId: null });
   const [disputeReason, setDisputeReason] = useState("");
   const [disputeSubmitting, setDisputeSubmitting] = useState(false);
+
+  // Template modal state
+  const [templateRoomType, setTemplateRoomType] = useState<string | null>(null);
+  const [selectedTemplates, setSelectedTemplates] = useState<Set<number>>(new Set());
+  const [addingTemplates, setAddingTemplates] = useState(false);
 
   // -------------------------------------------------------------------------
   // Room collapse toggle
@@ -384,6 +390,101 @@ export default function ChoresScreen() {
     [disputeDetails, router]
   );
 
+  // -------------------------------------------------------------------------
+  // Template helpers
+  // -------------------------------------------------------------------------
+
+  const openTemplateModal = useCallback((roomType: string) => {
+    setTemplateRoomType(roomType);
+    const templates = CHORE_TEMPLATES[roomType] || [];
+    setSelectedTemplates(new Set(templates.map((_, i) => i)));
+  }, []);
+
+  const handleAddTemplates = useCallback(async () => {
+    if (!templateRoomType || templateRoomType === '__picker__' || !household?.id || !user?.id) return;
+
+    const templates = CHORE_TEMPLATES[templateRoomType] || [];
+    const selected = Array.from(selectedTemplates).filter(i => i < templates.length);
+    if (selected.length === 0) return;
+
+    setAddingTemplates(true);
+
+    try {
+      // Find or create room for this room_type
+      let roomId: string | null = null;
+      const existingRoom = rooms.find(r => r.room_type === templateRoomType);
+
+      if (existingRoom) {
+        roomId = existingRoom.id;
+      } else {
+        const roomLabel = ROOM_MAP[templateRoomType]?.label ?? templateRoomType;
+        const { data: newRoom, error: roomErr } = await supabase
+          .from('rooms')
+          .insert({
+            household_id: household.id,
+            name: roomLabel,
+            room_type: templateRoomType,
+            is_private: false,
+            created_by: user.id,
+          })
+          .select()
+          .single();
+
+        if (roomErr || !newRoom) {
+          console.error('[chores] room creation failed:', roomErr?.message);
+          Alert.alert('Error', 'Failed to create room. Please try again.');
+          setAddingTemplates(false);
+          return;
+        }
+        roomId = newRoom.id;
+      }
+
+      // Build member IDs for rotation_order
+      const { data: membersData } = await supabase
+        .from('household_members')
+        .select('user_id')
+        .eq('household_id', household.id);
+
+      const memberIds = membersData?.map(m => m.user_id) ?? [user.id];
+
+      // Batch insert chores
+      const choreInserts = selected.map(i => {
+        const t = templates[i];
+        return {
+          household_id: household.id,
+          name: t.name,
+          frequency: t.frequency,
+          effort_points: t.effortPoints,
+          room_id: roomId!,
+          created_by: user.id,
+          rotation_order: memberIds,
+          current_assignee_index: 0,
+          current_assignee: memberIds[0],
+          next_due_at: new Date().toISOString(),
+        };
+      });
+
+      const { error: insertErr } = await supabase
+        .from('chores')
+        .insert(choreInserts);
+
+      if (insertErr) {
+        console.error('[chores] template insert failed:', insertErr.message);
+        Alert.alert('Error', 'Failed to add chores. Please try again.');
+      } else {
+        // Close modal and refresh
+        setTemplateRoomType(null);
+        setSelectedTemplates(new Set());
+        refreshChores();
+      }
+    } catch (err) {
+      console.error('[chores] template add error:', err);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    } finally {
+      setAddingTemplates(false);
+    }
+  }, [templateRoomType, selectedTemplates, rooms, household?.id, user?.id, refreshChores]);
+
   const handleDelete = useCallback(
     (choreId: string, choreName: string) => {
       Alert.alert(
@@ -511,12 +612,7 @@ export default function ChoresScreen() {
         className="bg-neutral-bg"
       >
         <EmptyState
-          onSelectSuggestion={(name, freq) =>
-            router.push({
-              pathname: "/(app)/chores/add",
-              params: { suggestedName: name, suggestedFrequency: freq },
-            } as never)
-          }
+          onSelectRoom={(roomType) => openTemplateModal(roomType)}
           onCreateCustom={() => router.push("/(app)/chores/add" as never)}
         />
       </ScrollView>
@@ -555,6 +651,15 @@ export default function ChoresScreen() {
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
         )}
+
+        {/* Browse templates entry point */}
+        <Pressable
+          className="mx-4 mt-2 flex-row items-center"
+          onPress={() => setTemplateRoomType('__picker__')}
+        >
+          <Ionicons name="add-circle-outline" size={18} color={colors.brand.DEFAULT} />
+          <Text className="ml-1.5 text-sm font-medium text-brand">Add from templates</Text>
+        </Pressable>
 
         {/* Room-grouped chore sections */}
         {orderedRoomIds.map((roomId) => {
@@ -764,6 +869,159 @@ export default function ChoresScreen() {
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Template selection modal */}
+      <Modal
+        visible={templateRoomType !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={() => {
+          setTemplateRoomType(null);
+          setSelectedTemplates(new Set());
+        }}
+      >
+        <Pressable
+          className="flex-1 justify-end bg-black/40"
+          onPress={() => {
+            setTemplateRoomType(null);
+            setSelectedTemplates(new Set());
+          }}
+        >
+          <Pressable
+            className="rounded-t-3xl bg-white pb-8 pt-4"
+            onPress={() => {}}
+          >
+            <View className="mb-4 items-center">
+              <View className="h-1 w-10 rounded-full bg-gray-300" />
+            </View>
+
+            {templateRoomType === '__picker__' ? (
+              /* Room picker view */
+              <View className="px-6">
+                <Text className="text-lg font-heading text-gray-800 mb-4">
+                  Choose a Room
+                </Text>
+                {ROOMS.filter(r => (CHORE_TEMPLATES[r.id]?.length ?? 0) > 0).map((room) => (
+                  <Pressable
+                    key={room.id}
+                    className="flex-row items-center py-3 border-b border-gray-100 active:bg-gray-50"
+                    onPress={() => openTemplateModal(room.id)}
+                  >
+                    <Ionicons
+                      name={room.icon as any}
+                      size={22}
+                      color={colors.brand.DEFAULT}
+                    />
+                    <Text className="ml-3 flex-1 text-sm font-medium text-neutral-text">
+                      {room.label}
+                    </Text>
+                    <Text className="text-xs text-neutral-secondary mr-2">
+                      {CHORE_TEMPLATES[room.id].length} templates
+                    </Text>
+                    <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
+                  </Pressable>
+                ))}
+              </View>
+            ) : templateRoomType ? (
+              /* Template list view */
+              <View className="px-6">
+                <View className="flex-row items-center mb-4">
+                  <Pressable
+                    className="mr-2 p-1"
+                    onPress={() => setTemplateRoomType('__picker__')}
+                  >
+                    <Ionicons name="arrow-back" size={20} color="#6B7280" />
+                  </Pressable>
+                  <Ionicons
+                    name={(ROOM_MAP[templateRoomType]?.icon ?? 'grid') as any}
+                    size={22}
+                    color={colors.brand.DEFAULT}
+                  />
+                  <Text className="ml-2 text-lg font-heading text-gray-800">
+                    {ROOM_MAP[templateRoomType]?.label ?? templateRoomType}
+                  </Text>
+                </View>
+
+                {/* Select all / deselect all */}
+                <Pressable
+                  className="mb-3"
+                  onPress={() => {
+                    const templates = CHORE_TEMPLATES[templateRoomType] || [];
+                    if (selectedTemplates.size === templates.length) {
+                      setSelectedTemplates(new Set());
+                    } else {
+                      setSelectedTemplates(new Set(templates.map((_, i) => i)));
+                    }
+                  }}
+                >
+                  <Text className="text-xs font-medium text-brand">
+                    {selectedTemplates.size === (CHORE_TEMPLATES[templateRoomType]?.length ?? 0)
+                      ? 'Deselect All'
+                      : 'Select All'}
+                  </Text>
+                </Pressable>
+
+                {/* Template rows */}
+                {(CHORE_TEMPLATES[templateRoomType] || []).map((template, idx) => {
+                  const isSelected = selectedTemplates.has(idx);
+                  return (
+                    <Pressable
+                      key={idx}
+                      className="flex-row items-center py-2.5 border-b border-gray-100"
+                      onPress={() => {
+                        setSelectedTemplates(prev => {
+                          const next = new Set(prev);
+                          next.has(idx) ? next.delete(idx) : next.add(idx);
+                          return next;
+                        });
+                      }}
+                    >
+                      <Ionicons
+                        name={isSelected ? 'checkbox' : 'square-outline'}
+                        size={22}
+                        color={isSelected ? colors.brand.DEFAULT : '#D1D5DB'}
+                      />
+                      <Text className="ml-3 flex-1 text-sm text-neutral-text">
+                        {template.name}
+                      </Text>
+                      <View className="flex-row items-center gap-1.5">
+                        <View className="rounded-full bg-brand-50 px-2 py-0.5">
+                          <Text className="text-[10px] font-medium text-brand-700">
+                            {template.frequency}
+                          </Text>
+                        </View>
+                        {template.effortPoints > 1 && (
+                          <View className="rounded-full bg-amber-50 px-2 py-0.5">
+                            <Text className="text-[10px] font-medium text-amber-700">
+                              ⚡{template.effortPoints}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </Pressable>
+                  );
+                })}
+
+                {/* Add selected button */}
+                <Pressable
+                  className="mt-4 items-center rounded-xl bg-brand py-3 active:opacity-90"
+                  onPress={handleAddTemplates}
+                  disabled={addingTemplates || selectedTemplates.size === 0}
+                  style={{ opacity: selectedTemplates.size === 0 ? 0.5 : 1 }}
+                >
+                  {addingTemplates ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text className="text-sm font-heading text-white">
+                      Add {selectedTemplates.size} Chore{selectedTemplates.size !== 1 ? 's' : ''}
+                    </Text>
+                  )}
+                </Pressable>
+              </View>
+            ) : null}
+          </Pressable>
+        </Pressable>
       </Modal>
     </View>
   );

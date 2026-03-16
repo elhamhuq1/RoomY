@@ -59,7 +59,7 @@
   - Verify: `npx tsc --noEmit`. Visual in Expo Go: room picker renders with household rooms, effort picker toggles 1/2/3, new room creation works, chore inserts with correct room_id and effort_points visible in Supabase.
   - Done when: Add screen includes working room picker (with inline creation), effort picker, all fields flow into INSERT, template params pre-fill correctly.
 
-- [ ] **T04: Template quick-add flow and redesigned empty state** `est:45m`
+- [x] **T04: Template quick-add flow and redesigned empty state** `est:45m`
   - Why: Delivers CHORE-05. Templates let users populate rooms with chores in one tap. Empty state should guide toward room-based template selection instead of a flat suggestion list.
   - Files: `components/chores/EmptyState.tsx`, `app/(app)/(tabs)/chores.tsx`
   - Do: Redesign EmptyState to show room cards (one per room type from ROOMS). Tapping a room card opens a template selection modal showing CHORE_TEMPLATES for that room type with checkboxes. "Add Selected" creates a room (if it doesn't exist) then inserts selected template chores via Promise.all (parallel, single loading state). Each inserted chore gets: name, frequency, effort_points from template, room_id from the created/existing room, rotation_order from all household members, household_id, created_by. Also add a "Browse Templates" entry point on the chores tab (small button below StatsRow or on empty room sections) for when chores already exist but user wants to add more from templates.

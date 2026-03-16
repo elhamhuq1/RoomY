@@ -3,32 +3,24 @@ import { View, Text, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { colors } from '@/lib/theme/colors';
-
-// ---------------------------------------------------------------------------
-// Suggested chores (Ionicons-based — original icon PNGs never shipped)
-// ---------------------------------------------------------------------------
-
-const SUGGESTED_CHORES: { name: string; icon: keyof typeof Ionicons.glyphMap; frequency: string }[] = [
-  { name: 'Dishes', icon: 'water-outline', frequency: 'daily' },
-  { name: 'Take out trash', icon: 'trash-outline', frequency: 'weekly' },
-  { name: 'Vacuum', icon: 'home-outline', frequency: 'weekly' },
-  { name: 'Clean bathroom', icon: 'sparkles-outline', frequency: 'weekly' },
-  { name: 'Mop floors', icon: 'resize-outline', frequency: 'weekly' },
-  { name: 'Wipe counters', icon: 'hand-left-outline', frequency: 'daily' },
-];
+import { ROOMS } from '@/lib/constants/chore-rooms';
+import { CHORE_TEMPLATES } from '@/lib/constants/chore-templates';
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 interface EmptyStateProps {
-  onSelectSuggestion: (name: string, frequency: string) => void;
+  onSelectRoom: (roomType: string) => void;
   onCreateCustom: () => void;
 }
 
-export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStateProps) {
+export function EmptyState({ onSelectRoom, onCreateCustom }: EmptyStateProps) {
+  const roomsWithTemplates = ROOMS.filter(r => (CHORE_TEMPLATES[r.id]?.length ?? 0) > 0);
+
   return (
     <View className="flex-1 bg-neutral-bg">
+      {/* Illustration + messaging */}
       <View className="items-center px-8 pt-12">
         <Image
           source={require('@/docs/empty-state-images/chore-main-empty-state.png')}
@@ -39,40 +31,41 @@ export function EmptyState({ onSelectSuggestion, onCreateCustom }: EmptyStatePro
           No chores yet!
         </Text>
         <Text className="font-sans mt-2 text-center text-body text-neutral-secondary leading-6">
-          Add some chores to keep your home running smoothly
+          Pick a room to get started with ready-made templates
         </Text>
       </View>
 
-      {/* Suggested chores grid */}
+      {/* Room-based template cards */}
       <View className="mt-8 px-4">
         <Text className="font-sans text-overline text-neutral-secondary uppercase mb-3">
-          Suggested Chores
+          Add by Room
         </Text>
-        <View className="flex-row flex-wrap gap-3">
-          {SUGGESTED_CHORES.map((suggestion) => (
-            <Pressable
-              key={suggestion.name}
-              className="w-[47%]"
-              onPress={() => onSelectSuggestion(suggestion.name, suggestion.frequency)}
-            >
-              <Card className="flex-row items-center px-3 py-3.5">
-                <Ionicons
-                  name={suggestion.icon}
-                  size={24}
-                  color={colors.brand.DEFAULT}
-                  style={{ marginRight: 10 }}
-                />
-                <Text className="flex-1 text-sm font-medium text-neutral-text" numberOfLines={1}>
-                  {suggestion.name}
+        {roomsWithTemplates.map((room) => (
+          <Pressable
+            key={room.id}
+            onPress={() => onSelectRoom(room.id)}
+            className="mb-2"
+          >
+            <Card className="flex-row items-center px-3 py-3.5">
+              <Ionicons
+                name={room.icon as any}
+                size={24}
+                color={colors.brand.DEFAULT}
+              />
+              <View className="ml-3 flex-1">
+                <Text className="text-sm font-medium text-neutral-text">{room.label}</Text>
+                <Text className="text-xs text-neutral-secondary">
+                  {CHORE_TEMPLATES[room.id].length} templates
                 </Text>
-              </Card>
-            </Pressable>
-          ))}
-        </View>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
+            </Card>
+          </Pressable>
+        ))}
 
         {/* Custom chore button */}
         <Pressable
-          className="mt-4 flex-row items-center justify-center rounded-xl border border-dashed border-gray-300 py-3.5 active:bg-gray-50"
+          className="mt-2 flex-row items-center justify-center rounded-xl border border-dashed border-gray-300 py-3.5 active:bg-gray-50"
           onPress={onCreateCustom}
         >
           <Ionicons name="add" size={20} color={colors.neutral.tertiary} />

@@ -121,3 +121,4 @@
 - "Chores tab grouped by room (not by 'your chores / household') — room is the primary organizational axis, assignee visible on each ChoreRow"
 - "Template batch insert uses Promise.all for parallel individual inserts — consistent with recipe import pattern, 3-5 items completes sub-second"
 - "Room auto-created from template flow if room_type doesn't exist for household — prevents requiring separate room management screen for S02"
+- "Template batch insert changed to single Supabase .insert(array) call instead of Promise.all — one network round-trip vs N, simpler error handling"
