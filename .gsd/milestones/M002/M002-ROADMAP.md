@@ -57,7 +57,7 @@ This milestone is complete only when all are true:
   > After this: user scans receipt from main groceries page, assigns items to household members, completes trip with splits calculated from item ownership (with even-split fallback)
 - [x] **S02: YouTube Recipe Import** `risk:medium` `depends:[S01]`
   > After this: user pastes a YouTube recipe URL, sees extracted ingredients with selection checkboxes, adds chosen items to the shared grocery list with realtime sync to all roommates
-- [ ] **S03: Category & Aisle Organization** `risk:low` `depends:[]`
+- [x] **S03: Category & Aisle Organization** `risk:low` `depends:[]`
   > After this: grocery list displays items grouped by department (produce, dairy, frozen, etc.) with collapsible section headers; users can manually change any item's category via a quick picker
 - [ ] **S04: Kroger Product Search** `risk:medium` `depends:[S03]`
   > After this: user searches Kroger products by name with a selected nearby store, sees real results with price, size, and aisle, and adds a product to the list with its category auto-assigned from Kroger's taxonomy
