@@ -123,6 +123,7 @@ export interface ChoreCompletion {
   dispute_reason: string | null;
   is_reverted: boolean;
   reverted_at: string | null;
+  effort_points: number;
 }
 
 export interface ChoreSwapRequest {
@@ -271,7 +272,7 @@ export interface Database {
       };
       chore_completions: {
         Row: ChoreCompletion;
-        Insert: Omit<ChoreCompletion, "id" | "completed_at" | "is_disputed" | "is_reverted"> & {
+        Insert: Omit<ChoreCompletion, "id" | "completed_at" | "is_disputed" | "is_reverted" | "effort_points"> & {
           id?: string;
           completed_at?: string;
           is_disputed?: boolean;
@@ -280,6 +281,7 @@ export interface Database {
           dispute_reason?: string | null;
           is_reverted?: boolean;
           reverted_at?: string | null;
+          effort_points?: number;
         };
         Update: Partial<Omit<ChoreCompletion, "id">>;
       };

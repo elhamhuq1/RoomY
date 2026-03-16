@@ -42,7 +42,7 @@
 
 ## Tasks
 
-- [ ] **T01: Migration & Types — effort_points on chore_completions + RPC update** `est:30m`
+- [x] **T01: Migration & Types — effort_points on chore_completions + RPC update** `est:30m`
   - Why: The dashboard can't show effort-weighted stats until completions carry effort_points, and the RPC stamps it at completion time. This is the data foundation for all three S03 requirements (CHORE-08, CHORE-09, CHORE-13).
   - Files: `supabase/migrations/20260316000017_effort_on_completions.sql`, `lib/types/database.ts`
   - Do: New migration adds `effort_points INT NOT NULL DEFAULT 1` to `chore_completions`. `CREATE OR REPLACE FUNCTION complete_chore` with exact same signature `(p_chore_id UUID, p_completed_by UUID) RETURNS JSON` — adds `v_chore.effort_points` to the INSERT into `chore_completions`. Keep SECURITY DEFINER, `SET search_path = ''`, fully qualified table refs. Update `ChoreCompletion` interface with `effort_points: number`. Update Database type's `chore_completions` Insert/Update entries.

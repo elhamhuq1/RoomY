@@ -50,6 +50,13 @@ Add `effort_points` column to `chore_completions` table and modify the `complete
 - `grep 'effort_points' supabase/migrations/20260316000017_effort_on_completions.sql` — shows column addition and INSERT usage
 - `grep 'effort_points' lib/types/database.ts` — shows the field in ChoreCompletion
 
+## Observability Impact
+
+- **New signal:** `chore_completions.effort_points` column — queryable via `SELECT effort_points FROM chore_completions LIMIT 5;` to confirm column exists and carries values post-migration.
+- **RPC change:** `complete_chore` now stamps `v_chore.effort_points` into the INSERT. If effort_points appears as DEFAULT 1 on new completions when the chore has a different weight, the RPC replacement did not apply — check migration order.
+- **Failure shape:** If downstream dashboard shows NaN or undefined in fairness %, the likely cause is missing effort_points on completion rows (migration not applied) or division by zero (guarded in T02).
+- **Inspection:** `grep -n effort_points supabase/migrations/20260316000017_effort_on_completions.sql` shows both the ALTER TABLE and INSERT usage in one file.
+
 ## Inputs
 
 - `supabase/migrations/20260311000004_chores.sql` — contains the original `complete_chore` RPC (lines 126-180) that must be replicated with one change. The original INSERT is `INSERT INTO public.chore_completions (chore_id, completed_by) VALUES (p_chore_id, p_completed_by)`.
