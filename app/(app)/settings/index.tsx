@@ -106,9 +106,7 @@ export default function SettingsScreen() {
             }}
           >
             <View
-              className={`mr-4 h-10 w-10 items-center justify-center rounded-xl ${
-                row.destructive ? "bg-red-50" : "bg-neutral-surface"
-              }`}
+              className="mr-4 h-10 w-10 items-center justify-center"
             >
               <Ionicons
                 name={row.icon}

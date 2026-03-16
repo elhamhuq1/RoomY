@@ -70,7 +70,10 @@ export default function TabsLayout() {
         options={{
           title: "Expenses",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'wallet' : 'wallet-outline'} size={size} color={color} />
+            <Image
+              source={require('@/assets/expenses-icon.png')}
+              style={{ width: size + 4, height: size + 4, tintColor: color }}
+            />
           ),
         }}
       />
@@ -80,7 +83,10 @@ export default function TabsLayout() {
           title: "Groceries",
           href: groceriesEnabled ? "/(app)/(tabs)/groceries" : null,
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'cart' : 'cart-outline'} size={size} color={color} />
+            <Image
+              source={require('@/assets/groceries-tab-icon.png')}
+              style={{ width: size + 4, height: size + 4, tintColor: color }}
+            />
           ),
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -108,7 +114,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ focused, color, size }) => (
             <Image
               source={require('@/assets/chores-tab-icon.png')}
-              style={{ width: size, height: size, tintColor: color }}
+              style={{ width: size + 4, height: size + 4, tintColor: color }}
             />
           ),
           headerRight: () => (

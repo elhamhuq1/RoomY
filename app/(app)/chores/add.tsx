@@ -375,6 +375,21 @@ export default function AddChoreScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ gap: 8 }}
             >
+              {/* + New Room pill (always first) */}
+              <Pressable
+                className="flex-row items-center rounded-xl border border-dashed border-gray-300 px-3.5 py-2.5"
+                onPress={() => setShowCreateRoom(true)}
+              >
+                <Ionicons
+                  name="add"
+                  size={16}
+                  color={colors.neutral.tertiary}
+                  style={{ marginRight: 4 }}
+                />
+                <Text className="text-sm font-medium text-gray-500">
+                  New Room
+                </Text>
+              </Pressable>
               {rooms.map((room) => {
                 const isSelected = room.id === selectedRoomId;
                 const icon = getRoomIcon(room.room_type);
@@ -404,21 +419,6 @@ export default function AddChoreScreen() {
                   </Pressable>
                 );
               })}
-              {/* + New Room pill */}
-              <Pressable
-                className="flex-row items-center rounded-xl border border-dashed border-gray-300 px-3.5 py-2.5"
-                onPress={() => setShowCreateRoom(true)}
-              >
-                <Ionicons
-                  name="add"
-                  size={16}
-                  color={colors.neutral.tertiary}
-                  style={{ marginRight: 4 }}
-                />
-                <Text className="text-sm font-medium text-gray-500">
-                  New Room
-                </Text>
-              </Pressable>
             </ScrollView>
           )}
         </View>

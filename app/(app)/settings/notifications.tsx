@@ -88,7 +88,7 @@ export default function NotificationsSettingsScreen() {
           <View className="mr-4 h-10 w-10 items-center justify-center">
             <Image
               source={require('@/assets/expenses-icon.png')}
-              style={{ width: 28, height: 28 }}
+              style={{ width: 36, height: 36 }}
             />
           </View>
           <View className="flex-1">
@@ -112,7 +112,7 @@ export default function NotificationsSettingsScreen() {
           <View className="mr-4 h-10 w-10 items-center justify-center">
             <Image
               source={require('@/assets/chores-tab-icon.png')}
-              style={{ width: 28, height: 28 }}
+              style={{ width: 36, height: 36 }}
             />
           </View>
           <View className="flex-1">

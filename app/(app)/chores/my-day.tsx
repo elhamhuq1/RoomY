@@ -12,6 +12,7 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
@@ -254,9 +255,11 @@ export default function MyDayScreen() {
         className="bg-neutral-bg"
       >
         <View className="items-center px-8">
-          <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-amber-50">
-            <Ionicons name="sunny" size={40} color="#F59E0B" />
-          </View>
+          <Image
+            source={require('@/docs/empty-state-images/attention-feed-all-caught-up.png')}
+            style={{ width: 140, height: 140, marginBottom: 16 }}
+            contentFit="contain"
+          />
           <Text className="text-xl font-heading text-neutral-text mb-2">
             You're all caught up! 🎉
           </Text>
