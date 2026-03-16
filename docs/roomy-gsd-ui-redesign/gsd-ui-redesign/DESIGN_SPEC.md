@@ -286,26 +286,26 @@ Each slide changes the hero gradient and the emoji badge. The content section sl
 ## 6. Verification Checklist (per phase)
 
 After each phase, verify:
-- [ ] App launches without errors
-- [ ] All existing data displays correctly
-- [ ] Navigation between all 4 tabs works
-- [ ] Adding new expenses, chores, grocery items still works
-- [ ] Settlements and disputes display correctly
-- [ ] Calendar shows correct dates and events
-- [ ] Member avatars render with correct colors
-- [ ] No regressions in existing functionality
-- [ ] Visual output matches the reference mockup for the relevant screen
+- [x] App launches without errors
+- [x] All existing data displays correctly
+- [x] Navigation between all 4 tabs works
+- [x] Adding new expenses, chores, grocery items still works
+- [x] Settlements and disputes display correctly
+- [x] Calendar shows correct dates and events
+- [x] Member avatars render with correct colors
+- [x] No regressions in existing functionality
+- [x] Visual output matches the reference mockup for the relevant screen
 
 ### Onboarding-specific verification:
-- [ ] Welcome carousel swipes between all 3 slides
-- [ ] "Get Started" navigates to sign up
-- [ ] "Sign in" link navigates to login flow
-- [ ] Sign up with email/password works
-- [ ] Sign up with Google/Apple OAuth works
-- [ ] Display name saves correctly and avatar preview updates live
-- [ ] "Create a Household" and "I Have an Invite Code" both navigate correctly
-- [ ] Household creation generates an invite code
-- [ ] Invite code share sheet triggers native share
-- [ ] Module toggles persist selection and Expenses stays locked on
-- [ ] "Let's Go!" transitions to the main app home screen
-- [ ] Step progress bar shows correct fill state on each screen
+- [x] Welcome carousel swipes between all 3 slides
+- [x] "Get Started" navigates to sign up
+- [x] "Sign in" link navigates to login flow
+- [x] Sign up with email/password works
+- [x] Sign up with Google/Apple OAuth works
+- [x] Display name saves correctly and avatar preview updates live
+- [x] "Create a Household" and "I Have an Invite Code" both navigate correctly
+- [x] Household creation generates an invite code
+- [x] Invite code share sheet triggers native share
+- [x] Module toggles persist selection and Expenses stays locked on
+- [x] "Let's Go!" transitions to the main app home screen
+- [x] Step progress bar shows correct fill state on each screen

@@ -38,8 +38,8 @@
   - [x] 11-03-PLAN.md — System chrome: tab bar, headers, StatusBar, splash + visual verification
 - [x] Phase 12: Empty State Illustrations (completed 2026-03-14)
 - [x] Phase 13: Profile Pictures (3 plans) (completed 2026-03-14)
-- [ ] Phase 14: Google OAuth (1 plan)
-  - [ ] 14-01-PLAN.md — Replace native Google Sign-In with browser OAuth, remove Apple sign-in, add branded Google button
+- [x] Phase 14: Google OAuth (1 plan)
+  - [x] 14-01-PLAN.md — Replace native Google Sign-In with browser OAuth, remove Apple sign-in, add branded Google button
 
 ---
 
@@ -158,7 +158,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 14-01-PLAN.md — Replace native Google Sign-In with browser OAuth, remove Apple sign-in, add branded Google button
+- [x] 14-01-PLAN.md — Replace native Google Sign-In with browser OAuth, remove Apple sign-in, add branded Google button
 
 ---
 

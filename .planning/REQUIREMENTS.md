@@ -22,15 +22,15 @@
 
 ### Empty States
 
-- [ ] **EMPTY-01**: Expenses tab shows `expense-main-empty-state.png` illustration when no expenses exist
-- [ ] **EMPTY-02**: Groceries tab shows `grocery-empty-list.png` illustration when list is empty
-- [ ] **EMPTY-03**: Chores tab shows `chore-main-empty-state.png` illustration when no chores exist
-- [ ] **EMPTY-04**: Home attention feed shows `attention-feed-all-caught-up.png` when no pending items
-- [ ] **EMPTY-05**: Balance section shows `balance-all-settled.png` when all settled
-- [ ] **EMPTY-06**: Chore dashboard shows `chore-dashboard-stats.png` for empty stats
-- [ ] **EMPTY-07**: Chore swap request shows `chore-swap-request.png` when no requests
-- [ ] **EMPTY-08**: Member expense history shows `expense-member-history.png` when empty
-- [ ] **EMPTY-09**: Grocery trip history shows `grocery-trip-history.png` when empty
+- [x] **EMPTY-01**: Expenses tab shows `expense-main-empty-state.png` illustration when no expenses exist
+- [x] **EMPTY-02**: Groceries tab shows `grocery-empty-list.png` illustration when list is empty
+- [x] **EMPTY-03**: Chores tab shows `chore-main-empty-state.png` illustration when no chores exist
+- [x] **EMPTY-04**: Home attention feed shows `attention-feed-all-caught-up.png` when no pending items
+- [x] **EMPTY-05**: Balance section shows `balance-all-settled.png` when all settled
+- [x] **EMPTY-06**: Chore dashboard shows `chore-dashboard-stats.png` for empty stats
+- [x] **EMPTY-07**: Chore swap request shows `chore-swap-request.png` when no requests
+- [x] **EMPTY-08**: Member expense history shows `expense-member-history.png` when empty
+- [x] **EMPTY-09**: Grocery trip history shows `grocery-trip-history.png` when empty
 
 ### Profile Pictures
 
@@ -46,10 +46,10 @@
 
 ### Google OAuth
 
-- [ ] **AUTH-01**: User can sign in with Google via browser-based OAuth flow
-- [ ] **AUTH-02**: Google OAuth works in Expo Go (expo-web-browser approach)
-- [ ] **AUTH-03**: Google-authenticated users automatically get profile picture from Google metadata
-- [ ] **AUTH-04**: OAuth redirect URLs configured in Supabase Dashboard
+- [x] **AUTH-01**: User can sign in with Google via browser-based OAuth flow
+- [x] **AUTH-02**: Google OAuth works in Expo Go (expo-web-browser approach)
+- [x] **AUTH-03**: Google-authenticated users automatically get profile picture from Google metadata
+- [x] **AUTH-04**: OAuth redirect URLs configured in Supabase Dashboard
 
 ## Deferred
 
