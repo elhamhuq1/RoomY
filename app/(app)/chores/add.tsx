@@ -10,12 +10,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Modal,
+  Switch,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
-import type { Profile } from "@/lib/types/database";
+import { ROOMS, ROOM_MAP } from "@/lib/constants/chore-rooms";
+import type { Profile, Room } from "@/lib/types/database";
+import type { RoomInfo } from "@/lib/constants/chore-rooms";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -28,6 +32,11 @@ const FREQUENCIES = [
   { value: "custom", label: "Custom" },
 ] as const;
 
+const EFFORT_LEVELS = [
+  { value: 1 as const, label: "⚡1", sublabel: "Easy" },
+  { value: 2 as const, label: "⚡2", sublabel: "Medium" },
+  { value: 3 as const, label: "⚡3", sublabel: "Hard" },
+];
 
 function getInitials(name: string): string {
   return name
@@ -59,6 +68,8 @@ export default function AddChoreScreen() {
   const params = useLocalSearchParams<{
     suggestedName?: string;
     suggestedFrequency?: string;
+    suggestedRoom?: string;
+    suggestedEffort?: string;
   }>();
   const { user, household } = useSession();
 
@@ -71,6 +82,37 @@ export default function AddChoreScreen() {
   const [members, setMembers] = useState<MemberItem[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  // Room state
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [loadingRooms, setLoadingRooms] = useState(true);
+
+  // Effort state
+  const [effortPoints, setEffortPoints] = useState<1 | 2 | 3>(() => {
+    const parsed = parseInt(params.suggestedEffort ?? "", 10);
+    return parsed === 1 || parsed === 2 || parsed === 3 ? parsed : 1;
+  });
+
+  // Create room modal state
+  const [showCreateRoom, setShowCreateRoom] = useState(false);
+  const [newRoomName, setNewRoomName] = useState("");
+  const [newRoomType, setNewRoomType] = useState<string>("general");
+  const [newRoomPrivate, setNewRoomPrivate] = useState(false);
+  const [creatingRoom, setCreatingRoom] = useState(false);
+
+  // -------------------------------------------------------------------------
+  // Room ordering helper — match ROOMS constant order, unknowns at end
+  // -------------------------------------------------------------------------
+
+  const sortRooms = useCallback((roomList: Room[]): Room[] => {
+    const orderMap = new Map(ROOMS.map((r, i) => [r.id, i]));
+    return [...roomList].sort((a, b) => {
+      const aIdx = orderMap.get(a.room_type) ?? 999;
+      const bIdx = orderMap.get(b.room_type) ?? 999;
+      return aIdx - bIdx;
+    });
+  }, []);
 
   // -------------------------------------------------------------------------
   // Fetch members (two-query pattern)
@@ -105,9 +147,34 @@ export default function AddChoreScreen() {
     setLoadingMembers(false);
   }, [household?.id]);
 
+  // -------------------------------------------------------------------------
+  // Fetch rooms
+  // -------------------------------------------------------------------------
+
+  const fetchRooms = useCallback(async () => {
+    if (!household?.id) return;
+
+    const { data } = await supabase
+      .from("rooms")
+      .select("*")
+      .eq("household_id", household.id);
+
+    if (data) {
+      const typed = data as Room[];
+      setRooms(sortRooms(typed));
+      // Default: suggestedRoom param > General room > first room
+      const general = typed.find((r) => r.room_type === "general");
+      setSelectedRoomId(
+        params.suggestedRoom || general?.id || typed[0]?.id || null
+      );
+    }
+    setLoadingRooms(false);
+  }, [household?.id, params.suggestedRoom, sortRooms]);
+
   useEffect(() => {
     fetchMembers();
-  }, [fetchMembers]);
+    fetchRooms();
+  }, [fetchMembers, fetchRooms]);
 
   // -------------------------------------------------------------------------
   // Toggle member selection
@@ -122,6 +189,43 @@ export default function AddChoreScreen() {
   }, []);
 
   // -------------------------------------------------------------------------
+  // Create room
+  // -------------------------------------------------------------------------
+
+  const handleCreateRoom = useCallback(async () => {
+    const trimmed = newRoomName.trim();
+    if (!trimmed || !household?.id || !user?.id) return;
+
+    setCreatingRoom(true);
+    const { data, error } = await supabase
+      .from("rooms")
+      .insert({
+        household_id: household.id,
+        name: trimmed,
+        room_type: newRoomType,
+        is_private: newRoomPrivate,
+        created_by: user.id,
+      })
+      .select()
+      .single();
+
+    setCreatingRoom(false);
+
+    if (error) {
+      Alert.alert("Error", "Failed to create room. Please try again.");
+      return;
+    }
+
+    const created = data as Room;
+    setRooms((prev) => sortRooms([...prev, created]));
+    setSelectedRoomId(created.id);
+    setShowCreateRoom(false);
+    setNewRoomName("");
+    setNewRoomType("general");
+    setNewRoomPrivate(false);
+  }, [newRoomName, newRoomType, newRoomPrivate, household?.id, user?.id, sortRooms]);
+
+  // -------------------------------------------------------------------------
   // Submit
   // -------------------------------------------------------------------------
 
@@ -132,6 +236,11 @@ export default function AddChoreScreen() {
       return;
     }
     if (!household?.id || !user?.id) return;
+
+    if (!selectedRoomId) {
+      Alert.alert("Room required", "Please select a room for this chore.");
+      return;
+    }
 
     const selectedMembers = members.filter((m) => m.selected);
     if (selectedMembers.length === 0) {
@@ -173,6 +282,8 @@ export default function AddChoreScreen() {
         current_assignee: firstAssignee,
         next_due_at: dueDate.toISOString(),
         created_by: user.id,
+        room_id: selectedRoomId,
+        effort_points: effortPoints,
       })
       .select()
       .single();
@@ -185,14 +296,22 @@ export default function AddChoreScreen() {
     }
 
     router.back();
-  }, [name, frequency, customDays, members, household?.id, user?.id, router]);
+  }, [name, frequency, customDays, members, household?.id, user?.id, router, selectedRoomId, effortPoints]);
 
   // -------------------------------------------------------------------------
-  // Render
+  // Render helpers
   // -------------------------------------------------------------------------
 
   const selectedCount = members.filter((m) => m.selected).length;
-  const canSubmit = name.trim().length > 0 && selectedCount > 0 && !submitting;
+  const canSubmit =
+    name.trim().length > 0 &&
+    selectedCount > 0 &&
+    selectedRoomId !== null &&
+    !submitting;
+
+  const getRoomIcon = (roomType: string): string => {
+    return ROOM_MAP[roomType]?.icon ?? "grid";
+  };
 
   return (
     <KeyboardAvoidingView
@@ -219,6 +338,69 @@ export default function AddChoreScreen() {
             autoFocus={!params.suggestedName}
             returnKeyType="next"
           />
+        </View>
+
+        {/* Room picker */}
+        <View className="mt-6 px-4">
+          <Text className="mb-2 text-sm font-medium text-gray-500">Room</Text>
+          {loadingRooms ? (
+            <ActivityIndicator
+              size="small"
+              color={colors.brand.DEFAULT}
+              style={{ marginTop: 4 }}
+            />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 8 }}
+            >
+              {rooms.map((room) => {
+                const isSelected = room.id === selectedRoomId;
+                const icon = getRoomIcon(room.room_type);
+                return (
+                  <Pressable
+                    key={room.id}
+                    className={`flex-row items-center rounded-xl px-3.5 py-2.5 ${
+                      isSelected
+                        ? "bg-brand"
+                        : "bg-white border border-gray-200"
+                    }`}
+                    onPress={() => setSelectedRoomId(room.id)}
+                  >
+                    <Ionicons
+                      name={icon as any}
+                      size={16}
+                      color={isSelected ? "#fff" : colors.neutral.tertiary}
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text
+                      className={`text-sm font-medium ${
+                        isSelected ? "text-white" : "text-gray-600"
+                      }`}
+                    >
+                      {room.name}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+              {/* + New Room pill */}
+              <Pressable
+                className="flex-row items-center rounded-xl border border-dashed border-gray-300 px-3.5 py-2.5"
+                onPress={() => setShowCreateRoom(true)}
+              >
+                <Ionicons
+                  name="add"
+                  size={16}
+                  color={colors.neutral.tertiary}
+                  style={{ marginRight: 4 }}
+                />
+                <Text className="text-sm font-medium text-gray-500">
+                  New Room
+                </Text>
+              </Pressable>
+            </ScrollView>
+          )}
         </View>
 
         {/* Frequency picker */}
@@ -253,7 +435,7 @@ export default function AddChoreScreen() {
             <View className="mt-3 flex-row items-center gap-2">
               <Text className="font-sans text-sm text-gray-500">Every</Text>
               <TextInput
-            className="font-sans w-16 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-base text-gray-800"
+                className="font-sans w-16 rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-base text-gray-800"
                 value={customDays}
                 onChangeText={setCustomDays}
                 keyboardType="number-pad"
@@ -262,6 +444,44 @@ export default function AddChoreScreen() {
               <Text className="font-sans text-sm text-gray-500">days</Text>
             </View>
           )}
+        </View>
+
+        {/* Effort picker */}
+        <View className="mt-6 px-4">
+          <Text className="mb-2 text-sm font-medium text-gray-500">
+            Effort
+          </Text>
+          <View className="flex-row gap-2">
+            {EFFORT_LEVELS.map((e) => {
+              const isSelected = effortPoints === e.value;
+              return (
+                <Pressable
+                  key={e.value}
+                  className={`flex-1 items-center rounded-xl py-2.5 ${
+                    isSelected
+                      ? "bg-brand"
+                      : "bg-white border border-gray-200"
+                  }`}
+                  onPress={() => setEffortPoints(e.value)}
+                >
+                  <Text
+                    className={`text-sm font-medium ${
+                      isSelected ? "text-white" : "text-gray-600"
+                    }`}
+                  >
+                    {e.label}
+                  </Text>
+                  <Text
+                    className={`text-xs ${
+                      isSelected ? "text-white/70" : "text-gray-400"
+                    }`}
+                  >
+                    {e.sublabel}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
 
         {/* Member selection */}
@@ -352,6 +572,136 @@ export default function AddChoreScreen() {
           )}
         </Pressable>
       </View>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Create Room Modal                                                  */}
+      {/* ----------------------------------------------------------------- */}
+      <Modal
+        visible={showCreateRoom}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowCreateRoom(false)}
+      >
+        <Pressable
+          className="flex-1 justify-end bg-black/40"
+          onPress={() => setShowCreateRoom(false)}
+        >
+          <Pressable
+            className="rounded-t-3xl bg-white pb-8 pt-4"
+            onPress={() => {}}
+          >
+            {/* Drag handle */}
+            <View className="mb-4 items-center">
+              <View className="h-1 w-10 rounded-full bg-gray-300" />
+            </View>
+
+            <Text className="mb-4 px-6 text-lg font-heading text-gray-800">
+              Create Room
+            </Text>
+
+            {/* Room name input */}
+            <View className="mb-4 px-6">
+              <Text className="mb-1 text-sm font-medium text-gray-500">
+                Room Name
+              </Text>
+              <TextInput
+                className="font-sans rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-800"
+                placeholder="e.g. Master Bedroom"
+                placeholderTextColor={colors.neutral.tertiary}
+                value={newRoomName}
+                onChangeText={setNewRoomName}
+                autoFocus
+              />
+            </View>
+
+            {/* Room type picker */}
+            <View className="mb-4 px-6">
+              <Text className="mb-2 text-sm font-medium text-gray-500">
+                Room Type
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 8 }}
+              >
+                {ROOMS.map((rt) => {
+                  const isSelected = newRoomType === rt.id;
+                  return (
+                    <Pressable
+                      key={rt.id}
+                      className={`items-center rounded-xl px-3 py-2 ${
+                        isSelected
+                          ? "bg-brand"
+                          : "bg-white border border-gray-200"
+                      }`}
+                      onPress={() => setNewRoomType(rt.id)}
+                    >
+                      <Ionicons
+                        name={rt.icon as any}
+                        size={20}
+                        color={isSelected ? "#fff" : colors.neutral.tertiary}
+                      />
+                      <Text
+                        className={`mt-0.5 text-xs font-medium ${
+                          isSelected ? "text-white" : "text-gray-600"
+                        }`}
+                      >
+                        {rt.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
+            {/* Private toggle */}
+            <View className="mb-6 flex-row items-center justify-between px-6">
+              <View className="flex-1">
+                <Text className="text-sm font-medium text-gray-700">
+                  Private Room
+                </Text>
+                <Text className="text-xs text-gray-400">
+                  Only visible to you (e.g. your bedroom)
+                </Text>
+              </View>
+              <Switch
+                value={newRoomPrivate}
+                onValueChange={setNewRoomPrivate}
+                trackColor={{
+                  false: "#d1d5db",
+                  true: colors.brand.DEFAULT,
+                }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            {/* Create button */}
+            <View className="px-6">
+              <Pressable
+                className={`items-center rounded-2xl py-3.5 ${
+                  newRoomName.trim()
+                    ? "bg-brand active:bg-brand-dark"
+                    : "bg-gray-200"
+                }`}
+                onPress={handleCreateRoom}
+                disabled={!newRoomName.trim() || creatingRoom}
+              >
+                {creatingRoom ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text
+                    className={`text-base font-heading ${
+                      newRoomName.trim() ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Create Room
+                  </Text>
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }

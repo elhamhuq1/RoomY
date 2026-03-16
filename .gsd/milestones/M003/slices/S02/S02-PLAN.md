@@ -52,7 +52,7 @@
   - Verify: `npx tsc --noEmit`. Visual in Expo Go: chores grouped by room, collapse/expand works, all action buttons functional.
   - Done when: Chores tab renders room sections with collapsible headers, private room chores hidden from non-owners (RLS), all existing functionality preserved.
 
-- [ ] **T03: Add room picker, effort picker, and inline room creation to add screen** `est:1h`
+- [x] **T03: Add room picker, effort picker, and inline room creation to add screen** `est:1h`
   - Why: Every new chore needs a room_id (NOT NULL) and effort_points. Supports CHORE-04 (effort UI) and CHORE-02 (private room creation). Also accepts template pre-fill params for T04.
   - Files: `app/(app)/chores/add.tsx`
   - Do: Fetch household rooms on mount. Add room picker as scrollable row of room pills (icon + label, same style as frequency picker). Default to "General" room. Add "+ New Room" pill that opens a mini-modal (name, room_type picker from ROOMS constant, is_private toggle). Private room sets `is_private: true, created_by: auth.uid()`. Add effort picker as 1/2/3 toggle row below frequency. Accept URL params `suggestedRoom`, `suggestedEffort` for template pre-fill. Include `room_id` and `effort_points` in the INSERT call.

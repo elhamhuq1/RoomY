@@ -142,6 +142,14 @@ The add chore screen currently creates chores without room or effort. Since `cho
 - `lib/constants/chore-rooms.ts` — ROOMS (8 entries), ROOM_MAP lookup by room_type
 - S01 forward intelligence: `chores.room_id` is NOT NULL — every chore must have a room. Room creation needs `household_id`, `name`, `room_type` (one of 8 CHECK values), `is_private`, `created_by`.
 
+## Observability Impact
+
+- **Room fetch failure:** If rooms query returns empty, `rooms` state is empty and no pills render — the user sees only the "+ New Room" pill. No crash, but no room selection possible from existing rooms. Inspect via console.log on fetchRooms or check Supabase rooms table.
+- **Room creation failure:** Alert shown to user ("Failed to create room"). The `creatingRoom` spinner prevents double-submit. Supabase error propagates to the Alert. Inspect via Supabase dashboard or RLS policy logs.
+- **Missing room on submit:** `selectedRoomId === null` blocks submit via `canSubmit` check. An Alert explains "Please select a room for this chore." This is a validation guard — not a runtime failure.
+- **Effort default:** effortPoints defaults to 1 (Easy). If `suggestedEffort` URL param has an invalid value, the initializer falls through to 1. No silent wrong state.
+- **INSERT includes room_id and effort_points:** Chore creation failure (e.g. FK violation if room was deleted between selection and submit) surfaces as Alert to user and can be inspected in Supabase logs.
+
 ## Expected Output
 
 - `app/(app)/chores/add.tsx` — extended with room picker, effort picker, create room modal, and updated INSERT
