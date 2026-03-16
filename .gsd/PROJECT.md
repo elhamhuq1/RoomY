@@ -37,17 +37,21 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - ✓ Empty state illustrations for all 9 modules — v1.2
 - ✓ Profile picture upload (camera + gallery) in settings and onboarding — v1.2
 - ✓ Profile pictures with cache busting and realtime sync — v1.2
+- ✓ Receipt scanning with Gemini Vision OCR for grocery trips — M002/S01
+- ✓ Receipt-based item ownership with smart per-member splitting — M002/S01b
+- ✓ YouTube recipe import with ingredient extraction — M002/S02
+- ✓ Department-grouped grocery list with collapsible sections and manual category picker — M002/S03
+- ✓ Kroger product search with store selection and auto-categorized add-to-list — M002/S04
 
 ### Active
 
-- Receipt scanning with Gemini Vision OCR for grocery trip completion (M002/S01)
-- Receipt-based item ownership with per-member smart splitting (M002/S01b)
-- YouTube recipe import with ingredient extraction and grocery list addition (M002/S02)
-- Category & aisle organization with department-grouped grocery list (M002/S03)
-- Kroger product search with store selection and auto-categorized add-to-list (M002/S04)
 - Chore system overhaul: room-based organization, effort points, fairness analytics, smart daily lists, templates, nudging, leaderboard, badges (M003)
 
 ## Completed Milestones
+
+### M002: Smart Groceries (completed 2026-03-16)
+
+Transformed the grocery tab from a basic shared checklist into an intelligent grocery workflow across 5 slices. Receipt scanning with Gemini Vision OCR for cost splitting and per-member ownership, YouTube recipe import with client-side transcript extraction and Gemini ingredient parsing, Kroger product search with real store inventory and auto-categorization, and department-grouped list organization with collapsible sections. Added 4 new Edge Functions, 6 migrations, and a 10-department taxonomy shared between client and server.
 
 ### M001: RoomY v1.0–v1.2 (completed 2026-03-16)
 
@@ -59,7 +63,7 @@ Full roommate household management app delivered across 14 slices. Three version
 - Web version — mobile first, web can come later
 - Public app store release — v1 is for personal use
 - Social features beyond the household — this isn't a social network
-- ~~Receipt scanning / OCR — manual entry is fine for small households~~ (now implemented in M002)
+- ~~Receipt scanning / OCR — manual entry is fine for small households~~ (implemented in M002)
 - Dark mode — doubles design surface area; tokens support it later but not implementing now
 
 ## Context
@@ -69,9 +73,10 @@ Full roommate household management app delivered across 14 slices. Three version
 - Expo chosen so both devs can test on their own phones via QR code regardless of OS
 - Personal project — solving their own problem first
 - Venmo is the existing payment method in their social circle
-- Shipped v1.0 MVP (2026-03-10), v1.1 UI Redesign (2026-03-13), v1.2 Polish & Identity (2026-03-16)
-- Codebase: ~14k LOC TypeScript/TSX across app/, components/, lib/
+- Shipped v1.0 MVP (2026-03-10), v1.1 UI Redesign (2026-03-13), v1.2 Polish & Identity (2026-03-16), M002 Smart Groceries (2026-03-16)
+- Codebase: ~16k LOC TypeScript/TSX across app/, components/, lib/, supabase/functions/
 - Tech stack: Expo SDK 55, NativeWind v4 (TW3), Supabase (auth + DB + RLS + Storage + Edge Functions), expo-router
+- External integrations: Gemini Vision API (receipt OCR, recipe extraction), Kroger Products/Locations API (product search), YouTube innertube API (caption extraction)
 
 ## Constraints
 
@@ -96,6 +101,10 @@ Full roommate household management app delivered across 14 slices. Three version
 | Deterministic avatar colors via userId hash | charCodeAt hash % 8 gradient pairs — no DB storage, consistent across sessions | ✓ Good |
 | Browser-based Google OAuth | expo-web-browser works in Expo Go without native modules — removed Apple Sign-In | ✓ Good |
 | Supabase Storage for profile pictures | RLS-protected, user-scoped paths, cache-busted URLs with realtime sync | ✓ Good |
+| Gemini Vision via REST from Deno Edge Functions | No SDK needed — structured fetch with API key auth, markdown fence stripping for response parsing | ✓ Good |
+| Client-side YouTube transcript extraction | YouTube blocks cloud IPs — innertube ANDROID API on-device, text mode to Edge Function | ✓ Good |
+| Kroger API over Instacart | Only major US chain with genuine self-serve public developer API — Instacart requires uncertain review | ✓ Good |
+| Fixed 10-department taxonomy | Shared constant between client and Edge Functions — Kroger categories map to it, manual items default to 'other' | ✓ Good |
 
 ---
-*Last updated: 2026-03-16 after M001 completion*
+*Last updated: 2026-03-16 after M002 completion*

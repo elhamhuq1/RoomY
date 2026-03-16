@@ -2,108 +2,49 @@
 
 ## Active
 
+(No active M002 requirements remaining — all validated by completed slices.)
+
+## Validated
+
 ### GROC-01 — User can photograph a grocery receipt from the complete-trip screen
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — scan-receipt Edge Function + receipt capture UI with camera/gallery input
 
 ### GROC-02 — Receipt photo is processed by Edge Function via Gemini Vision OCR
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — deployed scan-receipt Edge Function processes base64 images via Gemini Vision REST API
 
 ### GROC-03 — Extracted line items (name, quantity, price) shown for review before confirming
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — scan-receipt screen shows editable extracted items before confirmation
 
 ### GROC-04 — Receipt total auto-populates the trip amount field
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — extracted total flows to complete-trip screen
 
 ### GROC-05 — Per-item prices stored with trip for itemized cost visibility in history
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
-
-### GROC-09 — Imported items appear on all roommates' lists via existing realtime sync
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S02
-- Supporting Slices: S01 (establishes `source` column pattern)
-
-### GROC-10 — Grocery items have a category/department field
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-- Supporting Slices: S01 (migration may include column)
-
-### GROC-11 — Grocery list displays items grouped by department for efficient shopping
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-
-### GROC-12 — Items from recipe import and Kroger search are auto-categorized
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-- Supporting Slices: S02, S04
-
-### GROC-13 — Users can manually change an item's category
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-
-### GROC-14 — User can search Kroger products when adding items to the list
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-### GROC-15 — Search results show product name, brand, price, size, and aisle location
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-### GROC-16 — Adding a Kroger product auto-assigns its category from Kroger's taxonomy
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-### GROC-17 — User can select a nearby Kroger-family store for location-specific results
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-## Validated
+- Validated by: S01 — unit_price column on grocery_items, complete_grocery_trip_with_receipt RPC stores per-item prices
 
 ### GROC-06 — User can paste a YouTube recipe URL to import ingredients
 
@@ -128,6 +69,80 @@
 - Source: M002-CONTEXT
 - Primary Slice: S02
 - Validated by: S02 — review phase with scrollable ingredient list, checkboxes (all checked by default), select all/deselect all toggle, selected count display
+
+### GROC-09 — Imported items appear on all roommates' lists via existing realtime sync
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S02
+- Supporting Slices: S01 (establishes `source` column pattern)
+- Validated by: S02 — recipe ingredients inserted as grocery_items with source='recipe', flow through existing realtime subscription
+
+### GROC-10 — Grocery items have a category/department field
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Validated by: S03 — category TEXT column on grocery_items, department taxonomy constant shared between client and Edge Functions
+
+### GROC-11 — Grocery list displays items grouped by department for efficient shopping
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Validated by: S03 — groceries.tsx renders items in collapsible department sections with counts
+
+### GROC-12 — Items from recipe import and Kroger search are auto-categorized
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Supporting Slices: S02, S04
+- Validated by: S02 ingredients get category from Gemini extraction; S04 products get category from mapKrogerCategory mapping
+
+### GROC-13 — Users can manually change an item's category
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Validated by: S03 — category picker component for manual category assignment/change on any item
+
+### GROC-14 — User can search Kroger products when adding items to the list
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — search-products Edge Function tested with real Kroger API; "Search Products" button on grocery tab navigates to search screen
+
+### GROC-15 — Search results show product name, brand, price, size, and aisle location
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — curl test confirmed all fields in API response; UI renders name, brand, price, promoPrice, size, aisle, department badge
+
+### GROC-16 — Adding a Kroger product auto-assigns its category from Kroger's taxonomy
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — mapKrogerCategory maps Kroger categories to app departments; insert sets category from mapped department
+
+### GROC-17 — User can select a nearby Kroger-family store for location-specific results
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — search-stores Edge Function tested with real zip code; store selection persists to household_settings
 
 ### EMPTY-01 — Expenses tab shows `expense-main-empty-state.png` illustration when no expenses exist
 
