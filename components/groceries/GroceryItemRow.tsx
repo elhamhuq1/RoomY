@@ -15,6 +15,7 @@ interface GroceryItemRowProps {
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onLongPress?: () => void;
 }
 
 function RightSwipeAction({ onDelete }: { onDelete: () => void }) {
@@ -38,6 +39,7 @@ export function GroceryItemRow({
   onToggle,
   onEdit,
   onDelete,
+  onLongPress,
 }: GroceryItemRowProps) {
   return (
     <ReanimatedSwipeable
@@ -57,6 +59,8 @@ export function GroceryItemRow({
           isChecked ? 'opacity-60' : ''
         }`}
         onPress={onEdit}
+        onLongPress={onLongPress}
+        delayLongPress={400}
       >
         {/* Circle checkbox */}
         <Pressable className="mr-3" onPress={onToggle} hitSlop={8}>

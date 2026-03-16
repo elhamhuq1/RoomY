@@ -65,3 +65,10 @@ Adds a long-press gesture to `GroceryItemRow` that opens a category picker overl
 - `components/groceries/GroceryItemRow.tsx` — `onLongPress` prop added and wired
 - `components/groceries/index.ts` — `CategoryPicker` exported
 - `app/(app)/(tabs)/groceries.tsx` — category picker state, handlers, and `<CategoryPicker>` rendered
+
+## Observability Impact
+
+- **Category update failures** surface via the existing Supabase error path — `handleCategoryChange` rolls back the optimistic local state on `.update()` error, making the item snap back to its original department section. No silent failures.
+- **Inspection:** Query `SELECT id, name, category FROM grocery_items WHERE household_id = '...'` to verify persisted category values after reassignment.
+- **Realtime:** The existing realtime subscription handles `UPDATE` events on `grocery_items`, so category changes made by other household members also move items to the correct section without refresh.
+- **Failure shape:** If the Supabase update fails, the item visually reverts. The error object from Supabase is not surfaced to the user (no toast) — it's a silent rollback. Future work could add error feedback.

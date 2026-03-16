@@ -26,6 +26,7 @@
 - `npx tsc --noEmit` passes with `category` field on `GroceryItem`
 - `supabase migration up` or `supabase db reset` applies cleanly (category column exists)
 - Visual in Expo Go: grocery list shows department sections, items grouped correctly, collapsible headers work, long-press shows picker, category change moves item to correct section
+- Diagnostic: after a category update failure (e.g. network offline), the item snaps back to its original section — verify optimistic rollback by checking `grocery_items.category` in Supabase dashboard still holds the old value
 
 ## Observability / Diagnostics
 
@@ -42,21 +43,21 @@
 
 ## Tasks
 
-- [ ] **T01: Add category column, type, and department taxonomy** `est:30m`
+- [x] **T01: Add category column, type, and department taxonomy** `est:30m`
   - Why: Everything else depends on the schema column, the TypeScript type, and the shared taxonomy constant. Gets the data layer right first.
   - Files: `supabase/migrations/20260316000014_add_category_column.sql`, `lib/types/database.ts`, `lib/constants/grocery-departments.ts`
   - Do: Create migration adding `category TEXT NOT NULL DEFAULT 'other'` to `grocery_items`. Add `category: string` to `GroceryItem` interface and the `Insert`/`Update` types. Create `lib/constants/grocery-departments.ts` exporting an ordered array of `{ id, label, icon }` for the 10 departments (produce, dairy, meat, frozen, bakery, beverages, snacks, pantry, household, other) and a `Record<string, DepartmentInfo>` lookup map. Add `category: 'other'` to the optimistic `GroceryItem` in `addItem` in `groceries.tsx` and to the recipe import insert in `import-recipe.tsx`.
   - Verify: `npx tsc --noEmit` passes. Migration file exists and is valid SQL.
   - Done when: `GroceryItem` includes `category`, taxonomy constant is importable, all insert paths include `category`.
 
-- [ ] **T02: Group grocery list by department with collapsible sections** `est:1h`
+- [x] **T02: Group grocery list by department with collapsible sections** `est:1h`
   - Why: Core deliverable — transforms the flat "TO GET" list into department-grouped sections for efficient in-store shopping (GROC-11).
   - Files: `app/(app)/(tabs)/groceries.tsx`, `components/groceries/SectionHeader.tsx`
   - Do: Import the department taxonomy. Add `collapsedDepts` state (`Set<string>`). Replace flat `uncheckedItems` rendering with a `useMemo` that groups items by `category` into `Record<string, GroceryItem[]>`. Iterate departments in taxonomy order, skip empty ones, render each as a collapsible `SectionHeader` (with department icon) + `Card` containing `GroceryItemRow` list. Optionally add an `icon` prop to `SectionHeader` for department icons. Keep DONE section unchanged as a single flat collapsible list. Ensure collapsible state survives realtime updates.
   - Verify: `npx tsc --noEmit` passes. Visual in Expo Go: items grouped by department, sections collapse/expand independently, empty departments hidden, DONE section unchanged.
   - Done when: Unchecked items render in department groups with collapsible headers in store-walk order.
 
-- [ ] **T03: Long-press category picker for manual reassignment** `est:45m`
+- [x] **T03: Long-press category picker for manual reassignment** `est:45m`
   - Why: Users need to reassign any item's category regardless of source — manual, receipt, or recipe (GROC-13). Long-press is a distinct gesture that doesn't conflict with existing tap (edit) and swipe (delete).
   - Files: `components/groceries/CategoryPicker.tsx`, `components/groceries/GroceryItemRow.tsx`, `components/groceries/index.ts`, `app/(app)/(tabs)/groceries.tsx`
   - Do: Create `CategoryPicker` component — a `Modal` with transparent background showing department pills (icon + label) in a grid/list. Accepts `visible`, `currentCategory`, `onSelect`, `onDismiss` props. Add `onLongPress` prop to `GroceryItemRow` and wire it to the outer `Pressable`. In `groceries.tsx`, add state for the long-pressed item, show `CategoryPicker` on long-press, handle selection by optimistically updating the item's category in local state + calling `supabase.from('grocery_items').update({ category })`. Item moves to the correct department section immediately. Export `CategoryPicker` from barrel.

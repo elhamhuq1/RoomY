@@ -55,3 +55,10 @@ Creates the data foundation for department-based grocery organization: a `catego
 - `lib/constants/grocery-departments.ts` — new file with taxonomy constant
 - `app/(app)/(tabs)/groceries.tsx` — `addItem` optimistic object includes `category: 'other'`
 - `app/(app)/groceries/import-recipe.tsx` — insert includes `category: 'other'`
+
+## Observability Impact
+
+- **Schema change:** `grocery_items.category` column is directly queryable via `SELECT DISTINCT category FROM grocery_items` — useful for verifying migration applied and data distribution.
+- **Index:** `idx_grocery_items_category` on `(household_id, category)` supports efficient grouped queries; `EXPLAIN` will show index usage.
+- **Inspection surface:** `DEPARTMENT_MAP` and `DEPARTMENTS` exports can be imported in any diagnostic context to validate taxonomy completeness.
+- **Failure state:** If migration fails to apply, `category` column will be absent — downstream `tsc` and runtime queries will fail explicitly with column-not-found errors (not silent).

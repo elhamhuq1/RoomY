@@ -22,8 +22,10 @@ import {
   GroceryItemRow,
   SectionHeader,
   EmptyState,
+  CategoryPicker,
 } from "@/components/groceries";
 import type { GroceryItem } from "@/lib/types/database";
+import { DEPARTMENTS } from "@/lib/constants/grocery-departments";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -49,8 +51,10 @@ export default function GroceriesScreen() {
     name: string;
     quantity: number;
   } | null>(null);
+  const [categoryPickerItem, setCategoryPickerItem] = useState<GroceryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [doneExpanded, setDoneExpanded] = useState(false);
+  const [collapsedDepts, setCollapsedDepts] = useState<Set<string>>(new Set());
   const [creatorProfiles, setCreatorProfiles] = useState<
     Record<string, { id: string; display_name: string; avatar_url: string | null }>
   >({});
@@ -212,6 +216,7 @@ export default function GroceriesScreen() {
       archived_at: null,
       unit_price: null,
       source: 'manual',
+      category: 'other',
       assigned_to: null,
       created_by: user.id,
       created_at: new Date().toISOString(),
@@ -364,6 +369,42 @@ export default function GroceriesScreen() {
   }, [editingItem, items]);
 
   // -------------------------------------------------------------------------
+  // Change category (optimistic) -- used by category picker
+  // -------------------------------------------------------------------------
+
+  const handleCategoryChange = useCallback(
+    async (newCategory: string) => {
+      if (!categoryPickerItem) return;
+
+      const itemId = categoryPickerItem.id;
+      const oldCategory = categoryPickerItem.category;
+
+      // Optimistic update
+      setItems((prev) =>
+        prev.map((i) =>
+          i.id === itemId ? { ...i, category: newCategory } : i
+        )
+      );
+      setCategoryPickerItem(null);
+
+      const { error } = await supabase
+        .from("grocery_items")
+        .update({ category: newCategory })
+        .eq("id", itemId);
+
+      if (error) {
+        // Rollback on failure
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === itemId ? { ...i, category: oldCategory } : i
+          )
+        );
+      }
+    },
+    [categoryPickerItem]
+  );
+
+  // -------------------------------------------------------------------------
   // Derived data
   // -------------------------------------------------------------------------
 
@@ -393,6 +434,15 @@ export default function GroceriesScreen() {
 
   const hasCheckedItems = checkedItems.length > 0;
   const isEmpty = dedupedItems.length === 0 && !loading;
+
+  const groupedItems = useMemo(() => {
+    const groups: Record<string, GroceryItem[]> = {};
+    for (const item of uncheckedItems) {
+      const cat = item.category || 'other';
+      (groups[cat] ??= []).push(item);
+    }
+    return groups;
+  }, [uncheckedItems]);
 
   // -------------------------------------------------------------------------
   // Loading
@@ -456,41 +506,70 @@ export default function GroceriesScreen() {
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
         >
-          {/* TO GET section */}
+          {/* Department-grouped sections */}
           {uncheckedItems.length > 0 && (
             <View className="mt-3">
-              <SectionHeader label="TO GET" count={uncheckedItems.length} />
-              <View className="mx-4 rounded-card border border-neutral-border overflow-hidden">
-                {uncheckedItems.map((item, index) => (
-                  <View
-                    key={item.id}
-                    className={
-                      index < uncheckedItems.length - 1
-                        ? "border-b border-neutral-border"
-                        : ""
-                    }
-                  >
-                    <GroceryItemRow
-                      item={item}
-                      isChecked={false}
-                      creatorName={
-                        creatorProfiles[item.created_by]?.display_name ?? "?"
-                      }
-                      creatorId={item.created_by}
-                      creatorAvatarUrl={creatorProfiles[item.created_by]?.avatar_url}
-                      onToggle={() => toggleCheck(item)}
-                      onEdit={() =>
-                        setEditingItem({
-                          id: item.id,
-                          name: item.name,
-                          quantity: item.quantity,
+              {DEPARTMENTS.map((dept) => {
+                const deptItems = groupedItems[dept.id];
+                if (!deptItems || deptItems.length === 0) return null;
+                const isExpanded = !collapsedDepts.has(dept.id);
+                return (
+                  <View key={dept.id} className="mb-2">
+                    <SectionHeader
+                      label={dept.label}
+                      icon={dept.icon}
+                      count={deptItems.length}
+                      collapsible
+                      expanded={isExpanded}
+                      onToggle={() =>
+                        setCollapsedDepts((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(dept.id)) {
+                            next.delete(dept.id);
+                          } else {
+                            next.add(dept.id);
+                          }
+                          return next;
                         })
                       }
-                      onDelete={() => deleteItem(item.id)}
                     />
+                    {isExpanded && (
+                      <View className="mx-4 rounded-card border border-neutral-border overflow-hidden">
+                        {deptItems.map((item, index) => (
+                          <View
+                            key={item.id}
+                            className={
+                              index < deptItems.length - 1
+                                ? "border-b border-neutral-border"
+                                : ""
+                            }
+                          >
+                            <GroceryItemRow
+                              item={item}
+                              isChecked={false}
+                              creatorName={
+                                creatorProfiles[item.created_by]?.display_name ?? "?"
+                              }
+                              creatorId={item.created_by}
+                              creatorAvatarUrl={creatorProfiles[item.created_by]?.avatar_url}
+                              onToggle={() => toggleCheck(item)}
+                              onEdit={() =>
+                                setEditingItem({
+                                  id: item.id,
+                                  name: item.name,
+                                  quantity: item.quantity,
+                                })
+                              }
+                              onDelete={() => deleteItem(item.id)}
+                              onLongPress={() => setCategoryPickerItem(item)}
+                            />
+                          </View>
+                        ))}
+                      </View>
+                    )}
                   </View>
-                ))}
-              </View>
+                );
+              })}
             </View>
           )}
 
@@ -532,6 +611,7 @@ export default function GroceriesScreen() {
                           })
                         }
                         onDelete={() => deleteItem(item.id)}
+                        onLongPress={() => setCategoryPickerItem(item)}
                       />
                     </View>
                   ))}
@@ -655,6 +735,14 @@ export default function GroceriesScreen() {
           </Pressable>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Category picker modal */}
+      <CategoryPicker
+        visible={!!categoryPickerItem}
+        currentCategory={categoryPickerItem?.category ?? 'other'}
+        onSelect={handleCategoryChange}
+        onDismiss={() => setCategoryPickerItem(null)}
+      />
     </KeyboardAvoidingView>
   );
 }

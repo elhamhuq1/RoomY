@@ -1,11 +1,12 @@
 import React from 'react';
-import { Text, Pressable, LayoutAnimation } from 'react-native';
+import { Text, Pressable, LayoutAnimation, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/lib/theme/colors';
 
 interface SectionHeaderProps {
   label: string;
   count: number;
+  icon?: string;
   collapsible?: boolean;
   expanded?: boolean;
   onToggle?: () => void;
@@ -14,6 +15,7 @@ interface SectionHeaderProps {
 export function SectionHeader({
   label,
   count,
+  icon,
   collapsible = false,
   expanded = true,
   onToggle,
@@ -29,9 +31,18 @@ export function SectionHeader({
       onPress={collapsible ? handleToggle : undefined}
       disabled={!collapsible}
     >
-      <Text className="font-sans text-overline text-neutral-secondary uppercase">
-        {label} ({count})
-      </Text>
+      <View className="flex-row items-center gap-1.5">
+        {icon && (
+          <Ionicons
+            name={icon as any}
+            size={14}
+            color={colors.neutral.secondary}
+          />
+        )}
+        <Text className="font-sans text-overline text-neutral-secondary uppercase">
+          {label} ({count})
+        </Text>
+      </View>
       {collapsible && (
         <Ionicons
           name={expanded ? 'chevron-up' : 'chevron-down'}
