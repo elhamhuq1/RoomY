@@ -115,6 +115,17 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="groceries/search-products"
+        options={{
+          headerShown: true,
+          title: "Search Products",
+          headerBackTitle: "Groceries",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="groceries/assign-items"
         options={{
           headerShown: true,

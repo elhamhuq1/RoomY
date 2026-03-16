@@ -112,6 +112,13 @@ Create the `search-products` Stack screen that ties together store selection, pr
 - `lib/auth-context.ts` — `useSession()` hook for auth/user/household context
 - `lib/supabase.ts` — `supabase` client for Edge Function invocation and DB operations
 
+## Observability Impact
+
+- **Console logs**: `[search-products]` prefix on all `console.error` calls in the screen (store search errors, product search errors, add-to-list errors, store persistence errors). Grep-friendly for RN Metro logs.
+- **Persisted state**: `household_settings.kroger_location_id` and `kroger_location_name` track selected store. `grocery_items` with `source = 'kroger'` track Kroger-added items.
+- **Edge Function diagnostics**: Errors from Edge Functions surface in the UI with the message from the `error` field. The `phase` field in Edge Function responses localizes failures to oauth/search/mapping.
+- **UI error states**: Store search errors, product search errors, and add-to-list failures all surface via visible error text or Alert dialogs — no silent swallowing.
+
 ## Expected Output
 
 - `app/(app)/groceries/search-products.tsx` — complete product search screen with store selection and add-to-list
