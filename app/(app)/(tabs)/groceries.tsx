@@ -212,6 +212,7 @@ export default function GroceriesScreen() {
       archived_at: null,
       unit_price: null,
       source: 'manual',
+      assigned_to: null,
       created_by: user.id,
       created_at: new Date().toISOString(),
     };
@@ -420,6 +421,19 @@ export default function GroceriesScreen() {
         onChangeText={setNewItemName}
         onSubmit={addItem}
       />
+
+      {/* Scan Receipt button */}
+      <View className="mx-4 mt-2 mb-1">
+        <Pressable
+          className="flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2.5 active:bg-brand-light"
+          onPress={() => router.push('/(app)/groceries/scan-receipt')}
+        >
+          <Ionicons name="camera-outline" size={18} color={colors.brand.DEFAULT} />
+          <Text className="ml-2 text-sm font-heading-semi text-brand">
+            Scan Receipt
+          </Text>
+        </Pressable>
+      </View>
 
       {/* Empty state */}
       {isEmpty && <EmptyState />}

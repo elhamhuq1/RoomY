@@ -76,6 +76,7 @@ export interface GroceryItem {
   archived_at: string | null;
   unit_price: number | null;
   source: string;
+  assigned_to: string | null;
   created_by: string;
   created_at: string;
 }
@@ -208,7 +209,7 @@ export interface Database {
       };
       grocery_items: {
         Row: GroceryItem;
-        Insert: Omit<GroceryItem, "id" | "created_at" | "is_checked" | "trip_id" | "archived_at" | "unit_price" | "source"> & {
+        Insert: Omit<GroceryItem, "id" | "created_at" | "is_checked" | "trip_id" | "archived_at" | "unit_price" | "source" | "assigned_to"> & {
           id?: string;
           created_at?: string;
           is_checked?: boolean;
@@ -217,6 +218,7 @@ export interface Database {
           archived_at?: string | null;
           unit_price?: number | null;
           source?: string;
+          assigned_to?: string | null;
         };
         Update: Partial<Omit<GroceryItem, "id">>;
       };
@@ -313,8 +315,9 @@ export interface Database {
           p_split_user_ids: string[];
           p_created_by: string;
           p_item_prices?: unknown;
+          p_item_assignments?: unknown;
         };
-        Returns: { trip_id: string; expense_id: string };
+        Returns: { trip_id: string; expense_id: string; split_mode: string };
       };
       complete_chore: {
         Args: { p_chore_id: string; p_completed_by: string };
