@@ -212,6 +212,13 @@ export function ChoreRow({
             <Text className="text-xs font-heading-semi text-red-600">Disputed</Text>
           </View>
         )}
+        {chore.effort_points > 1 && (
+          <View className="bg-amber-50 px-2 py-0.5 rounded-full">
+            <Text className="text-xs font-medium text-amber-700">
+              ⚡×{chore.effort_points}
+            </Text>
+          </View>
+        )}
         {isOverdue ? (
           <View className="rounded-full bg-amber-100 px-2 py-0.5">
             <Text className="text-xs font-heading-semi text-amber-700">

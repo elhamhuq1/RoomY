@@ -60,6 +60,12 @@ SectionHeader is a generic collapsible section header component currently living
 - `rg "SectionHeader" components/ui/` shows the new file and export
 - `rg "effort_points" components/chores/ChoreRow.tsx` confirms effort badge is rendered
 
+## Observability Impact
+
+- **Signals changed:** None — this task moves a component and adds a display-only badge. No new API calls, state management, or error paths.
+- **Inspection:** SectionHeader importability verified by tsc. Effort badge visibility driven by `chore.effort_points > 1` — inspect by checking ChoreRow render output for chores with varying effort values.
+- **Failure state:** No new failure modes. SectionHeader move is a pure refactor. Effort badge is conditional render — worst case is missing badge for effort=1 (which is correct behavior).
+
 ## Inputs
 
 - `components/groceries/SectionHeader.tsx` — 55 LOC generic component, takes label/count/icon/collapsible/expanded/onToggle props

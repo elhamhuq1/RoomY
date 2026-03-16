@@ -38,7 +38,7 @@
 
 ## Tasks
 
-- [ ] **T01: Move SectionHeader to shared UI and add effort badge to ChoreRow** `est:25m`
+- [x] **T01: Move SectionHeader to shared UI and add effort badge to ChoreRow** `est:25m`
   - Why: SectionHeader is generic but lives in `components/groceries/`. Chores tab needs it. Moving to `components/ui/` avoids cross-domain imports. Effort badge on ChoreRow is needed before the tab redesign renders room sections.
   - Files: `components/groceries/SectionHeader.tsx`, `components/ui/SectionHeader.tsx`, `components/ui/index.ts`, `app/(app)/(tabs)/groceries.tsx`, `components/groceries/index.ts`, `components/chores/ChoreRow.tsx`, `components/chores/index.ts`
   - Do: Move SectionHeader to `components/ui/SectionHeader.tsx`. Update groceries.tsx import from `@/components/groceries` to `@/components/ui`. Remove from groceries/index.ts. Add to ui/index.ts export. Add effort_points badge to ChoreRow metadata pills row (show "⚡×2" or "⚡×3" pill, hide for effort=1 since it's default).
@@ -65,6 +65,13 @@
   - Do: Redesign EmptyState to show room cards (one per room type from ROOMS). Tapping a room card opens a template selection modal showing CHORE_TEMPLATES for that room type with checkboxes. "Add Selected" creates a room (if it doesn't exist) then inserts selected template chores via Promise.all (parallel, single loading state). Each inserted chore gets: name, frequency, effort_points from template, room_id from the created/existing room, rotation_order from all household members, household_id, created_by. Also add a "Browse Templates" entry point on the chores tab (small button below StatsRow or on empty room sections) for when chores already exist but user wants to add more from templates.
   - Verify: `npx tsc --noEmit`. Visual in Expo Go: empty state shows room template cards, template selection modal works, added chores appear in correct room section after refresh.
   - Done when: Users can populate a room with template chores in under 30 seconds (success criterion), empty state guides toward room-based templates.
+
+## Observability / Diagnostics
+
+- **Runtime signals:** No new runtime signals from this slice — chore grouping and template insertion use existing Supabase queries. Errors surface through existing React Native error boundaries and console warnings.
+- **Inspection surfaces:** Room grouping correctness inspectable via `supabase.from('rooms').select('*')` and `supabase.from('chores').select('room_id, name')`. Template insertion results visible in chore list refresh. Effort badge visibility driven by `chore.effort_points` — inspect via row props.
+- **Failure visibility:** Room fetch failure → empty section list (no crash). Template insert failure → Promise.all rejection logged to console. Private room RLS filtering invisible to non-owners by design — verify by querying as different user.
+- **Redaction:** No secrets or PII in this slice. Room names and chore names are user-generated but non-sensitive household data.
 
 ## Files Likely Touched
 
