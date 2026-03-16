@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
+import { useChoreActions } from "@/lib/hooks/use-chore-actions";
 import { Avatar, Card, SectionHeader } from "@/components/ui";
 import { StatsRow, ChoreRow, EmptyState } from "@/components/chores";
 import { ROOMS, ROOM_MAP } from "@/lib/constants/chore-rooms";
@@ -111,19 +112,9 @@ export default function ChoresScreen() {
   const [disputeDetails, setDisputeDetails] = useState<Record<string, ChoreCompletion>>({});
   const [pendingSwapCount, setPendingSwapCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [completingId, setCompletingId] = useState<string | null>(null);
-  const [claimingId, setClaimingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
   const [swapModalChoreId, setSwapModalChoreId] = useState<string | null>(null);
   const [swapSubmitting, setSwapSubmitting] = useState(false);
-  // Dispute reason modal
-  const [disputeReasonModal, setDisputeReasonModal] = useState<{
-    visible: boolean;
-    choreId: string | null;
-    completionId: string | null;
-  }>({ visible: false, choreId: null, completionId: null });
-  const [disputeReason, setDisputeReason] = useState("");
-  const [disputeSubmitting, setDisputeSubmitting] = useState(false);
 
   // Template modal state
   const [templateRoomType, setTemplateRoomType] = useState<string | null>(null);
@@ -268,115 +259,23 @@ export default function ChoresScreen() {
   });
 
   // -------------------------------------------------------------------------
-  // Actions
+  // Actions (shared hook + local-only handlers)
   // -------------------------------------------------------------------------
 
-  const handleComplete = useCallback(
-    (choreId: string) => {
-      if (!user?.id) return;
-
-      Alert.alert(
-        "Mark Complete?",
-        "This chore will be marked as done and rotate to the next person.",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Complete",
-            onPress: async () => {
-              setCompletingId(choreId);
-              const { error } = await supabase.rpc("complete_chore", {
-                p_chore_id: choreId,
-                p_completed_by: user.id,
-              });
-              setCompletingId(null);
-              if (!error) {
-                setTimeout(() => refreshChores(), 400);
-              }
-            },
-          },
-        ]
-      );
-    },
-    [user?.id, refreshChores]
-  );
-
-  const handleClaim = useCallback(
-    async (choreId: string) => {
-      if (!user?.id) return;
-      setClaimingId(choreId);
-      const { error } = await supabase.rpc("claim_chore", {
-        p_chore_id: choreId,
-        p_claimed_by: user.id,
-      });
-      setClaimingId(null);
-      if (!error) {
-        refreshChores();
-      }
-    },
-    [user?.id, refreshChores]
-  );
-
-  const handleDispute = useCallback(
-    async (choreId: string) => {
-      if (!user?.id) return;
-
-      // Fetch the most recent non-reverted completion for this chore
-      const { data: recentCompletions } = await supabase
-        .from("chore_completions")
-        .select("*")
-        .eq("chore_id", choreId)
-        .eq("is_reverted", false)
-        .order("completed_at", { ascending: false })
-        .limit(1);
-
-      if (!recentCompletions || recentCompletions.length === 0) {
-        Alert.alert("No completion", "No recent completion found to dispute.");
-        return;
-      }
-
-      const completion = recentCompletions[0] as ChoreCompletion;
-
-      if (completion.is_disputed) {
-        Alert.alert("Already disputed", "This completion is already under dispute.");
-        return;
-      }
-
-      // Show the dispute reason modal
-      setDisputeReason("");
-      setDisputeReasonModal({
-        visible: true,
-        choreId,
-        completionId: completion.id,
-      });
-    },
-    [user?.id]
-  );
-
-  const handleDisputeSubmit = useCallback(async () => {
-    if (!user?.id || !disputeReasonModal.completionId || !disputeReasonModal.choreId) return;
-
-    const reason = disputeReason.trim();
-    if (!reason) {
-      Alert.alert("Reason required", "Please explain why you are disputing this completion.");
-      return;
-    }
-
-    setDisputeSubmitting(true);
-    const { error } = await supabase.rpc("dispute_completion", {
-      p_completion_id: disputeReasonModal.completionId,
-      p_disputed_by: user.id,
-      p_reason: reason,
-    });
-    setDisputeSubmitting(false);
-
-    if (error) {
-      Alert.alert("Error", "Failed to dispute completion.");
-    } else {
-      setDisputeReasonModal({ visible: false, choreId: null, completionId: null });
-      setDisputeReason("");
-      refreshChores();
-    }
-  }, [user?.id, disputeReasonModal, disputeReason, refreshChores]);
+  const {
+    handleComplete,
+    handleClaim,
+    handleDispute,
+    handleDisputeSubmit,
+    handleDelete,
+    completingId,
+    claimingId,
+    disputeReasonModal,
+    setDisputeReasonModal,
+    disputeReason,
+    setDisputeReason,
+    disputeSubmitting,
+  } = useChoreActions(refreshChores);
 
   const handleViewDispute = useCallback(
     (choreId: string) => {
@@ -484,32 +383,6 @@ export default function ChoresScreen() {
       setAddingTemplates(false);
     }
   }, [templateRoomType, selectedTemplates, rooms, household?.id, user?.id, refreshChores]);
-
-  const handleDelete = useCallback(
-    (choreId: string, choreName: string) => {
-      Alert.alert(
-        "Delete Chore?",
-        `"${choreName}" will be removed for everyone in the household.`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: async () => {
-              const { error } = await supabase
-                .from("chores")
-                .update({ is_active: false })
-                .eq("id", choreId);
-              if (!error) {
-                refreshChores();
-              }
-            },
-          },
-        ]
-      );
-    },
-    [refreshChores]
-  );
 
   const handleSwapRequest = useCallback(
     async (targetUserId: string) => {

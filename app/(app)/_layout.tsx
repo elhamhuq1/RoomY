@@ -192,6 +192,17 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="chores/my-day"
+        options={{
+          headerShown: true,
+          title: "My Day",
+          headerBackTitle: "Chores",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="chores/dispute"
         options={{
           headerShown: true,

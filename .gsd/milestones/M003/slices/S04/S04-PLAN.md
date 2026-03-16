@@ -54,7 +54,7 @@
   - Verify: `npx tsc --noEmit` passes; visual check in Expo Go shows correct urgency colors on chores tab
   - Done when: ChoreRow renders green border+pill for 2+ days, yellow for today/tomorrow, red for overdue; disputed rows unchanged
 
-- [ ] **T02: Build My Day screen with shared action hooks and navigation wiring** `est:1h`
+- [x] **T02: Build My Day screen with shared action hooks and navigation wiring** `est:1h`
   - Why: CHORE-06 — delivers the personalized daily task list screen with all chore actions working, plus extracts shared action logic to prevent duplication between chores tab and My Day
   - Files: `lib/hooks/use-chore-actions.ts` (new), `app/(app)/chores/my-day.tsx` (new), `app/(app)/(tabs)/chores.tsx`, `app/(app)/(tabs)/_layout.tsx`, `app/(app)/_layout.tsx`
   - Do: (1) Extract action handlers (handleComplete, handleClaim, handleDispute, handleDisputeSubmit, handleDelete, handleViewDispute) from chores.tsx into a new `useChoreActions(refreshFn)` hook returning the handler functions + dispute modal state. (2) Refactor chores.tsx to use the hook. (3) Create `my-day.tsx` screen: fetch household chores, filter to `current_assignee === user.id` where `next_due_at <= endOfToday` or overdue (use `setHours(23,59,59,999)` for local end-of-day), sort overdue oldest-first then due-today. Render flat ScrollView of ChoreRow components using useChoreActions. Include dispute reason modal (same pattern as chores tab). Show friendly empty state with sun icon when nothing is due. Display room label from ROOM_MAP next to each chore for context. (4) Add sun icon (`sunny-outline`) Pressable to chores tab headerRight. (5) Add Stack.Screen for `chores/my-day` in `_layout.tsx`.

@@ -210,3 +210,11 @@ Deliver the "My Day" screen (CHORE-06) — a personalized daily task list showin
 - `app/(app)/(tabs)/chores.tsx` — refactored to use `useChoreActions` hook (less LOC, same behavior)
 - `app/(app)/(tabs)/_layout.tsx` — sun icon button added to chores tab headerRight
 - `app/(app)/_layout.tsx` — Stack.Screen entry for `chores/my-day`
+
+## Observability Impact
+
+- **My Day filtered list count** is visible in the UI header pill ("N chores for today"). A future agent can verify correctness by comparing against the full chore list in the main chores tab.
+- **Urgency sort order** is visually observable — red-bordered (overdue) chores appear before yellow/green chores. Inspect `chore.next_due_at` in Supabase if sort looks wrong.
+- **Empty state** renders when `chores.length === 0` after loading — observable via the sun icon and "all caught up" message.
+- **Action handlers** (complete/claim/dispute/delete) surface errors via `Alert.alert` on failure. Success triggers `refreshMyDay()` to re-fetch, making the list update visually.
+- **No new persisted state** — My Day is a read-only view over existing chore data. All filtering/sorting is done client-side at render time.
