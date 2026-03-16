@@ -2,80 +2,90 @@
 
 ## Active
 
+## Validated
+
 ### CHORE-01 — Chores are organized by room with collapsible sections
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S02
 - Supporting Slices: S01
+- Validated by: M003 — chores tab renders room-grouped collapsible sections using SectionHeader per room, orderedRoomIds derivation confirmed, tsc passes
 
 ### CHORE-02 — Users can create private rooms visible only to the room creator
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S02
 - Supporting Slices: S01
+- Validated by: M003 — rooms table with is_private + RLS policy limiting private rooms to created_by; inline private room creation in add screen
 
 ### CHORE-03 — Private room chores are invisible to other household members at the database level (RLS)
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S01
+- Validated by: M003 — compound chores SELECT policy with EXISTS subquery on rooms table; non-private OR created_by = auth.uid()
 
 ### CHORE-04 — Each chore has an effort_points value (1-3) reflecting difficulty
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S01
 - Supporting Slices: S02
+- Validated by: M003 — effort_points INT (1-3) with CHECK constraint; effort picker on add screen; effort badge on ChoreRow
 
 ### CHORE-05 — Pre-built chore templates available per room with default effort values
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S02
+- Validated by: M003 — room-based template cards in EmptyState, template modal with batch insert via .insert(array), auto room creation
 
 ### CHORE-08 — Weekly leaderboard ranked by effort points with leader highlighted
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S03
+- Validated by: M003 — dashboard sorts by effortPoints descending, progress bars proportional to max effort
 
 ### CHORE-09 — Fairness score showing effort-weighted workload distribution per member
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S03
+- Validated by: M003 — fairnessPercent computed as (member effort / total effort × 100) with division-by-zero guard
 
 ### CHORE-10 — Streak badges (7-day, 30-day, 60-day) for consistent chore completion
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S03
+- Validated by: M003 — tiered emoji badges at 7/30/60-day thresholds, shows highest achieved tier per member on dashboard
 
 ### CHORE-12 — Existing chores migrated to default "General" room with effort_points=1, preserving all history
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S01
+- Validated by: M003 — migration creates General room per household, backfills existing chores, preserves completion history
 
 ### CHORE-13 — Effort-weighted contribution dashboard replaces count-based dashboard
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M003-CONTEXT
 - Primary Slice: S03
-
-## Validated
+- Validated by: M003 — dashboard end-to-end effort-weighted: ranking, progress bars, display values all use effortPoints
 
 ### CHORE-11 — Peer nudge sends push notification for overdue chores (rate limited: 1 per chore per 24h per sender)
 

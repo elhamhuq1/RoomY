@@ -42,17 +42,27 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - ✓ YouTube recipe import with ingredient extraction — M002/S02
 - ✓ Department-grouped grocery list with collapsible sections and manual category picker — M002/S03
 - ✓ Kroger product search with store selection and auto-categorized add-to-list — M002/S04
+- ✓ Room-based chore organization with collapsible sections — M003
+- ✓ Private rooms with DB-level RLS enforcement — M003
+- ✓ Effort points (1-3) on chores with effort picker — M003
+- ✓ Pre-built chore templates per room with batch insert — M003
+- ✓ "My Day" personalized daily chore view — M003
+- ✓ Visual urgency indicators (green/yellow/red) on chore rows — M003
+- ✓ Effort-weighted leaderboard with fairness analytics — M003
+- ✓ Streak badges (7/30/60-day) on dashboard — M003
+- ✓ Peer nudge push notifications with 24h rate limiting — M003
+- ✓ Existing chores migrated to General room with effort_points=1 — M003
+- ✓ Effort-weighted contribution dashboard — M003
 
 ### Active
 
-- Chore system overhaul: room-based organization, effort points, fairness analytics, smart daily lists, templates, nudging, leaderboard, badges (M003)
-  - S01 complete: rooms table, chore_nudges table, effort_points/room_id on chores, private room RLS, General room migration, types and constants
-  - S02 complete: room-based chores tab with collapsible sections, effort picker, template population, private room filtering
-  - S03 complete: effort_points on completions via RPC stamp, effort-weighted dashboard with fairness %, tiered streak badges (7/30/60-day)
-  - S04 complete: three-tier urgency coloring (green/yellow/red) on all chore rows, "My Day" screen with personalized due/overdue list, shared useChoreActions hook
-  - S05 complete: peer nudge Edge Function with auth/validation/24h rate limit/push delivery, nudge button on overdue non-own chores with loading + session disable
+- none
 
 ## Completed Milestones
+
+### M003: Chore System Overhaul (completed 2026-03-16)
+
+Transformed chores from a flat checklist into a room-based, effort-weighted household chore management system across 5 slices. Room-based organization with collapsible sections (8 room types), private room RLS enforced at the DB level, effort points (1-3) with denormalization onto completions, pre-built chore templates with one-tap batch insert, effort-weighted leaderboard with fairness analytics, tiered streak badges (7/30/60-day), "My Day" personalized daily view, three-tier urgency coloring (green/yellow/red), and peer nudge push notifications with 24h rate limiting. Added 2 migrations, 1 Edge Function, and shared useChoreActions hook.
 
 ### M002: Smart Groceries (completed 2026-03-16)
 
@@ -78,8 +88,8 @@ Full roommate household management app delivered across 14 slices. Three version
 - Expo chosen so both devs can test on their own phones via QR code regardless of OS
 - Personal project — solving their own problem first
 - Venmo is the existing payment method in their social circle
-- Shipped v1.0 MVP (2026-03-10), v1.1 UI Redesign (2026-03-13), v1.2 Polish & Identity (2026-03-16), M002 Smart Groceries (2026-03-16)
-- Codebase: ~16k LOC TypeScript/TSX across app/, components/, lib/, supabase/functions/
+- Shipped v1.0 MVP (2026-03-10), v1.1 UI Redesign (2026-03-13), v1.2 Polish & Identity (2026-03-16), M002 Smart Groceries (2026-03-16), M003 Chore System Overhaul (2026-03-16)
+- Codebase: ~18k LOC TypeScript/TSX across app/, components/, lib/, supabase/functions/
 - Tech stack: Expo SDK 55, NativeWind v4 (TW3), Supabase (auth + DB + RLS + Storage + Edge Functions), expo-router
 - External integrations: Gemini Vision API (receipt OCR, recipe extraction), Kroger Products/Locations API (product search), YouTube innertube API (caption extraction)
 
@@ -110,6 +120,9 @@ Full roommate household management app delivered across 14 slices. Three version
 | Client-side YouTube transcript extraction | YouTube blocks cloud IPs — innertube ANDROID API on-device, text mode to Edge Function | ✓ Good |
 | Kroger API over Instacart | Only major US chain with genuine self-serve public developer API — Instacart requires uncertain review | ✓ Good |
 | Fixed 10-department taxonomy | Shared constant between client and Edge Functions — Kroger categories map to it, manual items default to 'other' | ✓ Good |
+| Fixed 8-room taxonomy for chores | Mirrors grocery department pattern — kitchen, bathroom, living_room, bedroom, laundry, outdoor, garage, general | ✓ Good |
+| Effort denormalized onto completions | Stamps effort_points from chore at completion time — leaderboard reflects difficulty when done, not current value | ✓ Good |
+| Compound RLS joining through rooms | Private room chores invisible at DB level via EXISTS subquery — not UI-hidden | ✓ Good |
 
 ---
-*Last updated: 2026-03-16 after M002 completion*
+*Last updated: 2026-03-16 after M003 completion*
