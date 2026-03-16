@@ -101,6 +101,12 @@ Replace the amber-only overdue styling in ChoreRow with a three-tier urgency col
 - Visual check: future chores show green pill with "Due in Xd" text
 - Visual check: disputed chores still show red bg + red border + "Disputed" pill (unchanged)
 
+## Observability Impact
+
+- **What changes:** ChoreRow now renders urgency-colored left borders and pills instead of amber-only overdue styling. The `getUrgencyLevel` helper is a pure function — no side effects, no network calls, no persisted state.
+- **Inspection:** A future agent can verify urgency logic by checking the rendered border color (inline `borderLeftColor` style) and pill className on ChoreRow instances. The urgency level is derived from `chore.next_due_at` at render time.
+- **Failure state:** If `next_due_at` is invalid/missing, `new Date(...)` produces `NaN`, causing all comparisons to return false → defaults to `'green'`. This is a safe fallback but may mask upstream data issues.
+
 ## Inputs
 
 - `components/chores/ChoreRow.tsx` — existing 258-line component with amber-only overdue styling

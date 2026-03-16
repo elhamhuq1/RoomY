@@ -32,6 +32,13 @@
 - Visual in Expo Go: My Day empty state displays when no chores are due
 - Visual in Expo Go: Complete/claim/delete actions work from My Day screen
 
+## Observability / Diagnostics
+
+- **Runtime signals:** Urgency level is computed per-render from `chore.next_due_at` — no persisted state. Visual left-border color and pill color are the observable outputs. My Day screen's filtered list count is visible in the UI.
+- **Inspection surfaces:** In React DevTools, check `urgency` and `urgencyStyle` local variables inside ChoreRow. My Day screen's filtering logic can be verified by comparing displayed chores against the full household chore list in the chores tab.
+- **Failure visibility:** If `next_due_at` is missing or malformed, `getUrgencyLevel` will return `'green'` (NaN comparison falls through to default). This is safe but may hide data issues — inspect raw chore data via Supabase dashboard if urgency colors look wrong.
+- **Redaction constraints:** None — no secrets or PII involved in urgency computation.
+
 ## Integration Closure
 
 - Upstream surfaces consumed: `components/chores/ChoreRow.tsx` (existing component), `app/(app)/(tabs)/chores.tsx` (action handler patterns, data fetching pattern), `lib/theme/colors.ts` (brand/semantic color tokens), `lib/constants/chore-rooms.ts` (room labels/icons), `lib/types/database.ts` (Chore type with room_id, effort_points, next_due_at)
@@ -40,7 +47,7 @@
 
 ## Tasks
 
-- [ ] **T01: Add urgency color system and update ChoreRow visual styling** `est:30m`
+- [x] **T01: Add urgency color system and update ChoreRow visual styling** `est:30m`
   - Why: CHORE-07 — replaces amber-only overdue styling with green/yellow/red urgency indicators on all chore rows (shared component affects both chores tab and My Day)
   - Files: `components/chores/ChoreRow.tsx`
   - Do: Add `getUrgencyLevel(nextDueAt: string): 'green' | 'yellow' | 'red'` helper using thresholds from DECISIONS.md. Replace the current amber-only `rowBg` logic (lines 115-119) with urgency-based left border coloring for non-disputed rows. Replace the amber due-date pill (lines 216-229) with urgency-colored pill. Use existing color tokens: `colors.brand.DEFAULT` (#2D6A4F) for green, `colors.semantic.warning` (#F59E0B) for yellow, `colors.semantic.error` (#EF4444) for red. Disputed styling (`bg-red-50 border-l-4 border-red-300`) must remain the first condition and take precedence.

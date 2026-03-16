@@ -62,6 +62,28 @@ function formatDueDate(nextDueAt: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Urgency color system
+// ---------------------------------------------------------------------------
+
+type UrgencyLevel = 'green' | 'yellow' | 'red';
+
+function getUrgencyLevel(nextDueAt: string): UrgencyLevel {
+  const due = new Date(nextDueAt);
+  const now = new Date();
+  const diffMs = due.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return 'red';       // overdue
+  if (diffDays <= 1) return 'yellow';    // due today or tomorrow
+  return 'green';                        // 2+ days out
+}
+
+const URGENCY_COLORS: Record<UrgencyLevel, { border: string; pillBg: string; pillText: string }> = {
+  green:  { border: colors.brand.DEFAULT,   pillBg: 'bg-brand-light',  pillText: 'text-brand-dark' },
+  yellow: { border: colors.semantic.warning, pillBg: 'bg-amber-50',     pillText: 'text-amber-700' },
+  red:    { border: colors.semantic.error,   pillBg: 'bg-red-100',      pillText: 'text-red-700' },
+};
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -111,16 +133,23 @@ export function ChoreRow({
   const emoji = getChoreEmoji(chore.name);
   const isOverdue = overdueDays !== null;
 
-  // Row styling based on state — no mx/my on disputed/overdue since rows sit inside a Card
+  // Row styling based on state — urgency coloring for non-disputed rows
+  const urgency = getUrgencyLevel(chore.next_due_at);
+  const urgencyStyle = URGENCY_COLORS[urgency];
+
   let rowBg = '';
   if (isDisputed) {
     rowBg = 'bg-red-50 border-l-4 border-red-300';
-  } else if (isOverdue) {
-    rowBg = 'bg-amber-50/50';
+  } else {
+    // Always show urgency left border for non-disputed rows
+    rowBg = 'border-l-4';
   }
 
   return (
-    <View className={`px-4 py-3 ${rowBg}`}>
+    <View
+      className={`px-4 py-3 ${rowBg}`}
+      style={!isDisputed ? { borderLeftColor: urgencyStyle.border } : undefined}
+    >
       {/* Top row: avatar + name + action buttons */}
       <View className="flex-row items-center">
         {/* Avatar */}
@@ -219,17 +248,11 @@ export function ChoreRow({
             </Text>
           </View>
         )}
-        {isOverdue ? (
-          <View className="rounded-full bg-amber-100 px-2 py-0.5">
-            <Text className="text-xs font-heading-semi text-amber-700">
-              {overdueDays}d overdue
-            </Text>
-          </View>
-        ) : (
-          <Text className="font-sans text-metadata text-neutral-tertiary">
-            {formatDueDate(chore.next_due_at)}
+        <View className={`rounded-full px-2 py-0.5 ${urgencyStyle.pillBg}`}>
+          <Text className={`text-xs font-heading-semi ${urgencyStyle.pillText}`}>
+            {isOverdue ? `${overdueDays}d overdue` : formatDueDate(chore.next_due_at)}
           </Text>
-        )}
+        </View>
       </View>
 
       {isDisputed && (
