@@ -91,3 +91,10 @@ Create the client-side recipe import screen at `app/(app)/groceries/import-recip
 ## Expected Output
 
 - `app/(app)/groceries/import-recipe.tsx` — complete recipe import screen with two-mode input, Edge Function invocation, ingredient review with checkboxes, and bulk insert to grocery_items, ~250-350 lines
+
+## Observability Impact
+
+- **Phase state on screen**: The `ScreenPhase` state machine (`input` → `loading` → `error` | `review`) is directly visible in the rendered UI. Error phase displays the exact error message from the Edge Function (including its `phase` tag in the message text), making it inspectable without logs.
+- **Bulk insert failures**: Partial insert failures are surfaced via `Alert` with counts of succeeded/failed items. `Promise.allSettled` ensures no silent swallowing — every insert result is checked.
+- **Edge Function error propagation**: Both `supabase.functions.invoke` network errors and application-level `data.error` responses are captured and displayed. The error message preserves the original Edge Function text, so the `phase` tag from T01 flows through to the user.
+- **Inspection surface**: For debugging, check the Edge Function logs (Supabase dashboard → Functions → import-recipe) for server-side phase-tagged errors. Client-side, the error phase renders the exact message string. The `errorFromYoutube` flag controls whether the "paste manually" fallback hint appears.

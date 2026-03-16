@@ -86,3 +86,9 @@ Register the import-recipe screen in the app navigation and refactor the groceri
 
 - `app/(app)/_layout.tsx` — one new `Stack.Screen` entry added for `groceries/import-recipe`
 - `app/(app)/(tabs)/groceries.tsx` — standalone Scan Receipt button replaced with two-button action row
+
+## Observability Impact
+
+- **No new runtime signals.** This task is pure navigation wiring and UI layout — no async flows, API calls, or state machines.
+- **Inspection:** Both buttons can be verified visually on the groceries tab. The route registration can be confirmed by navigating to `/(app)/groceries/import-recipe` and seeing the "Shop by Recipe" header with "Groceries" back button.
+- **Failure visibility:** If the route is missing, Expo Router will throw a navigation error visible in the console. If the import-recipe screen file doesn't exist, the route will 404 at runtime.

@@ -422,15 +422,24 @@ export default function GroceriesScreen() {
         onSubmit={addItem}
       />
 
-      {/* Scan Receipt button */}
-      <View className="mx-4 mt-2 mb-1">
+      {/* Action buttons */}
+      <View className="mx-4 mt-2 mb-1 flex-row gap-2">
         <Pressable
-          className="flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2.5 active:bg-brand-light"
+          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2.5 active:bg-brand-light"
           onPress={() => router.push('/(app)/groceries/scan-receipt')}
         >
           <Ionicons name="camera-outline" size={18} color={colors.brand.DEFAULT} />
-          <Text className="ml-2 text-sm font-heading-semi text-brand">
+          <Text className="ml-1.5 text-sm font-heading-semi text-brand">
             Scan Receipt
+          </Text>
+        </Pressable>
+        <Pressable
+          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2.5 active:bg-brand-light"
+          onPress={() => router.push('/(app)/groceries/import-recipe')}
+        >
+          <Ionicons name="restaurant-outline" size={18} color={colors.brand.DEFAULT} />
+          <Text className="ml-1.5 text-sm font-heading-semi text-brand">
+            Shop by Recipe
           </Text>
         </Pressable>
       </View>
