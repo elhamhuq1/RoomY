@@ -74,6 +74,8 @@ export interface GroceryItem {
   is_checked: boolean;
   trip_id: string | null;
   archived_at: string | null;
+  unit_price: number | null;
+  source: string;
   created_by: string;
   created_at: string;
 }
@@ -206,13 +208,15 @@ export interface Database {
       };
       grocery_items: {
         Row: GroceryItem;
-        Insert: Omit<GroceryItem, "id" | "created_at" | "is_checked" | "trip_id" | "archived_at"> & {
+        Insert: Omit<GroceryItem, "id" | "created_at" | "is_checked" | "trip_id" | "archived_at" | "unit_price" | "source"> & {
           id?: string;
           created_at?: string;
           is_checked?: boolean;
           quantity?: number;
           trip_id?: string | null;
           archived_at?: string | null;
+          unit_price?: number | null;
+          source?: string;
         };
         Update: Partial<Omit<GroceryItem, "id">>;
       };
@@ -298,6 +302,17 @@ export interface Database {
           p_paid_by: string;
           p_split_user_ids: string[];
           p_created_by: string;
+        };
+        Returns: { trip_id: string; expense_id: string };
+      };
+      complete_grocery_trip_with_receipt: {
+        Args: {
+          p_household_id: string;
+          p_total_amount: number;
+          p_paid_by: string;
+          p_split_user_ids: string[];
+          p_created_by: string;
+          p_item_prices?: unknown;
         };
         Returns: { trip_id: string; expense_id: string };
       };

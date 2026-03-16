@@ -186,10 +186,18 @@ export default function TripHistoryScreen() {
                       <Text className="font-sans flex-1 text-sm text-gray-600">
                         {item.name}
                       </Text>
-                      {item.quantity > 1 && (
-                        <Text className="font-sans text-xs text-gray-400">
-                          x{item.quantity}
+                      {item.unit_price != null && item.unit_price > 0 ? (
+                        <Text className="font-sans text-xs text-gray-500">
+                          {item.quantity > 1
+                            ? `x${item.quantity} · ${formatCurrency(item.unit_price)} each`
+                            : formatCurrency(item.unit_price)}
                         </Text>
+                      ) : (
+                        item.quantity > 1 && (
+                          <Text className="font-sans text-xs text-gray-400">
+                            x{item.quantity}
+                          </Text>
+                        )
                       )}
                     </View>
                   ))}

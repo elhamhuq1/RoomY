@@ -13,10 +13,21 @@ import {
   Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/lib/types/database";
+
+type ReceiptItemData = {
+  name: string;
+  quantity: number;
+  price: number;
+};
+
+type ReceiptData = {
+  items: ReceiptItemData[];
+  total: number;
+};
 
 
 const formatCurrency = (amount: number): string =>
@@ -47,9 +58,11 @@ type SplitMode = 'even' | 'custom';
 export default function CompleteTripScreen() {
   const router = useRouter();
   const { user, household } = useSession();
+  const params = useLocalSearchParams<{ receiptItems?: string; receiptTotal?: string }>();
 
   const [amount, setAmount] = useState("");
   const [payerId, setPayerId] = useState<string | null>(null);
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
     new Set()
   );
@@ -121,6 +134,22 @@ export default function CompleteTripScreen() {
     fetchMembers();
     fetchCheckedCount();
   }, [fetchMembers, fetchCheckedCount]);
+
+  // Parse receipt data from route params (from scan-receipt screen)
+  useEffect(() => {
+    if (params.receiptItems && params.receiptTotal) {
+      try {
+        const items: ReceiptItemData[] = JSON.parse(params.receiptItems);
+        const total = parseFloat(params.receiptTotal);
+        if (Array.isArray(items) && items.length > 0 && !isNaN(total) && total > 0) {
+          setReceiptData({ items, total });
+          setAmount(total.toFixed(2));
+        }
+      } catch {
+        // Invalid receipt params — ignore silently, user can still enter manually
+      }
+    }
+  }, [params.receiptItems, params.receiptTotal]);
 
   const parsedAmount = parseFloat(amount);
   const isValidAmount = !isNaN(parsedAmount) && parsedAmount > 0;
@@ -225,17 +254,33 @@ export default function CompleteTripScreen() {
 
     try {
       if (splitMode === 'even') {
-        // Even mode: use existing RPC
-        const { error: rpcError } = await supabase.rpc("complete_grocery_trip", {
-          p_household_id: household.id,
-          p_total_amount: parsedAmount,
-          p_paid_by: payerId!,
-          p_split_user_ids: Array.from(selectedMemberIds),
-          p_created_by: user.id,
-        });
+        if (receiptData) {
+          // Even mode with receipt: use receipt-aware RPC
+          const { error: rpcError } = await supabase.rpc("complete_grocery_trip_with_receipt", {
+            p_household_id: household.id,
+            p_total_amount: parsedAmount,
+            p_paid_by: payerId!,
+            p_split_user_ids: Array.from(selectedMemberIds),
+            p_created_by: user.id,
+            p_item_prices: JSON.stringify(receiptData.items),
+          });
 
-        if (rpcError) {
-          throw new Error(rpcError.message);
+          if (rpcError) {
+            throw new Error(rpcError.message);
+          }
+        } else {
+          // Even mode without receipt: use existing RPC
+          const { error: rpcError } = await supabase.rpc("complete_grocery_trip", {
+            p_household_id: household.id,
+            p_total_amount: parsedAmount,
+            p_paid_by: payerId!,
+            p_split_user_ids: Array.from(selectedMemberIds),
+            p_created_by: user.id,
+          });
+
+          if (rpcError) {
+            throw new Error(rpcError.message);
+          }
         }
       } else {
         // Custom mode: client-side inserts
@@ -303,6 +348,18 @@ export default function CompleteTripScreen() {
         if (splitsError) {
           throw new Error(splitsError.message);
         }
+
+        // 5. Apply receipt item prices to archived grocery items (if receipt data present)
+        // Uses ilike for case-insensitive exact match (matches RPC's LOWER() approach)
+        if (receiptData) {
+          for (const receiptItem of receiptData.items) {
+            await supabase
+              .from("grocery_items")
+              .update({ unit_price: receiptItem.price, source: 'receipt' })
+              .eq("trip_id", trip.id)
+              .ilike("name", receiptItem.name);
+          }
+        }
       }
 
       // Success - go back to grocery list (realtime will clear archived items)
@@ -341,6 +398,34 @@ export default function CompleteTripScreen() {
             <Text className="ml-2 text-sm font-medium text-brand-dark">
               {checkedCount} item{checkedCount !== 1 ? "s" : ""} checked off
             </Text>
+          </View>
+        )}
+
+        {/* Scan Receipt button */}
+        <Pressable
+          className="mb-4 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-3 active:bg-brand-light"
+          onPress={() => router.push('/(app)/groceries/scan-receipt')}
+        >
+          <Ionicons name="camera-outline" size={20} color={colors.brand.DEFAULT} />
+          <Text className="ml-2 text-base font-heading-semi text-brand">
+            Scan Receipt
+          </Text>
+        </Pressable>
+
+        {/* Receipt summary card (when receipt data present) */}
+        {receiptData && (
+          <View className="mb-4 rounded-xl bg-green-50 px-4 py-3">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center">
+                <Text className="mr-2 text-lg">📋</Text>
+                <Text className="text-sm font-medium text-green-800">
+                  {receiptData.items.length} item{receiptData.items.length !== 1 ? 's' : ''} scanned
+                </Text>
+              </View>
+              <Text className="text-sm font-heading-semi text-green-800">
+                {formatCurrency(receiptData.total)}
+              </Text>
+            </View>
           </View>
         )}
 

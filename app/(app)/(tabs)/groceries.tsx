@@ -210,6 +210,8 @@ export default function GroceriesScreen() {
       is_checked: false,
       trip_id: null,
       archived_at: null,
+      unit_price: null,
+      source: 'manual',
       created_by: user.id,
       created_at: new Date().toISOString(),
     };

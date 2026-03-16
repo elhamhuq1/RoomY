@@ -93,6 +93,17 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="groceries/scan-receipt"
+        options={{
+          headerShown: true,
+          title: "Scan Receipt",
+          headerBackTitle: "Groceries",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
         name="groceries/complete-trip"
         options={{
           headerShown: true,
