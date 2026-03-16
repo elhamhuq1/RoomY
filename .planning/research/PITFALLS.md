@@ -354,17 +354,17 @@ Card redesign phase -- update Card component, then search all consumers for shad
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Avatar upload:** Verify the uploaded image displays correctly on ALL screens that show avatars (Home MembersCard, Expenses rows, Groceries item rows, Chores assignee, Settings members, WeeklyTimeline) -- not just the upload screen
-- [ ] **Avatar fallback:** Verify users WITHOUT a profile picture still show gradient initials (the fallback). Test by creating a new account and checking all avatar-displaying screens
-- [ ] **Avatar cache busting:** Upload a new photo, verify the old photo is NOT still showing on any screen. Test without killing the app
-- [ ] **Storage RLS:** Try uploading an avatar for a different user's path via the Supabase client -- verify it is rejected by RLS
-- [ ] **Google Sign-In in Expo Go:** Launch the app in Expo Go and verify it does not crash. Verify the Google button is either hidden or shows a graceful message
-- [ ] **Google Sign-In in dev build:** If testing in a development build, verify the full Google OAuth flow: button tap, Google account picker, redirect back, user session established, profile created/updated
-- [ ] **Palette grep:** Run `grep -r '#10B981\|#059669\|#D1FAE5' --include='*.tsx' --include='*.ts' app/ components/ lib/` -- zero results means the palette migration is complete
-- [ ] **Empty state distinction:** Navigate to each module with no data and verify the empty state displays. Then add one item and verify the empty state disappears and content renders
-- [ ] **Cream background seams:** Check the top of the screen (status bar area), bottom (home indicator area), tab bar background, and pull-to-refresh background all match the cream color
-- [ ] **Card outlines:** Verify NO card shows both an outline border AND a shadow. Cards should be flat with border only
-- [ ] **Android permissions:** On a physical Android device, test camera and gallery access for avatar upload. Verify permission prompt appears and denial is handled gracefully
+- [x] **Avatar upload:** Verify the uploaded image displays correctly on ALL screens that show avatars (Home MembersCard, Expenses rows, Groceries item rows, Chores assignee, Settings members, WeeklyTimeline) -- not just the upload screen
+- [x] **Avatar fallback:** Verify users WITHOUT a profile picture still show gradient initials (the fallback). Test by creating a new account and checking all avatar-displaying screens
+- [x] **Avatar cache busting:** Upload a new photo, verify the old photo is NOT still showing on any screen. Test without killing the app
+- [x] **Storage RLS:** Try uploading an avatar for a different user's path via the Supabase client -- verify it is rejected by RLS
+- [x] **Google Sign-In in Expo Go:** Launch the app in Expo Go and verify it does not crash. Verify the Google button is either hidden or shows a graceful message
+- [x] **Google Sign-In in dev build:** If testing in a development build, verify the full Google OAuth flow: button tap, Google account picker, redirect back, user session established, profile created/updated
+- [x] **Palette grep:** Run `grep -r '#10B981\|#059669\|#D1FAE5' --include='*.tsx' --include='*.ts' app/ components/ lib/` -- zero results means the palette migration is complete
+- [x] **Empty state distinction:** Navigate to each module with no data and verify the empty state displays. Then add one item and verify the empty state disappears and content renders
+- [x] **Cream background seams:** Check the top of the screen (status bar area), bottom (home indicator area), tab bar background, and pull-to-refresh background all match the cream color
+- [x] **Card outlines:** Verify NO card shows both an outline border AND a shadow. Cards should be flat with border only
+- [x] **Android permissions:** On a physical Android device, test camera and gallery access for avatar upload. Verify permission prompt appears and denial is handled gracefully
 
 ## Recovery Strategies
 

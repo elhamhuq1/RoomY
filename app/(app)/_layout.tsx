@@ -54,7 +54,6 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Settings",
-          headerBackTitle: "Back",
           headerTintColor: colors.neutral.text,
           headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
@@ -109,6 +108,17 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Shop by Recipe",
+          headerBackTitle: "Groceries",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="groceries/search-products"
+        options={{
+          headerShown: true,
+          title: "Search Products",
           headerBackTitle: "Groceries",
           headerTintColor: colors.neutral.text,
           headerStyle: { backgroundColor: colors.neutral.bg },

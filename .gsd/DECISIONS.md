@@ -100,3 +100,5 @@
 - "Client-side YouTube transcript extraction via innertube ANDROID client (v20.10.38) instead of server-side watch page parsing -- YouTube blocks cloud IPs with 429 and xowf parameter blocks caption URL responses. Innertube ANDROID API reliably returns working caption URLs from any IP. Matches youtube-transcript-api library approach"
 - "Edge Function text mode limit raised from 5K to 15K chars -- client-extracted YouTube transcripts can be up to 15K chars; manual paste limit enforced client-side at 5K"
 - "Added composite index idx_grocery_items_category on (household_id, category) to grocery_items -- supports efficient grouped queries for department-section rendering in T02"
+- "Store selection persisted at household level (kroger_location_id on household_settings) -- all roommates shop at the same store, consistent with existing household-scoped settings pattern"
+- "Product search as separate Stack screen rather than augmenting QuickAddInput -- search + results + add flow needs more space than inline input, and keeps concerns separated"

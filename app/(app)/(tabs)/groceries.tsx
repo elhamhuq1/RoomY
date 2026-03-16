@@ -475,21 +475,30 @@ export default function GroceriesScreen() {
       {/* Action buttons */}
       <View className="mx-4 mt-2 mb-1 flex-row gap-2">
         <Pressable
-          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2.5 active:bg-brand-light"
+          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2 px-1 active:bg-brand-light"
           onPress={() => router.push('/(app)/groceries/scan-receipt')}
         >
-          <Ionicons name="camera-outline" size={18} color={colors.brand.DEFAULT} />
-          <Text className="ml-1.5 text-sm font-heading-semi text-brand">
+          <Ionicons name="camera-outline" size={16} color={colors.brand.DEFAULT} />
+          <Text className="ml-1 text-xs font-heading-semi text-brand">
             Scan Receipt
           </Text>
         </Pressable>
         <Pressable
-          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2.5 active:bg-brand-light"
+          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2 px-1 active:bg-brand-light"
           onPress={() => router.push('/(app)/groceries/import-recipe')}
         >
-          <Ionicons name="restaurant-outline" size={18} color={colors.brand.DEFAULT} />
-          <Text className="ml-1.5 text-sm font-heading-semi text-brand">
-            Shop by Recipe
+          <Ionicons name="restaurant-outline" size={16} color={colors.brand.DEFAULT} />
+          <Text className="ml-1 text-xs font-heading-semi text-brand">
+            Shop Recipe
+          </Text>
+        </Pressable>
+        <Pressable
+          className="flex-1 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-2 px-1 active:bg-brand-light"
+          onPress={() => router.push('/(app)/groceries/search-products')}
+        >
+          <Ionicons name="search-outline" size={16} color={colors.brand.DEFAULT} />
+          <Text className="ml-1 text-xs font-heading-semi text-brand">
+            Search Products
           </Text>
         </Pressable>
       </View>

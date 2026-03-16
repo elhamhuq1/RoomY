@@ -34,12 +34,12 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 ### Active
 
 <!-- v1.2 Polish & Identity -->
-- [ ] Cream background throughout entire app (post-login + onboarding)
-- [ ] Card component → gray outline style (transparent bg, no shadow)
-- [ ] Green palette shift to dark wintergreen matching logo (~#2D6A4F)
-- [ ] Google OAuth sign-in
-- [ ] Empty state illustrations for all modules
-- [ ] Profile picture upload (camera + gallery) in settings and onboarding
+- [x] Cream background throughout entire app (post-login + onboarding)
+- [x] Card component → gray outline style (transparent bg, no shadow)
+- [x] Green palette shift to dark wintergreen matching logo (~#2D6A4F)
+- [x] Google OAuth sign-in
+- [x] Empty state illustrations for all modules
+- [x] Profile picture upload (camera + gallery) in settings and onboarding
 
 ## Current Milestone: v1.2 Polish & Identity
 

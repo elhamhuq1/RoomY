@@ -36,6 +36,8 @@ export interface HouseholdSettings {
   chores_enabled: boolean;
   updated_at: string;
   updated_by: string | null;
+  kroger_location_id: string | null;
+  kroger_location_name: string | null;
 }
 
 export interface Expense {
@@ -175,12 +177,14 @@ export interface Database {
         Row: HouseholdSettings;
         Insert: Omit<
           HouseholdSettings,
-          "expenses_enabled" | "groceries_enabled" | "chores_enabled" | "updated_at"
+          "expenses_enabled" | "groceries_enabled" | "chores_enabled" | "updated_at" | "kroger_location_id" | "kroger_location_name"
         > & {
           expenses_enabled?: boolean;
           groceries_enabled?: boolean;
           chores_enabled?: boolean;
           updated_at?: string;
+          kroger_location_id?: string | null;
+          kroger_location_name?: string | null;
         };
         Update: Partial<Omit<HouseholdSettings, "household_id">>;
       };
