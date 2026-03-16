@@ -112,3 +112,6 @@
 - "Room taxonomy as a fixed constant (chore-rooms.ts) with rooms table for household instances -- same pattern as grocery departments, templates map to room types"
 - "Nudge rate limiting enforced in RPC before insert (not DB unique constraint with time check) -- simpler to implement, easier to adjust window"
 - "S02/S03/S04 all depend only on S01 and can theoretically parallelize -- ordered S02→S03→S04 by user-visible impact"
+- "Chore SELECT RLS policy replaced with compound policy joining through rooms table for private room filtering -- non-private room chores visible to household, private room chores visible only to room creator"
+- "Default General room inserted per household using households.created_by as room creator -- avoids nullable created_by on system-generated rooms"
+- "chore_nudges rate-limit index on (chore_id, sender_id, created_at DESC) for efficient RPC-side rate limiting queries"
