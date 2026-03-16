@@ -59,3 +59,10 @@ Connect the scan-receipt output into the existing complete-trip screen: add a "S
 
 - `app/(app)/groceries/complete-trip.tsx` — updated with scan receipt button, receipt item handling, receipt-aware RPC call
 - `app/(app)/groceries/trip-history.tsx` — updated to display per-item prices in expanded trip view
+
+## Observability Impact
+
+- **Receipt data flow**: When `receiptData` is present on submit, the RPC `complete_grocery_trip_with_receipt` is called instead of `complete_grocery_trip`. Verify by querying `SELECT source, unit_price FROM grocery_items WHERE trip_id = '<trip_id>'` — items matched by receipt should show `source = 'receipt'` and non-null `unit_price`.
+- **Custom split + receipt**: In custom mode, receipt item prices are applied via individual UPDATE queries after trip creation. Check `grocery_items` rows for the trip to confirm `unit_price` and `source` were set.
+- **Trip history display**: Expanding a trip in history now shows per-item prices when `unit_price` is non-null. Items without receipt data show quantity only (no price), preserving backward compatibility.
+- **Failure visibility**: RPC errors surface via the existing error state on the complete-trip screen. Invalid receipt route params are silently ignored (user can still enter amount manually).

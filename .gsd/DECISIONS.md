@@ -81,3 +81,6 @@
 - "New RPC complete_grocery_trip_with_receipt instead of modifying existing complete_grocery_trip -- additive change avoids breaking existing non-receipt flow"
 - "Receipt capture sends base64 directly to Edge Function for OCR rather than uploading to Storage first -- avoids extra round-trip. Receipts Storage bucket is created in migration for future receipt history/re-scan capability but not used in the MVP scan flow"
 - "Scan-receipt is a separate Stack screen (not modal) -- needs full-screen space for item review/editing and consistent back navigation"
+- "Receipts bucket scoped to household_id/ prefix (not user_id/) -- receipts belong to household shopping trips, all household members should see them"
+- "RPC uses LOWER() equality match for receipt-item→grocery-item matching (not ILIKE with wildcards) -- avoids false positives like 'Milk' matching 'Buttermilk'"
+- "10MB file size limit on receipts bucket (vs 5MB avatars) -- receipt photos may need higher resolution for OCR readability"

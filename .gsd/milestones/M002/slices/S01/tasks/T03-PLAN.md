@@ -62,6 +62,13 @@ Create the client-side receipt capture flow: a `lib/receipt-capture.ts` utility 
 - Decision: "Receipt photos resized to 1200px width (not 512px like avatars) — OCR needs readable small text on receipts"
 - Decision: "Receipt scan always requires user review/confirmation before committing items"
 
+## Observability Impact
+
+- **Phase-based error display**: Edge Function errors include `phase` field (config/gemini-call/parse/request). The scan-receipt screen surfaces the `error` message from the response body, giving users actionable context.
+- **Camera permission denial**: Throws `CAMERA_PERMISSION_DENIED` — the screen catches this and shows a native alert directing the user to Settings. Matches existing avatar-upload pattern.
+- **Item validation on confirm**: Items with empty name or zero price are silently filtered before navigation. An alert fires if all items get filtered out.
+- **Inspection**: In Expo Go debug console, look for `supabase.functions.invoke` network calls. Response body contains `{ items, total }` on success or `{ error, phase }` on failure.
+
 ## Expected Output
 
 - `lib/receipt-capture.ts` — receipt image capture + resize utility

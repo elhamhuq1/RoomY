@@ -41,28 +41,28 @@
 
 ## Tasks
 
-- [ ] **T01: Add receipt schema migration, Storage bucket, and TypeScript types** `est:45m`
+- [x] **T01: Add receipt schema migration, Storage bucket, and TypeScript types** `est:45m`
   - Why: All downstream tasks depend on the `unit_price` and `source` columns on `grocery_items`, the `receipts` Storage bucket, and a new RPC that accepts per-item prices. This must land first.
   - Files: `supabase/migrations/00010_receipt_scanning.sql`, `lib/types/database.ts`
   - Do: Create migration adding `unit_price NUMERIC(10,2)` and `source TEXT DEFAULT 'manual'` to `grocery_items`. Create `receipts` Storage bucket with RLS policies (household members can upload/read, user-scoped paths). Create `complete_grocery_trip_with_receipt` RPC that accepts a `p_item_prices JSONB` parameter (array of `{name, quantity, price}`) — it does everything the existing RPC does plus updates archived items with `unit_price` and sets `source = 'receipt'`. Update TypeScript types for `GroceryItem` (add `unit_price`, `source`), update table operation types.
   - Verify: `npx tsc --noEmit` passes. Migration SQL is syntactically valid (`grep` for required columns, RPC signature, bucket creation, RLS policies).
   - Done when: Migration file exists with all schema changes, TypeScript types compile, new RPC signature accepts per-item prices.
 
-- [ ] **T02: Build scan-receipt Edge Function with Gemini Vision** `est:1h`
+- [x] **T02: Build scan-receipt Edge Function with Gemini Vision** `est:1h`
   - Why: This is the highest-risk item — proves Gemini Vision works from Deno Edge Functions and returns structured receipt data. Must be verified independently before building UI around it.
   - Files: `supabase/functions/scan-receipt/index.ts`
   - Do: Create Edge Function that receives `{ imageBase64: string, mimeType: string }` POST body, calls Gemini `generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent` with the image as inline data and a structured prompt requesting JSON output `{ items: [{ name, quantity, price }], total }`. Strip markdown code fences from Gemini response before parsing. Prompt must instruct Gemini to expand receipt abbreviations into human-readable names. Handle errors: missing/invalid API key → 500 with `{ error, phase: "config" }`, Gemini 429 → 429 with `{ error: "Rate limit exceeded...", phase: "gemini-call" }`, non-receipt image / parse failure → 400 with `{ error, phase: "parse" }`. Add CORS headers for Expo Go requests. Follow the `push-expense` Edge Function pattern for structure.
   - Verify: `npx tsc --noEmit` on the function file (Deno types). Curl test with a base64 receipt image returns valid structured JSON. Curl with a non-receipt image returns an error with `phase` field.
   - Done when: Edge Function file exists, compiles, handles happy path and 3 error cases (bad config, rate limit, bad image/parse failure).
 
-- [ ] **T03: Build receipt capture utility and scan-receipt review screen** `est:1h30m`
+- [x] **T03: Build receipt capture utility and scan-receipt review screen** `est:1h30m`
   - Why: Delivers GROC-01 (photograph receipt) and GROC-03 (review extracted items). The capture utility follows the avatar-upload.ts pattern but resizes to 1200px. The review screen shows extracted items with inline editing before confirmation.
   - Files: `lib/receipt-capture.ts`, `app/(app)/groceries/scan-receipt.tsx`, `app/(app)/_layout.tsx`
   - Do: Create `lib/receipt-capture.ts` — function `captureAndUploadReceipt(userId, householdId, source: 'camera'|'gallery')` that uses expo-image-picker → expo-image-manipulator (resize to 1200px width, JPEG 0.8) → upload to `receipts` bucket at `{householdId}/{timestamp}.jpeg` → return `{ storageUrl, base64 }`. Create `app/(app)/groceries/scan-receipt.tsx` — screen with: (1) capture button calling the utility, (2) loading state while Edge Function processes, (3) extracted items list with editable name/quantity/price fields, (4) computed total shown at top, (5) "Confirm" button that navigates back to complete-trip with items as route params. Register the screen in `app/(app)/_layout.tsx` with cream header styling.
   - Verify: `npx tsc --noEmit` passes. Screen renders in Expo Go — capture button opens camera, scan returns items, items are editable, confirm navigates back.
   - Done when: Receipt capture utility exists following avatar-upload pattern, scan-receipt screen shows extracted items with editing, screen is registered in the navigator.
 
-- [ ] **T04: Wire receipt items into complete-trip flow and update trip history** `est:1h`
+- [x] **T04: Wire receipt items into complete-trip flow and update trip history** `est:1h`
   - Why: Delivers GROC-04 (auto-populate total) and GROC-05 (per-item prices in history). Connects the scan-receipt screen output into the existing complete-trip flow and updates trip history to show itemized costs.
   - Files: `app/(app)/groceries/complete-trip.tsx`, `app/(app)/groceries/trip-history.tsx`
   - Do: Update `complete-trip.tsx` — add "Scan Receipt" button that navigates to `scan-receipt` screen. Read receipt items from route params on return. When receipt items are present: auto-populate the amount field with receipt total, show a receipt items summary section (item count + total), use the new `complete_grocery_trip_with_receipt` RPC passing `p_item_prices` JSONB. Update `trip-history.tsx` — in the expanded trip item list, show `unit_price` next to each item name when available (formatted as currency). Query `unit_price` in the items fetch.
