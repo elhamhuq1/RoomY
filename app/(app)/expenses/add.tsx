@@ -308,6 +308,7 @@ export default function AddExpenseScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={true}
       >
         {/* Description */}
         <Text className="mb-2 text-sm font-medium text-gray-500">

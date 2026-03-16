@@ -332,6 +332,7 @@ export default function CompleteTripScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={true}
       >
         {/* Summary */}
         {checkedCount > 0 && (
