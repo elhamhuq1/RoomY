@@ -80,7 +80,7 @@ This milestone is complete only when all are true:
 - [x] **S01: Schema Migration, Rooms Table & Private Room RLS** `risk:high` `depends:[]`
   > After this: migration runs cleanly — existing chores have room_id pointing to "General" and effort_points=1, private room chores are invisible to non-owners via psql RLS verification, new rooms/nudges tables exist with proper policies
 
-- [ ] **S02: Room-Based Chores Tab with Templates & Private Rooms** `risk:medium` `depends:[S01]`
+- [x] **S02: Room-Based Chores Tab with Templates & Private Rooms** `risk:medium` `depends:[S01]`
   > After this: chores tab shows collapsible room sections (reusing SectionHeader pattern), users can create chores with room assignment and effort picker, templates populate rooms with one tap, private rooms appear only for their creator — all visible in Expo Go
 
 - [ ] **S03: Effort-Weighted Dashboard, Leaderboard, Fairness & Badges** `risk:medium` `depends:[S01]`
