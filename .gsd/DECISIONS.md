@@ -128,3 +128,5 @@
 - "Chore action handlers (complete, claim, dispute, delete) extracted into useChoreActions hook shared by chores tab and My Day — prevents ~150 LOC duplication and keeps behavior in sync"
 - "My Day screen renders flat list without room grouping — room context is secondary for a personal daily view; main chores tab already provides room-based organization"
 - "My Day shows all due/overdue items with no cap — small households have few chores, capping would hide important overdue items (reaffirming earlier decision)"
+- "Nudge rate limiting in Edge Function (not RPC) — Edge Function already needs service-role access for cross-user push token + notification prefs queries, so rate-limit check + nudge insert + push send all happen in one place. One client round-trip, one place for all nudge logic"
+- "Session-level nudgedIds Set for immediate nudge button disable — client-side optimistic disable after successful nudge prevents rapid re-taps without querying server. Edge Function enforces actual 24h rate limit server-side"
