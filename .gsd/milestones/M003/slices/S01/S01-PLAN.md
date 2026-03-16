@@ -45,7 +45,7 @@
 
 ## Tasks
 
-- [ ] **T01: Database migration — rooms table, chore_nudges, alter chores, private room RLS, data migration** `est:1h`
+- [x] **T01: Database migration — rooms table, chore_nudges, alter chores, private room RLS, data migration** `est:1h`
   - Why: Every downstream slice depends on the rooms table, effort_points column, and room_id FK existing. The migration must create tables in correct order (rooms → alter chores → migrate data) within a single transaction to avoid FK failures. Private room RLS is the highest-risk item in the entire milestone — must be proven here.
   - Files: `supabase/migrations/20260316000016_chore_rooms.sql`
   - Do: (1) CREATE `rooms` table with id, household_id, name, room_type, is_private, created_by, created_at. (2) Enable RLS on rooms with policies: household members see non-private rooms; private rooms visible only to created_by; creators can insert rooms in their household; members can update/delete non-private rooms, creators can update/delete their private rooms. (3) CREATE `chore_nudges` table with id, chore_id, sender_id, recipient_id, created_at + RLS (household members via chores join). (4) INSERT a default "General" room (room_type='general', is_private=false) for every household that has at least one chore. (5) ALTER chores ADD room_id UUID REFERENCES rooms, ADD effort_points INT DEFAULT 1 CHECK (1-3). (6) UPDATE existing chores SET room_id to their household's "General" room. (7) ALTER chores ALTER room_id SET NOT NULL. (8) DROP the existing "Members can view chores" SELECT policy on chores. (9) CREATE new compound SELECT policy: household_id matches AND (room is NOT private OR room.created_by = auth.uid()). (10) Add index on rooms(household_id) and chores(room_id).
