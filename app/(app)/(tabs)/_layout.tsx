@@ -2,6 +2,7 @@ import { colors } from "@/lib/theme/colors";
 import { Tabs, usePathname, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, Pressable, View } from "react-native";
+import { Image } from "expo-image";
 import { useSession } from "@/lib/auth-context";
 import { FAB } from "@/components/ui/FAB";
 
@@ -43,6 +44,7 @@ export default function TabsLayout() {
           backgroundColor: colors.neutral.bg,
         },
         headerShadowVisible: false,
+        headerTitleAlign: 'left',
         headerTintColor: colors.neutral.text,
         headerRight: () => (
           <Pressable
@@ -104,7 +106,10 @@ export default function TabsLayout() {
           title: "Chores",
           href: choresEnabled ? "/(app)/(tabs)/chores" : null,
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'checkbox' : 'checkbox-outline'} size={size} color={color} />
+            <Image
+              source={require('@/assets/chores-tab-icon.png')}
+              style={{ width: size, height: size, tintColor: color }}
+            />
           ),
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>

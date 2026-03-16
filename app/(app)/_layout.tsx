@@ -54,6 +54,7 @@ export default function AppLayout() {
         options={{
           headerShown: true,
           title: "Settings",
+          headerBackTitle: "Back",
           headerTintColor: colors.neutral.text,
           headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,
@@ -208,6 +209,17 @@ export default function AppLayout() {
           headerShown: true,
           title: "Dispute",
           headerBackTitle: "Chores",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="settings/notifications"
+        options={{
+          headerShown: true,
+          title: "Notifications",
+          headerBackTitle: "Settings",
           headerTintColor: colors.neutral.text,
           headerStyle: { backgroundColor: colors.neutral.bg },
           headerShadowVisible: false,

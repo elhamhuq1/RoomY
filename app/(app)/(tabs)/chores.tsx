@@ -252,9 +252,9 @@ export default function ChoresScreen() {
     setLoading(false);
   }, [household?.id, user?.id]);
 
-  // Refetch on screen focus (cached - skips if data is < 30s old)
+  // Refetch on screen focus
   const { refresh: refreshChores } = useCachedFetch(fetchData, {
-    staleTime: 30_000,
+    staleTime: 0,
     deps: [household?.id, user?.id],
   });
 

@@ -18,8 +18,10 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import { ROOMS, ROOM_MAP } from "@/lib/constants/chore-rooms";
+import { Avatar } from "@/components/ui";
 import type { Profile, Room } from "@/lib/types/database";
 import type { RoomInfo } from "@/lib/constants/chore-rooms";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -30,6 +32,7 @@ const FREQUENCIES = [
   { value: "weekly", label: "Weekly" },
   { value: "monthly", label: "Monthly" },
   { value: "custom", label: "Custom" },
+  { value: "once", label: "One-time" },
 ] as const;
 
 const EFFORT_LEVELS = [
@@ -51,7 +54,7 @@ function getInitials(name: string): string {
 // Types
 // ---------------------------------------------------------------------------
 
-type Frequency = "daily" | "weekly" | "monthly" | "custom";
+type Frequency = "daily" | "weekly" | "monthly" | "custom" | "once";
 
 interface MemberItem {
   userId: string;
@@ -100,6 +103,14 @@ export default function AddChoreScreen() {
   const [newRoomType, setNewRoomType] = useState<string>("general");
   const [newRoomPrivate, setNewRoomPrivate] = useState(false);
   const [creatingRoom, setCreatingRoom] = useState(false);
+
+  // One-time date state
+  const [oneTimeDate, setOneTimeDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d;
+  });
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // -------------------------------------------------------------------------
   // Room ordering helper — match ROOMS constant order, unknowns at end
@@ -242,7 +253,9 @@ export default function AddChoreScreen() {
       return;
     }
 
-    const selectedMembers = members.filter((m) => m.selected);
+    const selectedMembers = isPrivateRoom
+      ? [{ userId: user.id }]
+      : members.filter((m) => m.selected);
     if (selectedMembers.length === 0) {
       Alert.alert(
         "Members required",
@@ -261,13 +274,18 @@ export default function AddChoreScreen() {
 
     const firstAssignee = shuffled[0];
 
-    // Compute first due date based on frequency (not "now" — avoids instant overdue)
-    const now = new Date();
-    const dueDate = new Date(now);
-    if (frequency === "daily") dueDate.setDate(dueDate.getDate() + 1);
-    else if (frequency === "weekly") dueDate.setDate(dueDate.getDate() + 7);
-    else if (frequency === "monthly") dueDate.setMonth(dueDate.getMonth() + 1);
-    else if (frequency === "custom") dueDate.setDate(dueDate.getDate() + (parseInt(customDays, 10) || 3));
+    // Compute first due date based on frequency
+    let dueDate: Date;
+    if (frequency === "once") {
+      dueDate = oneTimeDate;
+    } else {
+      const now = new Date();
+      dueDate = new Date(now);
+      if (frequency === "daily") dueDate.setDate(dueDate.getDate() + 1);
+      else if (frequency === "weekly") dueDate.setDate(dueDate.getDate() + 7);
+      else if (frequency === "monthly") dueDate.setMonth(dueDate.getMonth() + 1);
+      else if (frequency === "custom") dueDate.setDate(dueDate.getDate() + (parseInt(customDays, 10) || 3));
+    }
 
     setSubmitting(true);
     const { error } = await supabase
@@ -303,9 +321,11 @@ export default function AddChoreScreen() {
   // -------------------------------------------------------------------------
 
   const selectedCount = members.filter((m) => m.selected).length;
+  const selectedRoom = rooms.find((r) => r.id === selectedRoomId);
+  const isPrivateRoom = selectedRoom?.is_private === true;
   const canSubmit =
     name.trim().length > 0 &&
-    selectedCount > 0 &&
+    (isPrivateRoom || selectedCount > 0) &&
     selectedRoomId !== null &&
     !submitting;
 
@@ -335,7 +355,7 @@ export default function AddChoreScreen() {
             placeholderTextColor={colors.neutral.tertiary}
             value={name}
             onChangeText={setName}
-            autoFocus={!params.suggestedName}
+            autoFocus={false}
             returnKeyType="next"
           />
         </View>
@@ -408,11 +428,11 @@ export default function AddChoreScreen() {
           <Text className="mb-2 text-sm font-medium text-gray-500">
             Frequency
           </Text>
-          <View className="flex-row gap-2">
+          <View className="flex-row flex-wrap gap-2">
             {FREQUENCIES.map((f) => (
               <Pressable
                 key={f.value}
-                className={`flex-1 items-center rounded-xl py-2.5 ${
+                className={`items-center rounded-xl px-4 py-2.5 ${
                   frequency === f.value
                     ? "bg-brand"
                     : "bg-white border border-gray-200"
@@ -442,6 +462,37 @@ export default function AddChoreScreen() {
                 maxLength={3}
               />
               <Text className="font-sans text-sm text-gray-500">days</Text>
+            </View>
+          )}
+
+          {/* One-time date picker */}
+          {frequency === "once" && (
+            <View className="mt-3">
+              <Text className="font-sans mb-2 text-sm text-gray-500">Due date</Text>
+              <Pressable
+                className="flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3"
+                onPress={() => {
+                  // Use native date input on Android; on iOS show inline picker
+                  setShowDatePicker(true);
+                }}
+              >
+                <Ionicons name="calendar-outline" size={18} color={colors.neutral.tertiary} style={{ marginRight: 8 }} />
+                <Text className="font-sans text-base text-gray-800">
+                  {oneTimeDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                </Text>
+              </Pressable>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={oneTimeDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  minimumDate={new Date()}
+                  onChange={(_event: any, selectedDate?: Date) => {
+                    setShowDatePicker(Platform.OS === 'ios');
+                    if (selectedDate) setOneTimeDate(selectedDate);
+                  }}
+                />
+              )}
             </View>
           )}
         </View>
@@ -484,7 +535,8 @@ export default function AddChoreScreen() {
           </View>
         </View>
 
-        {/* Member selection */}
+        {/* Member selection — hidden for private rooms (owner-only) */}
+        {!isPrivateRoom && (
         <View className="mt-6 px-4">
           <Text className="mb-2 text-sm font-medium text-gray-500">
             Rotation Members ({selectedCount} selected)
@@ -507,18 +559,13 @@ export default function AddChoreScreen() {
                   onPress={() => toggleMember(member.userId)}
                 >
                   {/* Avatar */}
-                  <View
-                    className="mr-3 h-9 w-9 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor:
-                        AVATAR_COLORS[
-                          member.userId.charCodeAt(0) % AVATAR_COLORS.length
-                        ],
-                    }}
-                  >
-                    <Text className="text-xs font-heading text-white">
-                      {getInitials(member.profile.display_name)}
-                    </Text>
+                  <View className="mr-3">
+                    <Avatar
+                      name={member.profile.display_name}
+                      userId={member.userId}
+                      avatarUrl={member.profile.avatar_url}
+                      size="sm"
+                    />
                   </View>
 
                   {/* Name */}
@@ -538,6 +585,7 @@ export default function AddChoreScreen() {
             </View>
           )}
         </View>
+        )}
       </ScrollView>
 
       {/* Submit button */}
@@ -582,6 +630,10 @@ export default function AddChoreScreen() {
         animationType="slide"
         onRequestClose={() => setShowCreateRoom(false)}
       >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
         <Pressable
           className="flex-1 justify-end bg-black/40"
           onPress={() => setShowCreateRoom(false)}
@@ -610,7 +662,6 @@ export default function AddChoreScreen() {
                 placeholderTextColor={colors.neutral.tertiary}
                 value={newRoomName}
                 onChangeText={setNewRoomName}
-                autoFocus
               />
             </View>
 
@@ -701,6 +752,7 @@ export default function AddChoreScreen() {
             </View>
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </KeyboardAvoidingView>
   );

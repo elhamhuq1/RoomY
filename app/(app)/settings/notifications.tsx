@@ -4,10 +4,9 @@
 import { colors } from "@/lib/theme/colors";
 import { useEffect, useState } from "react";
 import { View, Text, Switch, ActivityIndicator } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useSession } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
-import { Stack } from "expo-router";
 
 export default function NotificationsSettingsScreen() {
   const { session } = useSession();
@@ -75,7 +74,6 @@ export default function NotificationsSettingsScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg">
-        <Stack.Screen options={{ headerShown: true, title: "Notifications" }} />
         <ActivityIndicator size="large" color={colors.brand.DEFAULT} />
       </View>
     );
@@ -83,14 +81,15 @@ export default function NotificationsSettingsScreen() {
 
   return (
     <View className="flex-1 bg-neutral-bg px-6 pt-6">
-      <Stack.Screen options={{ headerShown: true, title: "Notifications" }} />
-
       {/* Toggle card */}
       <View className="rounded-card bg-transparent border border-neutral-border">
         {/* Expenses toggle */}
         <View className="flex-row items-center border-b border-neutral-border px-5 py-4">
-          <View className="mr-4 h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
-            <Ionicons name="wallet-outline" size={22} color="#3b82f6" />
+          <View className="mr-4 h-10 w-10 items-center justify-center">
+            <Image
+              source={require('@/assets/expenses-icon.png')}
+              style={{ width: 28, height: 28 }}
+            />
           </View>
           <View className="flex-1">
             <Text className="text-base font-medium text-gray-800">
@@ -110,8 +109,11 @@ export default function NotificationsSettingsScreen() {
 
         {/* Chores toggle */}
         <View className="flex-row items-center px-5 py-4">
-          <View className="mr-4 h-10 w-10 items-center justify-center rounded-xl bg-green-50">
-            <Ionicons name="checkbox-outline" size={22} color="#22c55e" />
+          <View className="mr-4 h-10 w-10 items-center justify-center">
+            <Image
+              source={require('@/assets/chores-tab-icon.png')}
+              style={{ width: 28, height: 28 }}
+            />
           </View>
           <View className="flex-1">
             <Text className="text-base font-medium text-gray-800">Chores</Text>
