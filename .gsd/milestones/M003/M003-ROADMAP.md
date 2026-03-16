@@ -77,7 +77,7 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Schema Migration, Rooms Table & Private Room RLS** `risk:high` `depends:[]`
+- [x] **S01: Schema Migration, Rooms Table & Private Room RLS** `risk:high` `depends:[]`
   > After this: migration runs cleanly — existing chores have room_id pointing to "General" and effort_points=1, private room chores are invisible to non-owners via psql RLS verification, new rooms/nudges tables exist with proper policies
 
 - [ ] **S02: Room-Based Chores Tab with Templates & Private Rooms** `risk:medium` `depends:[S01]`

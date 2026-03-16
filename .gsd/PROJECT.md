@@ -46,6 +46,7 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 ### Active
 
 - Chore system overhaul: room-based organization, effort points, fairness analytics, smart daily lists, templates, nudging, leaderboard, badges (M003)
+  - S01 complete: rooms table, chore_nudges table, effort_points/room_id on chores, private room RLS, General room migration, types and constants
 
 ## Completed Milestones
 

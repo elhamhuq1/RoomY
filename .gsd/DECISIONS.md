@@ -115,3 +115,4 @@
 - "Chore SELECT RLS policy replaced with compound policy joining through rooms table for private room filtering -- non-private room chores visible to household, private room chores visible only to room creator"
 - "Default General room inserted per household using households.created_by as room creator -- avoids nullable created_by on system-generated rooms"
 - "chore_nudges rate-limit index on (chore_id, sender_id, created_at DESC) for efficient RPC-side rate limiting queries"
+- "ON DELETE SET NULL on chores.room_id FK — room deletion should reassign chores, not cascade-delete them. Note: this creates a tension with NOT NULL constraint; room deletion must reassign chores first"
