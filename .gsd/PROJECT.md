@@ -43,6 +43,9 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 - Receipt scanning with Gemini Vision OCR for grocery trip completion (M002/S01)
 - Receipt-based item ownership with per-member smart splitting (M002/S01b)
 - YouTube recipe import with ingredient extraction and grocery list addition (M002/S02)
+- Category & aisle organization with department-grouped grocery list (M002/S03)
+- Kroger product search with store selection and auto-categorized add-to-list (M002/S04)
+- Chore system overhaul: room-based organization, effort points, fairness analytics, smart daily lists, templates, nudging, leaderboard, badges (M003)
 
 ## Completed Milestones
 
