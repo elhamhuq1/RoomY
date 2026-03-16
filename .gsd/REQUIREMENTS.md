@@ -2,7 +2,99 @@
 
 ## Active
 
-(No active M002 requirements remaining — all validated by completed slices.)
+### CHORE-01 — Chores are organized by room with collapsible sections
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S02
+- Supporting Slices: S01
+
+### CHORE-02 — Users can create private rooms visible only to the room creator
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S02
+- Supporting Slices: S01
+
+### CHORE-03 — Private room chores are invisible to other household members at the database level (RLS)
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S01
+
+### CHORE-04 — Each chore has an effort_points value (1-3) reflecting difficulty
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S01
+- Supporting Slices: S02
+
+### CHORE-05 — Pre-built chore templates available per room with default effort values
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S02
+
+### CHORE-06 — "My Day" view shows personalized daily task list (due today + overdue)
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S04
+
+### CHORE-07 — Visual urgency indicators (green/yellow/red) on each chore based on due date
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S04
+
+### CHORE-08 — Weekly leaderboard ranked by effort points with leader highlighted
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+
+### CHORE-09 — Fairness score showing effort-weighted workload distribution per member
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+
+### CHORE-10 — Streak badges (7-day, 30-day, 60-day) for consistent chore completion
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+
+### CHORE-11 — Peer nudge sends push notification for overdue chores (rate limited: 1 per chore per 24h per sender)
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S05
+
+### CHORE-12 — Existing chores migrated to default "General" room with effort_points=1, preserving all history
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S01
+
+### CHORE-13 — Effort-weighted contribution dashboard replaces count-based dashboard
+
+- Status: active
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
 
 ## Validated
 
