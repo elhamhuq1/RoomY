@@ -55,7 +55,7 @@ This milestone is complete only when all are true:
   > After this: user photographs a grocery receipt, reviews extracted line items (name, qty, price) on-screen, confirms to auto-populate the trip total and complete the trip with per-item cost splitting visible in trip history
 - [x] **S01b: Receipt-Based Item Ownership & Smart Splitting** `risk:medium` `depends:[S01]`
   > After this: user scans receipt from main groceries page, assigns items to household members, completes trip with splits calculated from item ownership (with even-split fallback)
-- [ ] **S02: YouTube Recipe Import** `risk:medium` `depends:[S01]`
+- [x] **S02: YouTube Recipe Import** `risk:medium` `depends:[S01]`
   > After this: user pastes a YouTube recipe URL, sees extracted ingredients with selection checkboxes, adds chosen items to the shared grocery list with realtime sync to all roommates
 - [ ] **S03: Category & Aisle Organization** `risk:low` `depends:[]`
   > After this: grocery list displays items grouped by department (produce, dairy, frozen, etc.) with collapsible section headers; users can manually change any item's category via a quick picker

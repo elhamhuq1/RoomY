@@ -42,6 +42,7 @@ Roommates can see exactly who owes what and settle up with one tap — no awkwar
 
 - Receipt scanning with Gemini Vision OCR for grocery trip completion (M002/S01)
 - Receipt-based item ownership with per-member smart splitting (M002/S01b)
+- YouTube recipe import with ingredient extraction and grocery list addition (M002/S02)
 
 ## Completed Milestones
 

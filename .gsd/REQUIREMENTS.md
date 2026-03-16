@@ -37,27 +37,6 @@
 - Source: M002-CONTEXT
 - Primary Slice: S01
 
-### GROC-06 — User can paste a YouTube recipe URL to import ingredients
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S02
-
-### GROC-07 — Edge Function extracts ingredients from YouTube transcript via Gemini
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S02
-
-### GROC-08 — Extracted ingredients shown for selection before adding to grocery list
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S02
-
 ### GROC-09 — Imported items appear on all roommates' lists via existing realtime sync
 
 - Status: active
@@ -125,6 +104,30 @@
 - Primary Slice: S04
 
 ## Validated
+
+### GROC-06 — User can paste a YouTube recipe URL to import ingredients
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S02
+- Validated by: S02 — import-recipe screen with YouTube URL input tab, client-side transcript extraction via innertube API, tested with real cooking videos
+
+### GROC-07 — Edge Function extracts ingredients from YouTube transcript via Gemini
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S02
+- Validated by: S02 — deployed import-recipe Edge Function returns structured ingredients from text mode; client-side YouTube extraction + text mode pipeline tested end-to-end (Babish Pasta Aglio e Olio → 8 ingredients)
+
+### GROC-08 — Extracted ingredients shown for selection before adding to grocery list
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S02
+- Validated by: S02 — review phase with scrollable ingredient list, checkboxes (all checked by default), select all/deselect all toggle, selected count display
 
 ### EMPTY-01 — Expenses tab shows `expense-main-empty-state.png` illustration when no expenses exist
 
