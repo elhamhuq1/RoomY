@@ -72,7 +72,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ focused, color, size }) => (
             <Image
               source={require('@/assets/expenses-icon.png')}
-              style={{ width: size + 4, height: size + 4, tintColor: color }}
+              style={{ width: size + 8, height: size + 8, tintColor: color }}
             />
           ),
         }}
@@ -85,7 +85,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ focused, color, size }) => (
             <Image
               source={require('@/assets/groceries-tab-icon.png')}
-              style={{ width: size + 4, height: size + 4, tintColor: color }}
+              style={{ width: size + 8, height: size + 8, tintColor: color }}
             />
           ),
           headerRight: () => (
@@ -114,7 +114,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ focused, color, size }) => (
             <Image
               source={require('@/assets/chores-tab-icon.png')}
-              style={{ width: size + 4, height: size + 4, tintColor: color }}
+              style={{ width: size + 8, height: size + 8, tintColor: color }}
             />
           ),
           headerRight: () => (
