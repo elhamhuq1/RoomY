@@ -2,108 +2,138 @@
 
 ## Active
 
+## Validated
+
+### CHORE-01 — Chores are organized by room with collapsible sections
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S02
+- Supporting Slices: S01
+- Validated by: M003 — chores tab renders room-grouped collapsible sections using SectionHeader per room, orderedRoomIds derivation confirmed, tsc passes
+
+### CHORE-02 — Users can create private rooms visible only to the room creator
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S02
+- Supporting Slices: S01
+- Validated by: M003 — rooms table with is_private + RLS policy limiting private rooms to created_by; inline private room creation in add screen
+
+### CHORE-03 — Private room chores are invisible to other household members at the database level (RLS)
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S01
+- Validated by: M003 — compound chores SELECT policy with EXISTS subquery on rooms table; non-private OR created_by = auth.uid()
+
+### CHORE-04 — Each chore has an effort_points value (1-3) reflecting difficulty
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S01
+- Supporting Slices: S02
+- Validated by: M003 — effort_points INT (1-3) with CHECK constraint; effort picker on add screen; effort badge on ChoreRow
+
+### CHORE-05 — Pre-built chore templates available per room with default effort values
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S02
+- Validated by: M003 — room-based template cards in EmptyState, template modal with batch insert via .insert(array), auto room creation
+
+### CHORE-08 — Weekly leaderboard ranked by effort points with leader highlighted
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+- Validated by: M003 — dashboard sorts by effortPoints descending, progress bars proportional to max effort
+
+### CHORE-09 — Fairness score showing effort-weighted workload distribution per member
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+- Validated by: M003 — fairnessPercent computed as (member effort / total effort × 100) with division-by-zero guard
+
+### CHORE-10 — Streak badges (7-day, 30-day, 60-day) for consistent chore completion
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+- Validated by: M003 — tiered emoji badges at 7/30/60-day thresholds, shows highest achieved tier per member on dashboard
+
+### CHORE-12 — Existing chores migrated to default "General" room with effort_points=1, preserving all history
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S01
+- Validated by: M003 — migration creates General room per household, backfills existing chores, preserves completion history
+
+### CHORE-13 — Effort-weighted contribution dashboard replaces count-based dashboard
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S03
+- Validated by: M003 — dashboard end-to-end effort-weighted: ranking, progress bars, display values all use effortPoints
+
+### CHORE-11 — Peer nudge sends push notification for overdue chores (rate limited: 1 per chore per 24h per sender)
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S05
+- Validated by: S05 — push-chore-nudge Edge Function with 5-phase lifecycle (auth, validation, 24h rate limit, insert, Expo Push); client nudge button conditional on overdue + non-own chore; tsc passes
+
 ### GROC-01 — User can photograph a grocery receipt from the complete-trip screen
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — scan-receipt Edge Function + receipt capture UI with camera/gallery input
 
 ### GROC-02 — Receipt photo is processed by Edge Function via Gemini Vision OCR
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — deployed scan-receipt Edge Function processes base64 images via Gemini Vision REST API
 
 ### GROC-03 — Extracted line items (name, quantity, price) shown for review before confirming
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — scan-receipt screen shows editable extracted items before confirmation
 
 ### GROC-04 — Receipt total auto-populates the trip amount field
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
+- Validated by: S01 — extracted total flows to complete-trip screen
 
 ### GROC-05 — Per-item prices stored with trip for itemized cost visibility in history
 
-- Status: active
+- Status: validated
 - Class: core-capability
 - Source: M002-CONTEXT
 - Primary Slice: S01
-
-### GROC-09 — Imported items appear on all roommates' lists via existing realtime sync
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S02
-- Supporting Slices: S01 (establishes `source` column pattern)
-
-### GROC-10 — Grocery items have a category/department field
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-- Supporting Slices: S01 (migration may include column)
-
-### GROC-11 — Grocery list displays items grouped by department for efficient shopping
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-
-### GROC-12 — Items from recipe import and Kroger search are auto-categorized
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-- Supporting Slices: S02, S04
-
-### GROC-13 — Users can manually change an item's category
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S03
-
-### GROC-14 — User can search Kroger products when adding items to the list
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-### GROC-15 — Search results show product name, brand, price, size, and aisle location
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-### GROC-16 — Adding a Kroger product auto-assigns its category from Kroger's taxonomy
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-### GROC-17 — User can select a nearby Kroger-family store for location-specific results
-
-- Status: active
-- Class: core-capability
-- Source: M002-CONTEXT
-- Primary Slice: S04
-
-## Validated
+- Validated by: S01 — unit_price column on grocery_items, complete_grocery_trip_with_receipt RPC stores per-item prices
 
 ### GROC-06 — User can paste a YouTube recipe URL to import ingredients
 
@@ -128,6 +158,80 @@
 - Source: M002-CONTEXT
 - Primary Slice: S02
 - Validated by: S02 — review phase with scrollable ingredient list, checkboxes (all checked by default), select all/deselect all toggle, selected count display
+
+### GROC-09 — Imported items appear on all roommates' lists via existing realtime sync
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S02
+- Supporting Slices: S01 (establishes `source` column pattern)
+- Validated by: S02 — recipe ingredients inserted as grocery_items with source='recipe', flow through existing realtime subscription
+
+### GROC-10 — Grocery items have a category/department field
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Validated by: S03 — category TEXT column on grocery_items, department taxonomy constant shared between client and Edge Functions
+
+### GROC-11 — Grocery list displays items grouped by department for efficient shopping
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Validated by: S03 — groceries.tsx renders items in collapsible department sections with counts
+
+### GROC-12 — Items from recipe import and Kroger search are auto-categorized
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Supporting Slices: S02, S04
+- Validated by: S02 ingredients get category from Gemini extraction; S04 products get category from mapKrogerCategory mapping
+
+### GROC-13 — Users can manually change an item's category
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S03
+- Validated by: S03 — category picker component for manual category assignment/change on any item
+
+### GROC-14 — User can search Kroger products when adding items to the list
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — search-products Edge Function tested with real Kroger API; "Search Products" button on grocery tab navigates to search screen
+
+### GROC-15 — Search results show product name, brand, price, size, and aisle location
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — curl test confirmed all fields in API response; UI renders name, brand, price, promoPrice, size, aisle, department badge
+
+### GROC-16 — Adding a Kroger product auto-assigns its category from Kroger's taxonomy
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — mapKrogerCategory maps Kroger categories to app departments; insert sets category from mapped department
+
+### GROC-17 — User can select a nearby Kroger-family store for location-specific results
+
+- Status: validated
+- Class: core-capability
+- Source: M002-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — search-stores Edge Function tested with real zip code; store selection persists to household_settings
 
 ### EMPTY-01 — Expenses tab shows `expense-main-empty-state.png` illustration when no expenses exist
 
@@ -368,6 +472,22 @@
 - Source: inferred
 - Primary Slice: S13
 - Validated by: S13 Plan 02 — AvatarUpload handles permission denial with messaging
+
+### CHORE-06 — "My Day" view shows personalized daily task list (due today + overdue)
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — My Day screen filters to current_assignee + due/overdue, sorts overdue-first, all chore actions work via shared useChoreActions hook
+
+### CHORE-07 — Visual urgency indicators (green/yellow/red) on each chore based on due date
+
+- Status: validated
+- Class: core-capability
+- Source: M003-CONTEXT
+- Primary Slice: S04
+- Validated by: S04 — getUrgencyLevel helper computes green (2+ days), yellow (today/tomorrow), red (overdue); ChoreRow renders urgency-colored left borders and due-date pills; disputed rows retain precedence
 
 ## Deferred
 

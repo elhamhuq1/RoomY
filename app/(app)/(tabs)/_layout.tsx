@@ -109,6 +109,12 @@ export default function TabsLayout() {
           headerRight: () => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Pressable
+                onPress={() => router.push("/(app)/chores/my-day" as never)}
+                style={{ marginRight: 8 }}
+              >
+                <Ionicons name="sunny-outline" size={24} color={colors.neutral.tertiary} />
+              </Pressable>
+              <Pressable
                 onPress={() =>
                   Alert.alert(
                     "Chore Actions Guide",

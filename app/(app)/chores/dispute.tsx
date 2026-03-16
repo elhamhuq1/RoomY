@@ -126,6 +126,7 @@ export default function DisputeScreen() {
         dispute_reason: completion.dispute_reason,
         is_reverted: completion.is_reverted,
         reverted_at: completion.reverted_at,
+        effort_points: completion.effort_points ?? 1,
       },
       choreName: completion.chores?.name ?? "Unknown chore",
       completedByProfile,

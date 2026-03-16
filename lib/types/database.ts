@@ -105,6 +105,8 @@ export interface Chore {
   current_assignee: string | null;
   next_due_at: string;
   last_completed_at: string | null;
+  room_id: string;
+  effort_points: number;
   created_by: string;
   created_at: string;
   is_active: boolean;
@@ -121,6 +123,7 @@ export interface ChoreCompletion {
   dispute_reason: string | null;
   is_reverted: boolean;
   reverted_at: string | null;
+  effort_points: number;
 }
 
 export interface ChoreSwapRequest {
@@ -131,6 +134,24 @@ export interface ChoreSwapRequest {
   status: "pending" | "accepted" | "declined";
   created_at: string;
   resolved_at: string | null;
+}
+
+export interface Room {
+  id: string;
+  household_id: string;
+  name: string;
+  room_type: 'kitchen' | 'bathroom' | 'living_room' | 'bedroom' | 'laundry' | 'outdoor' | 'garage' | 'general';
+  is_private: boolean;
+  created_by: string;
+  created_at: string;
+}
+
+export interface ChoreNudge {
+  id: string;
+  chore_id: string;
+  sender_id: string;
+  recipient_id: string;
+  created_at: string;
 }
 
 export interface NotificationPreferences {
@@ -239,17 +260,19 @@ export interface Database {
       };
       chores: {
         Row: Chore;
-        Insert: Omit<Chore, "id" | "created_at" | "is_active" | "last_completed_at"> & {
+        Insert: Omit<Chore, "id" | "created_at" | "is_active" | "last_completed_at" | "room_id" | "effort_points"> & {
           id?: string;
           created_at?: string;
           is_active?: boolean;
           last_completed_at?: string | null;
+          room_id?: string;
+          effort_points?: number;
         };
         Update: Partial<Omit<Chore, "id">>;
       };
       chore_completions: {
         Row: ChoreCompletion;
-        Insert: Omit<ChoreCompletion, "id" | "completed_at" | "is_disputed" | "is_reverted"> & {
+        Insert: Omit<ChoreCompletion, "id" | "completed_at" | "is_disputed" | "is_reverted" | "effort_points"> & {
           id?: string;
           completed_at?: string;
           is_disputed?: boolean;
@@ -258,6 +281,7 @@ export interface Database {
           dispute_reason?: string | null;
           is_reverted?: boolean;
           reverted_at?: string | null;
+          effort_points?: number;
         };
         Update: Partial<Omit<ChoreCompletion, "id">>;
       };
@@ -270,6 +294,22 @@ export interface Database {
           resolved_at?: string | null;
         };
         Update: Partial<Omit<ChoreSwapRequest, "id">>;
+      };
+      rooms: {
+        Row: Room;
+        Insert: Omit<Room, "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<Omit<Room, "id">>;
+      };
+      chore_nudges: {
+        Row: ChoreNudge;
+        Insert: Omit<ChoreNudge, "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<Omit<ChoreNudge, "id">>;
       };
       notification_preferences: {
         Row: NotificationPreferences;
