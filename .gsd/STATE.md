@@ -1,7 +1,7 @@
 # GSD State
 
 **Active Milestone:** M003: Chore System Overhaul
-**Active Slice:** S01: Schema Migration, Rooms Table & Private Room RLS
+**Active Slice:** S03: Effort-Weighted Dashboard, Leaderboard, Fairness & Badges
 **Phase:** executing
 **Requirements Status:** 13 active · 47 validated · 1 deferred · 0 out of scope
 
@@ -11,12 +11,10 @@
 - 🔄 **M003:** Chore System Overhaul
 
 ## Recent Decisions
-- Chore SELECT RLS replaced with compound policy joining through rooms for private room filtering
-- Default General room uses households.created_by as room creator
-- chore_nudges rate-limit index on (chore_id, sender_id, created_at DESC)
+- None recorded
 
 ## Blockers
 - None
 
 ## Next Action
-Execute T01 (database migration).
+Execute T01: Migration & Types — effort_points on chore_completions + RPC update.
