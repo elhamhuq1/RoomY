@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useSession } from "@/lib/auth-context";
 import { useCachedFetch } from "@/lib/use-cached-fetch";
 import { supabase } from "@/lib/supabase";
@@ -71,6 +70,8 @@ interface MemberStats {
   displayName: string;
   avatarUrl: string | null;
   completionCount: number;
+  effortPoints: number;
+  fairnessPercent: number;
   streak: number;
 }
 
@@ -182,10 +183,17 @@ export default function DashboardScreen() {
         const displayName =
           profileMap[userId]?.display_name ?? "Unknown";
 
-        // Count completions in period
-        const completionCount = completions.filter(
+        // Completions in period for this user
+        const userCompletions = completions.filter(
           (c) => c.completed_by === userId
-        ).length;
+        );
+        const completionCount = userCompletions.length;
+
+        // Sum effort points (fallback 1 for rows without effort_points)
+        const effortPoints = userCompletions.reduce(
+          (sum, c) => sum + (c.effort_points ?? 1),
+          0
+        );
 
         // Calculate streak from all completions for this user
         const userAllCompletions = allCompletions
@@ -202,12 +210,23 @@ export default function DashboardScreen() {
           displayName,
           avatarUrl: profileMap[userId]?.avatar_url ?? null,
           completionCount,
+          effortPoints,
+          fairnessPercent: 0, // computed after loop
           streak,
         });
       }
 
-      // Sort by completion count (descending)
-      stats.sort((a, b) => b.completionCount - a.completionCount);
+      // Compute fairness percentages
+      const totalEffort = stats.reduce((sum, s) => sum + s.effortPoints, 0);
+      stats.forEach((s) => {
+        s.fairnessPercent =
+          totalEffort > 0
+            ? Math.round((s.effortPoints / totalEffort) * 100)
+            : 0;
+      });
+
+      // Sort by effort points (descending)
+      stats.sort((a, b) => b.effortPoints - a.effortPoints);
       setMemberStats(stats);
       setLoading(false);
     },
@@ -240,8 +259,8 @@ export default function DashboardScreen() {
   // Computed
   // -------------------------------------------------------------------------
 
-  const maxCompletions = Math.max(
-    ...memberStats.map((s) => s.completionCount),
+  const maxEffort = Math.max(
+    ...memberStats.map((s) => s.effortPoints),
     1
   );
   const periodLabel = period === "week" ? "week" : "month";
@@ -348,10 +367,22 @@ export default function DashboardScreen() {
             </Text>
             {memberStats.map((member) => {
               const barWidth =
-                maxCompletions > 0
-                  ? (member.completionCount / maxCompletions) * 100
+                maxEffort > 0
+                  ? (member.effortPoints / maxEffort) * 100
                   : 0;
               const isCurrentUser = member.userId === user?.id;
+
+              // Streak badge — show highest achieved tier
+              const streakBadge =
+                member.streak >= 60
+                  ? { emoji: "🏆", label: "60-day streak", color: "#EAB308" }
+                  : member.streak >= 30
+                    ? { emoji: "🥈", label: "30-day streak", color: "#94A3B8" }
+                    : member.streak >= 7
+                      ? { emoji: "⭐", label: "7-day streak", color: "#F97316" }
+                      : member.streak > 0
+                        ? { emoji: "🔥", label: `${member.streak} streak`, color: "#f97316" }
+                        : null;
 
               return (
                 <View
@@ -375,24 +406,31 @@ export default function DashboardScreen() {
                         {member.displayName}
                         {isCurrentUser ? " (you)" : ""}
                       </Text>
-                      {member.streak > 0 && (
+                      {member.streak > 0 && streakBadge && (
                         <View className="mt-0.5 flex-row items-center">
-                          <Ionicons
-                            name="flame-outline"
-                            size={14}
-                            color="#f97316"
-                          />
-                          <Text className="font-sans ml-1 text-xs text-orange-500">
-                            {member.streak} streak
+                          <Text style={{ fontSize: 12 }}>{streakBadge.emoji}</Text>
+                          <Text
+                            className="font-sans ml-1 text-xs"
+                            style={{ color: streakBadge.color }}
+                          >
+                            {streakBadge.label}
                           </Text>
                         </View>
                       )}
                     </View>
 
-                    {/* Completion count */}
-                    <Text className="text-2xl font-heading text-brand-dark">
-                      {member.completionCount}
-                    </Text>
+                    {/* Effort points + fairness */}
+                    <View className="items-end">
+                      <Text className="text-2xl font-heading text-brand-dark">
+                        {member.effortPoints}
+                      </Text>
+                      <Text className="font-sans text-xs text-gray-400">
+                        effort pts
+                      </Text>
+                      <Text className="font-sans mt-0.5 text-xs text-gray-500">
+                        {member.fairnessPercent}% of effort
+                      </Text>
+                    </View>
                   </View>
 
                   {/* Progress bar */}

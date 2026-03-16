@@ -96,3 +96,9 @@ Redesign the existing chore dashboard (`dashboard.tsx`, 413 LOC) to rank members
 ## Expected Output
 
 - `app/(app)/chores/dashboard.tsx` — modified: effort-weighted ranking, fairness %, streak badges. Same file, same overall structure, upgraded data and display layer.
+
+## Observability Impact
+
+- **Changed signals:** Member cards now display `effortPoints` (number), `fairnessPercent` (percentage), and streak badge tier instead of flat `completionCount`. If `NaN` or `undefined` appears in fairness %, the division-by-zero guard is broken or `effort_points` is missing from completions.
+- **Inspection:** Visually inspect member cards in Expo Go — each should show a numeric effort value, "effort pts" label, and "X% of effort" line. Streak badges should show emoji+label at the correct tier threshold.
+- **Failure state:** If all members show 0 effort pts and 0% fairness, the `effort_points` column likely doesn't exist or completions aren't being fetched. If bars are all zero-width but numbers are nonzero, `maxEffort` computation is wrong.

@@ -49,7 +49,7 @@
   - Verify: `npx tsc --noEmit` — zero new errors. SQL reviewed for signature match and correct column addition.
   - Done when: Migration file exists with correct SQL, ChoreCompletion has effort_points field, tsc passes.
 
-- [ ] **T02: Effort-Weighted Dashboard with Fairness & Streak Badges** `est:1h`
+- [x] **T02: Effort-Weighted Dashboard with Fairness & Streak Badges** `est:1h`
   - Why: Delivers CHORE-08 (leaderboard by effort), CHORE-09 (fairness %), CHORE-10 (streak badges), CHORE-13 (effort-weighted dashboard). Replaces count-based ranking with effort-weighted ranking.
   - Files: `app/(app)/chores/dashboard.tsx`
   - Do: Add `effortPoints: number` and `fairnessPercent: number` to `MemberStats` interface. In `fetchData`, sum `effort_points` from completions per member (`.reduce()`). Compute `totalEffort` across all members, then `fairnessPercent = totalEffort > 0 ? (memberEffort / totalEffort * 100) : 0`. Sort by `effortPoints` descending. Update progress bar width to use `effortPoints / maxEffort`. Replace count display with effort points. Add fairness % display on each member card. Add streak badge indicators: 🔥×7, 🔥×30, 🔥×60 based on streak thresholds — show the highest achieved badge. Keep period toggle, empty state, and overall layout intact. Streaks remain all-time (no period filter).
