@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { colors } from '@/lib/theme/colors';
 import { Avatar } from '@/components/ui/Avatar';
+import { DEPARTMENT_MAP } from '@/lib/constants/grocery-departments';
 import type { GroceryItem } from '@/lib/types/database';
 
 interface GroceryItemRowProps {
@@ -88,6 +89,27 @@ export function GroceryItemRow({
         >
           {item.name}
         </Text>
+
+        {/* Category badge — tap opens picker */}
+        {(() => {
+          const dept = DEPARTMENT_MAP[item.category || 'other'] ?? DEPARTMENT_MAP['other'];
+          return (
+            <Pressable
+              className="mx-1.5 flex-row items-center rounded-full border border-neutral-border bg-neutral-surface px-2 py-0.5"
+              onPress={onLongPress}
+              hitSlop={4}
+            >
+              <Ionicons
+                name={dept.icon as any}
+                size={11}
+                color={colors.neutral.secondary}
+              />
+              <Text className="ml-1 text-xs text-neutral-secondary">
+                {dept.label}
+              </Text>
+            </Pressable>
+          );
+        })()}
 
         {/* Quantity badge for checked items with qty > 1 */}
         {isChecked && item.quantity > 1 && (
