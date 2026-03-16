@@ -90,3 +90,6 @@
 - "By Item split mode tab conditionally rendered only when itemAssignments present -- avoids UI clutter for non-receipt trips"
 - "Ownership shares pre-computed client-side (useMemo) for display only; actual split calculation runs in server-side RPC to maintain single source of truth"
 - "Ownership mode member list is read-only (no checkboxes) -- user already made assignment decisions on the assign-items screen, no need to toggle here"
+- "Recipe import uses two input modes (YouTube URL and manual text paste) sharing the same Gemini extraction prompt and review UI -- manual text mode covers no-caption videos, non-YouTube sources, and serves as fallback when YouTube parsing breaks"
+- "Client-side sequential inserts via Promise.all for recipe ingredients (not batch RPC) -- consistent with existing addItem pattern, 10-15 items completes sub-second, realtime dedup already handles the cascade"
+- "Ingredient name stored as full description ('2 cups flour') in grocery_items.name field -- grocery list displays free-text names, quantity column stays 1 since the ingredient description already includes the recipe quantity"
