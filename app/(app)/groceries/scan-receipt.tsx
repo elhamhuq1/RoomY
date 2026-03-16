@@ -191,7 +191,7 @@ export default function ScanReceiptScreen() {
     }));
 
     router.navigate({
-      pathname: '/(app)/groceries/complete-trip',
+      pathname: '/(app)/groceries/assign-items',
       params: {
         receiptItems: JSON.stringify(serialized),
         receiptTotal: total.toFixed(2),

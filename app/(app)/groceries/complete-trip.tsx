@@ -1,6 +1,6 @@
 import { colors } from "@/lib/theme/colors";
 import { Avatar } from "@/components/ui/Avatar";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -53,16 +53,17 @@ type MemberWithProfile = {
   profile: Profile;
 };
 
-type SplitMode = 'even' | 'custom';
+type SplitMode = 'even' | 'custom' | 'ownership';
 
 export default function CompleteTripScreen() {
   const router = useRouter();
   const { user, household } = useSession();
-  const params = useLocalSearchParams<{ receiptItems?: string; receiptTotal?: string }>();
+  const params = useLocalSearchParams<{ receiptItems?: string; receiptTotal?: string; itemAssignments?: string }>();
 
   const [amount, setAmount] = useState("");
   const [payerId, setPayerId] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [itemAssignments, setItemAssignments] = useState<{ name: string; assigned_to: string }[]>([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
     new Set()
   );
@@ -151,6 +152,21 @@ export default function CompleteTripScreen() {
     }
   }, [params.receiptItems, params.receiptTotal]);
 
+  // Parse item assignments from route params (from assign-items screen)
+  useEffect(() => {
+    if (params.itemAssignments) {
+      try {
+        const parsed = JSON.parse(params.itemAssignments);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setItemAssignments(parsed);
+          setSplitMode('ownership');
+        }
+      } catch {
+        // Invalid — ignore, user can still do even/custom split
+      }
+    }
+  }, [params.itemAssignments]);
+
   const parsedAmount = parseFloat(amount);
   const isValidAmount = !isNaN(parsedAmount) && parsedAmount > 0;
   const selectedMembers = members.filter((m) =>
@@ -159,6 +175,37 @@ export default function CompleteTripScreen() {
   const splits = isValidAmount
     ? calculateEqualSplits(parsedAmount, selectedMembers.length)
     : [];
+
+  // Ownership mode: compute per-member shares from item assignments + receipt data
+  const ownershipShares = useMemo(() => {
+    if (splitMode !== 'ownership' || !receiptData || itemAssignments.length === 0) return {};
+
+    const shares: Record<string, number> = {};
+    let assignedTotal = 0;
+
+    // Sum assigned item prices per user
+    for (const assignment of itemAssignments) {
+      const item = receiptData.items.find(
+        (ri) => ri.name.toLowerCase() === assignment.name.toLowerCase()
+      );
+      if (item) {
+        const itemCost = item.price * item.quantity;
+        shares[assignment.assigned_to] = (shares[assignment.assigned_to] ?? 0) + itemCost;
+        assignedTotal += itemCost;
+      }
+    }
+
+    // Unassigned portion splits evenly across all selected members
+    const unassignedTotal = parsedAmount - assignedTotal;
+    if (unassignedTotal > 0 && selectedMembers.length > 0) {
+      const evenShare = Math.round((unassignedTotal / selectedMembers.length) * 100) / 100;
+      for (const m of selectedMembers) {
+        shares[m.user_id] = (shares[m.user_id] ?? 0) + evenShare;
+      }
+    }
+
+    return shares;
+  }, [splitMode, receiptData, itemAssignments, parsedAmount, selectedMembers]);
 
   // Custom mode validation
   const customTotal = splitMode === 'custom'
@@ -174,7 +221,8 @@ export default function CompleteTripScreen() {
   const canSubmit =
     isValidAmount &&
     payerId !== null &&
-    (splitMode === 'even' ? selectedMembers.length > 0 : selectedMembers.length > 0 && customSplitsValid) &&
+    selectedMembers.length > 0 &&
+    (splitMode === 'even' || splitMode === 'ownership' || customSplitsValid) &&
     !submitting;
 
   function handleAmountChange(text: string) {
@@ -220,6 +268,10 @@ export default function CompleteTripScreen() {
         });
         setCustomAmounts(amounts);
       }
+    } else if (mode === 'ownership') {
+      // Ownership mode — pre-computed from item assignments, no custom amounts needed
+      setCustomAmounts({});
+      setSelectedMemberIds(new Set(members.map((m) => m.user_id)));
     } else {
       // Switching back to even: clear custom amounts, select all members
       setCustomAmounts({});
@@ -253,9 +305,24 @@ export default function CompleteTripScreen() {
     setError(null);
 
     try {
-      if (splitMode === 'even') {
+      if (splitMode === 'ownership') {
+        // Ownership mode: use receipt-aware RPC with item assignments
+        const { error: rpcError } = await supabase.rpc("complete_grocery_trip_with_receipt", {
+          p_household_id: household.id,
+          p_total_amount: parsedAmount,
+          p_paid_by: payerId!,
+          p_split_user_ids: Array.from(selectedMemberIds),
+          p_created_by: user.id,
+          p_item_prices: receiptData ? JSON.stringify(receiptData.items) : null,
+          p_item_assignments: JSON.stringify(itemAssignments),
+        });
+
+        if (rpcError) {
+          throw new Error(rpcError.message);
+        }
+      } else if (splitMode === 'even') {
         if (receiptData) {
-          // Even mode with receipt: use receipt-aware RPC
+          // Even mode with receipt: use receipt-aware RPC (no assignments)
           const { error: rpcError } = await supabase.rpc("complete_grocery_trip_with_receipt", {
             p_household_id: household.id,
             p_total_amount: parsedAmount,
@@ -401,17 +468,6 @@ export default function CompleteTripScreen() {
           </View>
         )}
 
-        {/* Scan Receipt button */}
-        <Pressable
-          className="mb-4 flex-row items-center justify-center rounded-xl border-2 border-brand bg-white py-3 active:bg-brand-light"
-          onPress={() => router.push('/(app)/groceries/scan-receipt')}
-        >
-          <Ionicons name="camera-outline" size={20} color={colors.brand.DEFAULT} />
-          <Text className="ml-2 text-base font-heading-semi text-brand">
-            Scan Receipt
-          </Text>
-        </Pressable>
-
         {/* Receipt summary card (when receipt data present) */}
         {receiptData && (
           <View className="mb-4 rounded-xl bg-green-50 px-4 py-3">
@@ -426,6 +482,11 @@ export default function CompleteTripScreen() {
                 {formatCurrency(receiptData.total)}
               </Text>
             </View>
+            {itemAssignments.length > 0 && (
+              <Text className="mt-1 text-xs text-green-700">
+                {itemAssignments.length} item{itemAssignments.length !== 1 ? 's' : ''} assigned to members
+              </Text>
+            )}
           </View>
         )}
 
@@ -497,6 +558,18 @@ export default function CompleteTripScreen() {
 
         {/* Split mode toggle */}
         <View className="mb-3 flex-row rounded-full border border-gray-200 bg-white p-1">
+          {itemAssignments.length > 0 && (
+            <Pressable
+              className={`flex-1 items-center rounded-full py-2 ${
+                splitMode === 'ownership' ? 'bg-brand' : ''
+              }`}
+              onPress={() => handleSplitModeChange('ownership')}
+            >
+              <Text className={`font-sans text-sm ${
+                splitMode === 'ownership' ? 'font-medium text-white' : 'text-gray-600'
+              }`}>By Item</Text>
+            </Pressable>
+          )}
           <Pressable
             className={`flex-1 items-center rounded-full py-2 ${
               splitMode === 'even' ? 'bg-brand' : ''
@@ -521,6 +594,42 @@ export default function CompleteTripScreen() {
 
         <View className="mb-2 rounded-xl bg-white">
           {members.map((member, index) => {
+            if (splitMode === 'ownership') {
+              const share = ownershipShares[member.user_id] ?? 0;
+              return (
+                <View
+                  key={member.user_id}
+                  className={`flex-row items-center px-4 py-3 ${
+                    index < members.length - 1 ? "border-b border-gray-100" : ""
+                  }`}
+                >
+                  {/* Avatar */}
+                  <View className="mr-3">
+                    <Avatar
+                      userId={member.user_id}
+                      name={member.profile.display_name}
+                      size="md"
+                      avatarUrl={member.profile.avatar_url}
+                    />
+                  </View>
+
+                  {/* Name */}
+                  <Text className="font-sans flex-1 text-base text-gray-800">
+                    {member.user_id === user?.id
+                      ? "You"
+                      : member.profile.display_name}
+                  </Text>
+
+                  {/* Ownership share (read-only) */}
+                  {isValidAmount && (
+                    <Text className={`text-sm font-medium ${share > 0 ? 'text-brand-dark' : 'text-gray-400'}`}>
+                      {formatCurrency(share)}
+                    </Text>
+                  )}
+                </View>
+              );
+            }
+
             if (splitMode === 'even') {
               const isChecked = selectedMemberIds.has(member.user_id);
               const splitIndex = selectedMembers.findIndex(
@@ -653,6 +762,32 @@ export default function CompleteTripScreen() {
                 Over by: {formatCurrency(Math.abs(remaining))}
               </Text>
             )}
+          </View>
+        )}
+
+        {/* Ownership mode summary */}
+        {splitMode === 'ownership' && isValidAmount && (
+          <View className="mb-6 rounded-xl bg-green-50 px-4 py-3">
+            <View className="flex-row items-center justify-center mb-1">
+              <Ionicons name="people" size={16} color="#166534" />
+              <Text className="font-sans ml-1.5 text-sm font-medium text-green-800">
+                Split by item ownership
+              </Text>
+            </View>
+            {(() => {
+              const assignedCount = itemAssignments.length;
+              const totalItems = receiptData?.items.length ?? 0;
+              const sharedCount = totalItems - assignedCount;
+              return sharedCount > 0 ? (
+                <Text className="font-sans text-center text-xs text-green-700">
+                  {assignedCount} assigned · {sharedCount} shared (split evenly)
+                </Text>
+              ) : (
+                <Text className="font-sans text-center text-xs text-green-700">
+                  All {assignedCount} items assigned
+                </Text>
+              );
+            })()}
           </View>
         )}
 
