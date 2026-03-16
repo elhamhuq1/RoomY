@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 Phase: 13 of 14 — Profile Pictures
 Plan: 3 of 3 complete
 Status: Phase 13 Complete
-Last activity: 2026-03-15 — Quick task 10: Add member selection checkboxes to custom split mode
+Last activity: 2026-03-15 — Quick task 11: Fix keyboard hiding custom split amount inputs
 
 Progress: v1.0 (18 plans) + v1.1 (17 plans) + v1.2 (3/3 Phase 11 + 3/3 Phase 13) = 41 plans shipped
 
@@ -104,6 +104,7 @@ None yet.
 | 8 | Fix profile pictures not showing in Add Expense and Complete Trip | 2026-03-15 | 6690195 | [7-fix-profile-pictures-not-showing-in-add-](./quick/7-fix-profile-pictures-not-showing-in-add-/) |
 | 9 | Add Even/Custom split toggle to expense and grocery trip screens | 2026-03-15 | 9bdf640 | [8-add-toggle-for-even-vs-custom-split-in-e](./quick/8-add-toggle-for-even-vs-custom-split-in-e/) |
 | 10 | Add member selection checkboxes to custom split mode | 2026-03-15 | a499fe9 | [9-add-member-selection-checkboxes-to-custo](./quick/9-add-member-selection-checkboxes-to-custo/) |
+| 11 | Fix keyboard hiding custom split amount inputs | 2026-03-15 | 65f2631 | [10-fix-keyboard-hiding-custom-split-amount-](./quick/10-fix-keyboard-hiding-custom-split-amount-/) |
 
 ### Blockers/Concerns
 
@@ -112,5 +113,5 @@ None — clean slate for next milestone.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed quick task 10 (Member selection checkboxes in custom split mode)
+Stopped at: Completed quick task 11 (Fix keyboard hiding custom split amount inputs)
 Resume file: None
