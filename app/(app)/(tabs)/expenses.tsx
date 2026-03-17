@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -309,6 +309,36 @@ export default function ExpensesScreen() {
     staleTime: 30_000,
     deps: [household?.id],
   });
+
+  // -------------------------------------------------------------------------
+  // Realtime subscription for expenses table
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!household?.id) return;
+
+    const channel = supabase
+      .channel(`expenses:${household.id}`)
+      .on(
+        "postgres_changes" as any,
+        {
+          event: "*",
+          schema: "public",
+          table: "expenses",
+          filter: `household_id=eq.${household.id}`,
+        },
+        () => {
+          // Refetch all data on any expense change — expenses have profile
+          // lookups and balance recalculations that are easier to refetch
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [household?.id, fetchData]);
 
   // ---------- Inline expand for expense splits ----------
 

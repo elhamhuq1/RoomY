@@ -5,7 +5,7 @@ export function EmptyState() {
   return (
     <View className="flex-1 items-center justify-center px-8">
       <Image
-        source={require('@/docs/empty-state-images/grocery-empty-list.png')}
+        source={require('@/assets/empty-states/grocery-empty-list.png')}
         style={{ width: 140, height: 140, marginBottom: 24 }}
         resizeMode="contain"
       />

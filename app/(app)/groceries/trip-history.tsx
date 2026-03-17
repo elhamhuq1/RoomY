@@ -116,7 +116,7 @@ export default function TripHistoryScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
         <Image
-          source={require('@/docs/empty-state-images/grocery-trip-history.png')}
+          source={require('@/assets/empty-states/grocery-trip-history.png')}
           style={{ width: 140, height: 140, marginBottom: 24 }}
           resizeMode="contain"
         />

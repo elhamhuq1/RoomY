@@ -75,7 +75,7 @@ export function WeeklyTimeline({ chores, selectedDate }: WeeklyTimelineProps) {
       {!hasWeekItems ? (
         <View className="items-center py-6">
           <Image
-            source={require('@/docs/empty-state-images/chore-main-empty-state.png')}
+            source={require('@/assets/empty-states/chore-main-empty-state.png')}
             style={{ width: 140, height: 140 }}
             resizeMode="contain"
           />

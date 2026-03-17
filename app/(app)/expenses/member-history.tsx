@@ -310,7 +310,7 @@ export default function MemberHistoryScreen() {
         {groupedHistory.length === 0 ? (
           <View className="items-center justify-center py-20">
             <Image
-              source={require('@/docs/empty-state-images/expense-member-history.png')}
+              source={require('@/assets/empty-states/expense-member-history.png')}
               style={{ width: 140, height: 140, marginBottom: 16 }}
               resizeMode="contain"
             />

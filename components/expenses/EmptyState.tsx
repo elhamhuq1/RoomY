@@ -11,7 +11,7 @@ export function EmptyState({ onAddExpense }: EmptyStateProps) {
   return (
     <Card className="items-center py-8">
       <Image
-        source={require('@/docs/empty-state-images/expense-main-empty-state.png')}
+        source={require('@/assets/empty-states/expense-main-empty-state.png')}
         style={{ width: 140, height: 140, marginBottom: 16 }}
         resizeMode="contain"
       />

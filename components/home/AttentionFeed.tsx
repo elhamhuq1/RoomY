@@ -121,7 +121,7 @@ export function AttentionFeed(props: AttentionFeedProps) {
       {isEmpty ? (
         <View className="items-center py-6">
           <Image
-            source={require('@/docs/empty-state-images/attention-feed-all-caught-up.png')}
+            source={require('@/assets/empty-states/attention-feed-all-caught-up.png')}
             style={{ width: 140, height: 140 }}
             resizeMode="contain"
           />

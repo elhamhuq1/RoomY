@@ -256,7 +256,7 @@ export default function MyDayScreen() {
       >
         <View className="items-center px-8">
           <Image
-            source={require('@/docs/empty-state-images/attention-feed-all-caught-up.png')}
+            source={require('@/assets/empty-states/attention-feed-all-caught-up.png')}
             style={{ width: 140, height: 140, marginBottom: 16 }}
             contentFit="contain"
           />

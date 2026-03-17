@@ -346,7 +346,7 @@ export default function DashboardScreen() {
         {totalCompletions === 0 && (
           <View className="mx-4 mt-8 items-center rounded-card bg-transparent border border-neutral-border px-6 py-8">
             <Image
-              source={require('@/docs/empty-state-images/chore-dashboard-stats.png')}
+              source={require('@/assets/empty-states/chore-dashboard-stats.png')}
               style={{ width: 140, height: 140, marginBottom: 12 }}
               resizeMode="contain"
             />

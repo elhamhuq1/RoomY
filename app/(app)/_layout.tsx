@@ -225,6 +225,17 @@ export default function AppLayout() {
           headerShadowVisible: false,
         }}
       />
+      <Stack.Screen
+        name="settings/feedback"
+        options={{
+          headerShown: true,
+          title: "Feedback",
+          headerBackTitle: "Settings",
+          headerTintColor: colors.neutral.text,
+          headerStyle: { backgroundColor: colors.neutral.bg },
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }

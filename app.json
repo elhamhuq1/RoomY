@@ -14,7 +14,11 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.roomy.app"
+      "bundleIdentifier": "com.roomy.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "RoomY needs camera access to take profile photos and scan grocery receipts.",
+        "NSPhotoLibraryUsageDescription": "RoomY needs photo library access to set your profile picture and scan receipts."
+      }
     },
     "android": {
       "package": "com.roomy.app",
@@ -32,7 +36,15 @@
       "expo-router",
       "expo-sqlite",
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-mail-composer",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "RoomY needs photo library access to set your profile picture and scan receipts.",
+          "cameraPermission": "RoomY needs camera access to take profile photos and scan grocery receipts."
+        }
+      ]
     ]
   }
 }

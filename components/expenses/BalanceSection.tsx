@@ -37,7 +37,7 @@ export function BalanceSection({
       {visibleBalances.length === 0 ? (
         <View className="items-center py-6">
           <Image
-            source={require('@/docs/empty-state-images/balance-all-settled.png')}
+            source={require('@/assets/empty-states/balance-all-settled.png')}
             style={{ width: 140, height: 140 }}
             resizeMode="contain"
           />

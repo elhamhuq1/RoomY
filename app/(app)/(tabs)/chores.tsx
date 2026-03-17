@@ -1,5 +1,5 @@
 import { colors } from "@/lib/theme/colors";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -257,6 +257,49 @@ export default function ChoresScreen() {
     staleTime: 0,
     deps: [household?.id, user?.id],
   });
+
+  // -------------------------------------------------------------------------
+  // Realtime subscription for chores table
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!household?.id) return;
+
+    const channel = supabase
+      .channel(`chores:${household.id}`)
+      .on(
+        "postgres_changes" as any,
+        {
+          event: "*",
+          schema: "public",
+          table: "chores",
+          filter: `household_id=eq.${household.id}`,
+        },
+        (payload: any) => {
+          if (payload.eventType === "INSERT") {
+            const newChore = payload.new as Chore;
+            setChores((prev) => {
+              if (prev.some((c) => c.id === newChore.id)) return prev;
+              return [...prev, newChore];
+            });
+          } else if (payload.eventType === "UPDATE") {
+            const updated = payload.new as Chore;
+            setChores((prev) =>
+              prev.map((c) => (c.id === updated.id ? updated : c))
+            );
+          } else if (payload.eventType === "DELETE") {
+            setChores((prev) =>
+              prev.filter((c) => c.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [household?.id]);
 
   // -------------------------------------------------------------------------
   // Actions (shared hook + local-only handlers)

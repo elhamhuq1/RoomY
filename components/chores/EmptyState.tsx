@@ -23,7 +23,7 @@ export function EmptyState({ onSelectRoom, onCreateCustom }: EmptyStateProps) {
       {/* Illustration + messaging */}
       <View className="items-center px-8 pt-12">
         <Image
-          source={require('@/docs/empty-state-images/chore-main-empty-state.png')}
+          source={require('@/assets/empty-states/chore-main-empty-state.png')}
           style={{ width: 140, height: 140, marginBottom: 16 }}
           resizeMode="contain"
         />

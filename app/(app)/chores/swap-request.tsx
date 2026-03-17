@@ -220,7 +220,7 @@ export default function SwapRequestScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-bg px-8">
         <Image
-          source={require('@/docs/empty-state-images/chore-swap-request.png')}
+          source={require('@/assets/empty-states/chore-swap-request.png')}
           style={{ width: 140, height: 140, marginBottom: 16 }}
           resizeMode="contain"
         />

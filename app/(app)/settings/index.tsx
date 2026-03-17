@@ -58,6 +58,13 @@ export default function SettingsScreen() {
       route: "/(app)/settings/notifications",
     },
     {
+      key: "feedback",
+      title: "Feedback",
+      subtitle: "Report a bug or suggest a feature",
+      icon: "chatbubble-ellipses-outline",
+      route: "/(app)/settings/feedback",
+    },
+    {
       key: "signout",
       title: "Sign Out",
       subtitle: "",
