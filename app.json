@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.roomy.app",
+      "bundleIdentifier": "com.elhamhuq.roomy",
       "infoPlist": {
         "NSCameraUsageDescription": "RoomY needs camera access to take profile photos and scan grocery receipts.",
         "NSPhotoLibraryUsageDescription": "RoomY needs photo library access to set your profile picture and scan receipts."
       }
     },
     "android": {
-      "package": "com.roomy.app",
+      "package": "com.elhamhuq.roomy",
       "adaptiveIcon": {
         "backgroundColor": "#F5F0EB",
         "foregroundImage": "./assets/android-icon-foreground.png",
